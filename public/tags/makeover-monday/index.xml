@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>makeover-monday on ravic_</title>
+    <link>/tags/makeover-monday/</link>
+    <description>Recent content in makeover-monday on ravic_</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>Copyright (c) 2020 Ravi Chandrasekaran</copyright>
+    <lastBuildDate>Mon, 20 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/makeover-monday/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Makeover: Sugar consumption</title>
+      <link>/post/makeover-sugar-consumption/</link>
+      <pubDate>Mon, 20 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/makeover-sugar-consumption/</guid>
+      <description>Original visualization  Source Article: BBC Data source: British Nutrition Foundation Additional: NHS guidelines   Critique What works with this chart?
+The headline is attention-grabbing. Triple the recommendation?!? How is that possible?  What doesn’t work with this chart?
+Age breakdown gets a lot of attention (17 groups!). But the message I pull down is that free sugar consumption is well above target for all ages. There are other ways to make it personally relevant.</description>
+    </item>
+    
+  </channel>
+</rss>

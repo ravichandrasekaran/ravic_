@@ -2,7 +2,7 @@
 <html class="no-js" lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>Development | ravic_</title>
+    <title>makeover-monday | ravic_</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -63,10 +63,10 @@
   <div class="column small-12">
     
     
-    <h2><a href="/post/extra-point-vs-two-point-conversion/">Extra point vs. two-point conversion</a></h2>
+    <h2><a href="/post/hugoisforlovers/">Getting Started with Hugo</a></h2>
 <div class="post-metadata">
   <span class="post-date">
-    <time datetime="2020-01-20 00:00:00 &#43;0000 UTC" itemprop="datePublished">20 January 2020</time>
+    <time datetime="2014-04-02 00:00:00 &#43;0000 UTC" itemprop="datePublished">2 April 2014</time>
   </span>
   
   
@@ -74,7 +74,13 @@
   <span class="post-tags">
     <span class="nowrap"><i class="fa fa-tags"></i>
     
-    <a class="post-tag" href="/tags/riddler">riddler</a>
+    <a class="post-tag" href="/tags/go">go</a>,</span> 
+    
+    <a class="post-tag" href="/tags/golang">golang</a>, 
+    
+    <a class="post-tag" href="/tags/hugo">hugo</a>, 
+    
+    <a class="post-tag" href="/tags/development">development</a>
     
   </span>
   
@@ -82,54 +88,29 @@
 </div>
 
 
-From the Riddler, a proposal for a new-and-improved post-touchdown extra-point system.
-The defense Simple strategies One simple, uniformed strategy the defense could employ would be to simply defend against the 2-point conversion all the time. What would the offense’s expected score be?
-\[ \begin{aligned} E[S_{CONV}] &amp; = p_{XP} \cdot (1.0) + 2 \cdot (1 - p_{XP}) \cdot (0.4) \\ &amp; = (0.2) \cdot p_{XP} + 0.8 \\ \end{aligned} \]
-<p class="text-right"><a href="/post/extra-point-vs-two-point-conversion/">Read More…</a></p>
+Step 1. Install Hugo Goto hugo releases and download the appropriate version for your os and architecture.
+Save it somewhere specific as we will be using it in the next step.
+More complete instructions are available at installing hugo
+Step 2. Build the Docs Hugo has its own example site which happens to also be the documentation site you are reading right now.
+Follow the following steps:
+ Clone the hugo repository Go into the repo Run hugo in server mode and build the docs Open your browser to http://localhost:1313  Corresponding pseudo commands:
+<p class="text-right"><a href="/post/hugoisforlovers/">Read More…</a></p>
 	
 
     
-    <h2><a href="/post/makeover-sugar-consumption/">Makeover: Sugar consumption</a></h2>
+    <h2><a href="/post/migrate-from-jekyll/">Migrate to Hugo from Jekyll</a></h2>
 <div class="post-metadata">
   <span class="post-date">
-    <time datetime="2020-01-20 00:00:00 &#43;0000 UTC" itemprop="datePublished">20 January 2020</time>
+    <time datetime="2014-03-10 00:00:00 &#43;0000 UTC" itemprop="datePublished">10 March 2014</time>
   </span>
-  
-  
-  
-  <span class="post-tags">
-    <span class="nowrap"><i class="fa fa-tags"></i>
-    
-    <a class="post-tag" href="/tags/makeover-monday">makeover-monday</a>
-    
-  </span>
-  
   
 </div>
 
 
-Original visualization  Source Article: BBC Data source: British Nutrition Foundation Additional: NHS guidelines   Critique What works with this chart?
-The headline is attention-grabbing. Triple the recommendation?!? How is that possible?  What doesn’t work with this chart?
-Age breakdown gets a lot of attention (17 groups!). But the message I pull down is that free sugar consumption is well above target for all ages. There are other ways to make it personally relevant.
-<p class="text-right"><a href="/post/makeover-sugar-consumption/">Read More…</a></p>
-	
-
-    
-    <h2><a href="/post/writing-markdown-latex/">Writing content with Markdown, LaTeX, and Shortcodes</a></h2>
-<div class="post-metadata">
-  <span class="post-date">
-    <time datetime="2016-04-20 10:00:00 &#43;0000 UTC" itemprop="datePublished">20 April 2016</time>
-  </span>
-  
-  
-  
-  
-</div>
-
-
-Content can be written using Markdown, LaTeX math, and Hugo Shortcodes. Additionally, HTML may be used for advanced formatting.
-Sub-headings ## H2 ### H3 #### H4 ##### H5 ###### H6  Emphasis Italics with *asterisks* or _underscores_. Bold with **asterisks** or __underscores__. Combined emphasis with **asterisks and _underscores_**. Strikethrough with ~~two tildes~~.  Ordered lists 1. First item 2. Another item  Unordered lists * First item * Another item  Images Images may be added to a page by placing them in your static/img/ folder and referencing them using one of the following two notations:
-<p class="text-right"><a href="/post/writing-markdown-latex/">Read More…</a></p>
+Move static content to static Jekyll has a rule that any directory not starting with _ will be copied as-is to the _site output. Hugo keeps all static content under static. You should therefore move it all there. With Jekyll, something that looked like
+▾ &lt;root&gt;/ ▾ images/ logo.png  should become
+▾ &lt;root&gt;/ ▾ static/ ▾ images/ logo.png  Additionally, you&rsquo;ll want any files that should reside at the root (such as CNAME) to be moved to static.
+<p class="text-right"><a href="/post/migrate-from-jekyll/">Read More…</a></p>
 	
 
     
@@ -137,9 +118,9 @@ Sub-headings ## H2 ### H3 #### H4 ##### H5 ###### H6  Emphasis Italics with *ast
   <div class="column small-12">
     <ul class="pagination" role="navigation" aria-label="Pagination">
       
-      <li class="arrow" aria-disabled="true"><a href="/categories/development/page/2/">&laquo; <em>Older<span class="show-for-sr"> blog entries</span></em></a></li>
+      <li><span>Page 3 of 3</span></li>      
       
-      <li><span>Page 1 of 3</span></li>      
+      <li class="arrow" aria-disabled="true"><a href="/tags/makeover-monday/page/2/"><em>Newer<span class="show-for-sr"> blog entries</span></em>:&nbsp;&raquo;</a></li>
       
     </ul>    
     All Posts by <a href="/categories">Category</a> or <a href="/tags">Tags</a>.
