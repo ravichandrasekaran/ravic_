@@ -88,14 +88,14 @@ conversion until they know that that the offense is very likely to go
 for the extra point. 
 
 What's the threshold? We can set the two scoring equations equal, and 
-that will give us the threshold at which we should change tack: $p_{XP} = 0.67$.
+that will give us the threshold at which we should change tack: $p_{XP} = 0.8$.
 
 $$
 \begin{aligned}
 E[S_{CONV}] & = E[S_{XP}] \\
 (0.2) \cdot p_{XP} +  0.8 & = (-0.3) \cdot p_{XP} + (1.2) \\
 (0.5) \cdot p_{XP} & = 0.4 \\
-p_{XP} & = 0.80
+p_{XP} & = 0.8
 \end{aligned}
 $$
 
