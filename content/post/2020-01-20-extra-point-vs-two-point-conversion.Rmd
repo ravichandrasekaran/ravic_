@@ -20,7 +20,10 @@ defend against the 2-point conversion all the time. What would the offense's
 expected score be?
 
 $$
-E[S_{CONV}] = p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 \\
+\begin{aligned}
+E[S_{CONV}] & = p_{XP} \cdot (1.0) + 2 \cdot (1 - p_{XP}) \cdot (0.4) \\
+& = (0.2) \cdot p_{XP} +  0.8 \\
+\end{aligned}
 $$
 
 
@@ -28,7 +31,10 @@ The other simple, uninformed strategy would be to always defend against the
 extra point all the time. The expected score there would be:
 
 $$
-E[S_{XP}] = p_{XP} \cdot 0.9 + (1 - p_{XP}) \cdot .6 \\
+\begin{aligned}
+E[S_{XP}] & = p_{XP} \cdot (0.9) + 2 \cdot (1 - p_{XP}) \cdot (0.6) \\
+& = (-0.3) \cdot p_{XP} + (1.2) \\
+\end{aligned}
 $$
 
 We can graph both simple strategies and the offense's expected score as a 
@@ -81,12 +87,16 @@ the offense's total scoring. They can defend against the two-point
 conversion until they know that that the offense is very likely to go
 for the extra point. 
 
-Wha's the threshold? We can set the two scoring equations equal, and 
-that will give us the threshold at which we should change tack: $p_{XP} = 0.8$.
+What's the threshold? We can set the two scoring equations equal, and 
+that will give us the threshold at which we should change tack: $p_{XP} = 0.67$.
 
 $$
-p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 = p_{XP} \cdot 0.9 + (1 - p_{XP}) \cdot .6 \\
-p_{XP} = 0.8
+\begin{aligned}
+E[S_{CONV}] & = E[S_{XP}] \\
+(0.2) \cdot p_{XP} +  0.8 & = (-0.3) \cdot p_{XP} + (1.2) \\
+(0.5) \cdot p_{XP} & = 0.4 \\
+p_{XP} & = 0.80
+\end{aligned}
 $$
 
 
@@ -103,8 +113,8 @@ probability.**
 The offense knows that the defense knows the offense's strategy. (Ugh, that's 
 a mouthful.) But using the same graph above, the maximum expected score under
 the defense's approach will also be at $p_{XP} = 0.8$. Substituting into either
-equation gives us an expected score of $E[S] = `r {.8 * 1.0 + (1 - .8) * 0.4}`$.
+equation gives us an expected score of $E[S] = `r {.8 * 1.0 + 2 * (1 - .8) * 0.4}`$.
 
 **So, the offense should consistently send in a probability of 0.8, expecting to
-score 0.88 points per attempt.**
+score 0.96 points per attempt.**
 

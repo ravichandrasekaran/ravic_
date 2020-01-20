@@ -21,12 +21,18 @@ for a new-and-improved post-touchdown extra-point system.</p>
 defend against the 2-point conversion all the time. What would the offense’s
 expected score be?</p>
 <p><span class="math display">\[
-E[S_{CONV}] = p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 \\
+\begin{aligned}
+E[S_{CONV}] &amp; = p_{XP} \cdot (1.0) + 2 \cdot (1 - p_{XP}) \cdot (0.4) \\
+&amp; = (0.2) \cdot p_{XP} +  0.8 \\
+\end{aligned}
 \]</span></p>
 <p>The other simple, uninformed strategy would be to always defend against the
 extra point all the time. The expected score there would be:</p>
 <p><span class="math display">\[
-E[S_{XP}] = p_{XP} \cdot 0.9 + (1 - p_{XP}) \cdot .6 \\
+\begin{aligned}
+E[S_{XP}] &amp; = p_{XP} \cdot (0.9) + 2 \cdot (1 - p_{XP}) \cdot (0.6) \\
+&amp; = (-0.3) \cdot p_{XP} + (1.2) \\
+\end{aligned}
 \]</span></p>
 <p>We can graph both simple strategies and the offense’s expected score as a
 function of their selected probability of going for the extra point <span class="math inline">\(p_{XP}\)</span>:</p>
@@ -39,11 +45,15 @@ going for the extra point, they can select the strategy that minimizes
 the offense’s total scoring. They can defend against the two-point
 conversion until they know that that the offense is very likely to go
 for the extra point.</p>
-<p>Wha’s the threshold? We can set the two scoring equations equal, and
-that will give us the threshold at which we should change tack: <span class="math inline">\(p_{XP} = 0.8\)</span>.</p>
+<p>What’s the threshold? We can set the two scoring equations equal, and
+that will give us the threshold at which we should change tack: <span class="math inline">\(p_{XP} = 0.67\)</span>.</p>
 <p><span class="math display">\[
-p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 = p_{XP} \cdot 0.9 + (1 - p_{XP}) \cdot .6 \\
-p_{XP} = 0.8
+\begin{aligned}
+E[S_{CONV}] &amp; = E[S_{XP}] \\
+(0.2) \cdot p_{XP} +  0.8 &amp; = (-0.3) \cdot p_{XP} + (1.2) \\
+(0.5) \cdot p_{XP} &amp; = 0.4 \\
+p_{XP} &amp; = 0.80
+\end{aligned}
 \]</span></p>
 <p><strong>So, the defense should defend against the two-point conversion until it
 knows the offense is going to go for the extra point with at least a 80%
@@ -58,8 +68,8 @@ probability.</strong></p>
 <p>The offense knows that the defense knows the offense’s strategy. (Ugh, that’s
 a mouthful.) But using the same graph above, the maximum expected score under
 the defense’s approach will also be at <span class="math inline">\(p_{XP} = 0.8\)</span>. Substituting into either
-equation gives us an expected score of <span class="math inline">\(E[S] = 0.88\)</span>.</p>
+equation gives us an expected score of <span class="math inline">\(E[S] = 0.96\)</span>.</p>
 <p><strong>So, the offense should consistently send in a probability of 0.8, expecting to
-score 0.88 points per attempt.</strong></p>
+score 0.96 points per attempt.</strong></p>
 </div>
 </div>
