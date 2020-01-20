@@ -1,4 +1,4 @@
-# baseurl = "http://github.com/lambdafu/hugo-finite"
+baseurl = "http://ravic.netlify.com"
 title = "ravic_"
 author = "Ravi Chandrasekaran"
 copyright = "Copyright (c) 2020 Ravi Chandrasekaran"
