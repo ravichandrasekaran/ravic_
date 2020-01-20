@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>riddler on ravic_</title>
+    <link>/tags/riddler/</link>
+    <description>Recent content in riddler on ravic_</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>Copyright (c) 2020 Ravi Chandrasekaran</copyright>
+    <lastBuildDate>Mon, 20 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/riddler/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Extra point vs. two-point conversion</title>
+      <link>/post/extra-point-vs-two-point-conversion/</link>
+      <pubDate>Mon, 20 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/extra-point-vs-two-point-conversion/</guid>
+      <description>From the Riddler, a proposal for a new-and-improved post-touchdown extra-point system.
+The defense Simple strategies One simple, uniformed strategy the defense could employ would be to simply defend against the 2-point conversion all the time. What would the offense’s expected score be?
+\[ E[S_{CONV}] = p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 \\ \]
+The other simple, uninformed strategy would be to always defend against the extra point all the time.</description>
+    </item>
+    
+  </channel>
+</rss>

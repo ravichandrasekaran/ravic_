@@ -1,0 +1,109 @@
+---
+title: Extra point vs. two-point conversion
+author: Ravi Chandrasekaran
+date: '2020-01-20'
+slug: extra-point-vs-two-point-conversion
+categories: []
+math: true
+tags:
+  - riddler
+---
+
+
+From the Riddler, a [proposal](https://fivethirtyeight.com/features/can-you-track-the-delirious-ducks/) 
+for a new-and-improved post-touchdown extra-point system. 
+
+## The defense
+#### Simple strategies
+One simple, uniformed strategy the defense could employ would be to simply
+defend against the 2-point conversion all the time. What would the offense's
+expected score be?
+
+$$
+E[S_{CONV}] = p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 \\
+$$
+
+
+The other simple, uninformed strategy would be to always defend against the
+extra point all the time. The expected score there would be:
+
+$$
+E[S_{XP}] = p_{XP} \cdot 0.9 + (1 - p_{XP}) \cdot .6 \\
+$$
+
+We can graph both simple strategies and the offense's expected score as a 
+function of their selected probability of going for the extra point $p_{XP}$:
+
+```{r load_pacakges, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+
+
+```{r expected_score, echo = FALSE}
+# Expected score
+exp_score <- function(prob_xp, defend_xp) {
+  xp <- prob_xp * 1.0  * ifelse(defend_xp, .9, 1.0) 
+  conv <- (1 - prob_xp) * 2.0 * ifelse(defend_xp, .6, .4)
+  return(xp + conv)
+}
+
+# Simulation
+df <- tibble(prob_xp = seq(0, 1, .01)) %>%
+  mutate(
+    score_defend_xp = exp_score(prob_xp, TRUE),
+    score_defend_conv = exp_score(prob_xp, FALSE))
+```
+
+
+```{r visualise_results, echo = FALSE}
+df %>%
+  gather(key = "defense", value = "score", -prob_xp) %>%
+  ggplot(aes(prob_xp, score, col=defense)) +
+  geom_line() +
+  theme_light() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Expected scores with different defenses",
+    x = "Probability of extra point attempt",
+    y = "Expected point per play"
+  ) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  geom_vline(xintercept = .8, lty = 3)
+
+```
+
+
+#### General strategy
+Since the defense actually knows the offense's selected probability of
+going for the extra point, they can select the strategy that minimizes 
+the offense's total scoring. They can defend against the two-point 
+conversion until they know that that the offense is very likely to go
+for the extra point. 
+
+Wha's the threshold? We can set the two scoring equations equal, and 
+that will give us the threshold at which we should change tacks, $p_{XP} = 0.8$.
+
+$$
+p_{XP} \cdot 1.0 + (1 - p_{XP}) \cdot 0.4 = p_{XP} \cdot 0.9 + (1 - p_{XP}) \cdot .6 \\
+p_{XP} = 0.8
+$$
+
+
+
+**So, defend against the two-point conversion until we the offense is going
+to go for the extra point with at least a 80% probability.**
+
+---
+
+## The offense
+
+#### General strategy
+The offense knows that the defense knows the offense's strategy. (Ugh, that's 
+a mouthful.) But using the same graph above, the maximum expected score under
+the defense's approach will also be at $p_{XP} = 0.8$. Substituting into either
+equation gives us an expected score of $E[S] = `r {.8 * 1.0 + (1 - .8) * 0.4}`$.
+
+**So the offense should consistently send in a probability of 0.8, expecting to
+score 0.88 points per attempt.**
+
