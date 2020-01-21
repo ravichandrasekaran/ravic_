@@ -4,6 +4,7 @@ author: ravic_
 date: '2020-01-20'
 slug: makeover-sugar-consumption
 categories: []
+math: true
 tags:
   - makeover-monday
 ---
@@ -15,6 +16,7 @@ tags:
 * Source Article: [BBC](https://www.bbc.co.uk/news/health-48499195)
 * Data source: [British Nutrition Foundation](https://www.nutrition.org.uk/nutritioninthenews/new-reports/ndnsyears7and8.html)
 * Additional: [NHS guidelines](https://www.nhs.uk/live-well/eat-well/how-does-sugar-in-our-diet-affect-our-health/)
+* Original survey: [National Diet and Nutrition Survey](https://www.gov.uk/government/collections/national-diet-and-nutrition-survey)
 
 ---
 
@@ -50,6 +52,23 @@ tags:
     
 ---
 
+### Data
+
+1.  Data shows the survey detail for two-year survey periods with certain
+    demographic breakouts (children vs. adults, men vs. women, age brackets).
+2.  The data seems to have supports for changing trendlines, but is hard
+    to assess. For example, for children or elderly, is there really enough
+    data to make sound conclusions? The total survey is a representative
+    sample of $N = 1000$ people.
+3.  The original data seems to have the actual survey years, rather than this
+    aggregation. Not sure if that really helps, though.
+
+
+
+
+---
+
+
 #### Potential approaches
 
 1.  Leverage the NHS's materialization in terms of sugar cubes. (Or the
@@ -62,4 +81,84 @@ tags:
 4.  Choose-your-own-breakfast. 
 
 
-    
+---
+
+
+```{r load_packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+require("janitor", quietly = TRUE, warn.conflicts = FALSE)
+```
+
+```{r import_data, echo = FALSE}
+library("httr")
+library("readxl")
+url <- "https://query.data.world/s/v6ldz66lndxwsmlhpo5pxqdfn3dvtx" 
+GET(url, write_disk(tf <- tempfile(fileext = ".xlsx")))
+df <- read_excel(tf) %>%
+  janitor::clean_names() 
+names(df)[1] <- "demo_group"
+```
+
+```{r clean_data, echo = FALSE}
+df <- df %>%
+  gather(key = "years", value = "pct_free_sugar", -demo_group) %>%
+  mutate(demo_group = str_replace(demo_group, " years and over", "-100")) %>%
+  mutate(demo_group = str_replace(demo_group, " years", "")) %>%
+  separate(demo_group, " ", into = c("group", "age_bracket")) %>%
+  separate(age_bracket, "-", into = c("age_lower", "age_upper"), remove = FALSE) %>%
+  mutate_at(vars("age_lower", "age_upper"), as.numeric) %>%
+  mutate(age_bracket = factor(age_bracket, 
+                              levels = c("1.5-3", "4-10", "11-18", "19-64", 
+                                         "65-74", "65-100", "75-100"), 
+                              ordered = TRUE)) %>%
+  mutate(years = case_when(
+    years == "x2008_09_2009_10" ~ "2009",
+    years == "x2010_11_2011_12" ~ "2011",
+    years == "x2012_13_2013_14" ~ "2013",
+    years == "x2014_15_2015_16" ~ "2015",
+    TRUE ~ NA_character_)) %>%
+  filter(age_bracket != "65-100")
+```
+
+## Plots
+#### Children
+We might be reading into very little data, but there is at least hope
+that changes are occurring for children. Enough to go look for more 
+data, perhaps.
+
+```{r plot_trends, echo = FALSE}
+df %>%
+  filter(group == "Children") %>%
+  ggplot(aes(x = years, y = pct_free_sugar)) +
+  geom_point() + 
+  facet_wrap(~ age_bracket) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_light() +
+  labs(
+    title = "Children dietary free sugar consumption as percentage of overall daily calories",
+    y = "% Free sugar",
+    x = "Survey periods"
+  )
+```
+
+#### Adults
+Less reason to hope here, and perhaps just seeing the outputs of splitting
+the dataset so heavily into varying groups.
+
+```{r plot_adults, echo = FALSE}
+df %>%
+  filter(group %in% c("Men", "Women")) %>%
+  ggplot(aes(x = years, y = pct_free_sugar)) +
+  geom_point() + 
+  facet_wrap(~ group + age_bracket, ncol = 3) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_light() +
+  labs(
+    title = "Adult dietary free sugar consumption as percentage of overall daily calories",
+    y = "% Free sugar",
+    x = "Survey periods"
+  )
+
+```
+

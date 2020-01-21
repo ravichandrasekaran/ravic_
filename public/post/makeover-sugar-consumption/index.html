@@ -96,6 +96,7 @@
 <li>Source Article: <a href="https://www.bbc.co.uk/news/health-48499195">BBC</a></li>
 <li>Data source: <a href="https://www.nutrition.org.uk/nutritioninthenews/new-reports/ndnsyears7and8.html">British Nutrition Foundation</a></li>
 <li>Additional: <a href="https://www.nhs.uk/live-well/eat-well/how-does-sugar-in-our-diet-affect-our-health/">NHS guidelines</a></li>
+<li>Original survey: <a href="https://www.gov.uk/government/collections/national-diet-and-nutrition-survey">National Diet and Nutrition Survey</a></li>
 </ul>
 <hr />
 </div>
@@ -131,6 +132,19 @@ home.</li>
 </ol>
 <hr />
 </div>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<ol style="list-style-type: decimal">
+<li>Data shows the survey detail for two-year survey periods with certain
+demographic breakouts (children vs. adults, men vs. women, age brackets).</li>
+<li>The data seems to have supports for changing trendlines, but is hard
+to assess. For example, for children or elderly, is there really enough
+data to make sound conclusions? The total survey is a representative
+sample of <span class="math inline">\(N = 1000\)</span> people.</li>
+<li>The original data seems to have the actual survey years, rather than this
+aggregation. Not sure if that really helps, though.</li>
+</ol>
+<hr />
 <div id="potential-approaches" class="section level4">
 <h4>Potential approaches</h4>
 <ol style="list-style-type: decimal">
@@ -143,11 +157,35 @@ it.)</li>
 free sugar. Surprise with truth!</li>
 <li>Choose-your-own-breakfast.</li>
 </ol>
+<hr />
+<pre><code>## Response [https://download.data.world/file_download/makeovermonday/2020w3-is-it-time-to-treat-sugar-like-smoking/2020W3.xlsx?auth=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OnJhdmljIiwiaXNzIjoiYWdlbnQ6cmF2aWM6OjRiMWUwNDFhLWZmNGYtNDhiMS04MTIzLTkwYWY4MDc4Mjg0MSIsImlhdCI6MTU3OTU2MDI0OSwicm9sZSI6WyJ1c2VyIiwidXNlcl9hcGlfYWRtaW4iLCJ1c2VyX2FwaV9yZWFkIiwidXNlcl9hcGlfd3JpdGUiXSwiZ2VuZXJhbC1wdXJwb3NlIjpmYWxzZSwidXJsIjoiZDdhZmRiMGQwMjg3OTJiOGRjMmQzNGU5ZmI3YzdjYTUxMTJhNjk0NyJ9.in-8jHPiwNaHD80zve-79elUZEebKVRYZkV22eDaLtF3P1A1x4YYxYr41X1l4jsC3pc1afHZ4AVRnQisdeUSow]
+##   Date: 2020-01-21 00:00
+##   Status: 200
+##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+##   Size: 9.49 kB
+## &lt;ON DISK&gt;  /var/folders/52/6k41kd5123bd8fqvbc9x6nth0000gp/T//Rtmp24qj34/file16e196fdadcb4.xlsx</code></pre>
+</div>
+</div>
+<div id="plots" class="section level2">
+<h2>Plots</h2>
+<div id="children" class="section level4">
+<h4>Children</h4>
+<p>We might be reading into very little data, but there is at least hope
+that changes are occurring for children. Enough to go look for more
+data, perhaps.</p>
+<p><img src="/post/2020-01-20-makeover-sugar-consumption_files/figure-html/plot_trends-1.png" width="672" /></p>
+</div>
+<div id="adults" class="section level4">
+<h4>Adults</h4>
+<p>Less reason to hope here, and perhaps just seeing the outputs of splitting
+the dataset so heavily into varying groups.</p>
+<p><img src="/post/2020-01-20-makeover-sugar-consumption_files/figure-html/plot_adults-1.png" width="672" /></p>
+</div>
 </div>
 
       </div>
 
-      <meta itemprop="wordCount" content="307">
+      <meta itemprop="wordCount" content="470">
       <meta itemprop="datePublished" content="2020-01-20">
       <meta itemprop="url" content="/post/makeover-sugar-consumption/">
     </article>
@@ -192,6 +230,21 @@ free sugar. Surprise with truth!</li>
     <script>hljs.initHighlightingOnLoad();</script>
 
     
+    
+
+    <link rel="stylesheet" href="/katex/katex.min.css">
+
+    
+    <script defer src="/katex/katex.min.js"></script>
+
+    
+    <script defer src="/katex/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, { delimiters: [
+                    {left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true} ]});"></script>
+
     
     
   </body>
