@@ -1,0 +1,39 @@
+---
+title: 'Tidy: Spotify songs'
+author: ravic_
+date: '2020-01-20'
+slug: tidy-spotify-songs
+categories: []
+draft: true
+tags:
+  - tidy-tuesday
+---
+
+
+```{r load_packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+```
+
+```{r import_data, echo = FALSE}
+library("janitor")
+library("glue")
+require("lubridate", quietly = TRUE, warn.conflicts = FALSE)
+
+url <- glue::glue(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/",
+  "2020/2020-01-21/spotify_songs.csv")
+df <- readr::read_csv(url) %>%
+  janitor::clean_names() %>%
+  mutate(track_album_release_date = ymd(track_album_release_date))
+
+```
+
+```{r skim_data, echo = TRUE}
+library("skimr")
+skimr::skim(df)
+```
+
+
+
+
