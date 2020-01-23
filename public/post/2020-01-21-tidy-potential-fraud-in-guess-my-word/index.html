@@ -1,0 +1,92 @@
+
+
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>Like others, I’ve been surprised by my own addiction to Ryan Jones’s revival
+of “Guess My Word”.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>I grabbed a <a href="ttps://docs.google.com/spreadsheets/d/1-LWgLc0AsWJhOJKoE9k8X52dUB_Rcd8mRHpQJjkbxRk/edit?usp=sharing">snapshot</a>
+of the daily leaderboards from early 2020-01-21. For each participant, the
+number of guesses and the time to completion are recorded. In addition, entries
+are annotated with certain completion notes - first to respond, fewest guesses,
+fastest times, and “lucky”.</p>
+<pre><code>## Using an auto-discovered, cached token.
+## To suppress this message, modify your code or options to clearly consent to the use of a cached token.
+## See gargle&#39;s &quot;Non-interactive auth&quot; vignette for more details:
+## https://gargle.r-lib.org/articles/non-interactive-auth.html
+## The googlesheets4 package is using a cached token for ravichandrasekaran@gmail.com.</code></pre>
+<pre><code>## Reading from &#39;Guess My Word - Leaderboards&#39;</code></pre>
+<pre><code>## Range &quot;&#39;2020-01-21-normal&#39;&quot;</code></pre>
+<pre><code>## Reading from &#39;Guess My Word - Leaderboards&#39;</code></pre>
+<pre><code>## Range &quot;&#39;2020-01-21-hard&#39;&quot;</code></pre>
+<p><img src="2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/num_guess_plots-1.png" width="672" /><img src="2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/num_guess_plots-2.png" width="672" /></p>
+<pre><code>## # A tibble: 2 x 5
+##   difficulty     n mean_guesses sd_guesses threshold
+##   &lt;fct&gt;      &lt;int&gt;        &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+## 1 normal       668         14.7       4.57      2.91
+## 2 hard         391         17.8       5.38      3.97</code></pre>
+<pre><code>## # A tibble: 7 x 6
+##   difficulty name             number_guesses time     fraud_ind threshold
+##   &lt;fct&gt;      &lt;chr&gt;                     &lt;dbl&gt; &lt;Period&gt; &lt;lgl&gt;         &lt;dbl&gt;
+## 1 normal     Cheaters!                     2 1S       TRUE           2.91
+## 2 normal     top of the world              2 1S       TRUE           2.91
+## 3 normal     linkassistant                 2 4S       TRUE           2.91
+## 4 normal     Marce                         2 8S       TRUE           2.91
+## 5 normal     Jaymin patel                  2 10S      TRUE           2.91
+## 6 hard       cheated                       3 3S       TRUE           3.97
+## 7 hard       WASEEM                        3 14S      TRUE           3.97</code></pre>
+<p><img src="2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/fraud_by_time-1.png" width="672" /></p>
+<pre><code>## # A tibble: 2 x 5
+##   difficulty     n mean_log_secs sd_log_secs threshold
+##   &lt;fct&gt;      &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+## 1 normal       668          2.07       0.395      7.09
+## 2 hard         391          2.32       0.382     13.8</code></pre>
+<pre><code>## # A tibble: 9 x 7
+##   difficulty name       number_guesses time   fraud_ind awards         threshold
+##   &lt;fct&gt;      &lt;chr&gt;               &lt;dbl&gt; &lt;Peri&gt; &lt;lgl&gt;     &lt;chr&gt;              &lt;dbl&gt;
+## 1 normal     Cheaters!               2 1S     TRUE      🍀 lucky?           7.09
+## 2 normal     top of th…              2 1S     TRUE      🍀 lucky?           7.09
+## 3 normal     linkassis…              2 4S     TRUE      🍀 lucky?           7.09
+## 4 normal     Marce                   2 8S     TRUE      🍀 lucky?           7.09
+## 5 normal     Jaymin pa…              2 10S    TRUE      🍀 lucky?           7.09
+## 6 normal     d p                     4 4S     FALSE     🏆 fastest, 🏆 …      7.09
+## 7 normal     BizDev 4 …              5 7S     FALSE     &lt;NA&gt;                7.09
+## 8 hard       cheated                 3 3S     TRUE      🍀 lucky?          13.8 
+## 9 hard       WASEEM                  3 14S    TRUE      🍀 lucky?          13.8</code></pre>
+<div id="guess-rate" class="section level3">
+<h3>Guess rate</h3>
+<p>I’m defining <em>guess rate</em> as the number of guesses divided by the total
+completion time in seconds. With the guess rate, we can try to see if
+there is an unexpected barrage of overly quick guesses.</p>
+<p>Here’s the distribution. (Notably, the guess rate is pretty similar
+between the normal and hard contests.)</p>
+<p><img src="2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/guess_rate-1.png" width="672" /></p>
+<pre><code>## # A tibble: 2 x 5
+##   difficulty     n mean_log_guess_rate sd_log_guess_rate threshold
+##   &lt;fct&gt;      &lt;int&gt;               &lt;dbl&gt;             &lt;dbl&gt;     &lt;dbl&gt;
+## 1 normal       668               0.926             0.317     0.887
+## 2 hard         391               1.09              0.326     1.20</code></pre>
+<pre><code>## # A tibble: 7 x 8
+##   difficulty name     number_guesses  secs guess_rate threshold fraud_ind awards
+##   &lt;fct&gt;      &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;lgl&gt;     &lt;chr&gt; 
+## 1 normal     Cheater…              2     1       0.5      0.887 TRUE      🍀 luc…
+## 2 normal     top of …              2     1       0.5      0.887 TRUE      🍀 luc…
+## 3 normal     linkass…              2     4       2        0.887 TRUE      🍀 luc…
+## 4 normal     Marce                 2     8       4        0.887 TRUE      🍀 luc…
+## 5 normal     Jaymin …              2    10       5        0.887 TRUE      🍀 luc…
+## 6 hard       cheated               3     3       1        1.20  TRUE      🍀 luc…
+## 7 hard       WASEEM                3    14       4.67     1.20  TRUE      🍀 luc…</code></pre>
+<pre class="r"><code># Unfortunately, couldn&#39;t use simple rvest, since this is client side rendered.
+# Would need to enable with a headless Chrome pipeline at the end of the day.
+
+require(&quot;glue&quot;, quietly = TRUE, warn.conflicts = FALSE)
+url &lt;- glue::glue(
+  &quot;https://hryanjones.com/guess-my-word/board.html?&quot;,
+  &quot;difficulty=normal&quot;)
+tbls &lt;- read_html(url) 
+html_nodes(tbls, &quot;table&quot;) </code></pre>
+</div>
+</div>
+

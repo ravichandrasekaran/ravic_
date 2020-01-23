@@ -61,7 +61,6 @@ df <- tibble(prob_xp = seq(0, 1, .01)) %>%
     score_defend_conv = exp_score(prob_xp, FALSE))
 ```
 
-
 ```{r visualise_results, echo = FALSE}
 df %>%
   gather(key = "defense", value = "score", -prob_xp) %>%

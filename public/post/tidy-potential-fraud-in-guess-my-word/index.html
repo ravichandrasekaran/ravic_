@@ -1,0 +1,231 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Tidy: Potential fraud in Guess My Word  | ravic_</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="/css/foundation.min.css">
+    <link rel="stylesheet" href="/css/highlight.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/academicons.min.css">
+    <link rel="stylesheet" href="/css/fonts.css">
+    <link rel="stylesheet" href="/css/finite.css">
+    
+  </head>
+  <body>
+      
+    <header>
+      <nav class="nav-bar">
+	
+	  <div class="title-bar" data-responsive-toggle="site-menu" data-hide-for="medium">	      
+	    <button class="site-hamburger" type="button" data-toggle>
+	      <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
+	    </button>
+	    <div class="title-bar-title site-title">
+	      <a href="/">ravic_</a>
+	    </div>
+	    <div class="title-bar-right pull-right">
+	      
+
+
+
+	    </div>
+	  </div>
+	    
+	  
+	    <div class="top-bar" id="site-menu" >	      
+	      <div class="top-bar-title show-for-medium site-title">
+		<a href="/">ravic_</a>
+	      </div>
+	      <div class="top-bar-left">
+		<ul class="menu vertical medium-horizontal">
+		  
+		  
+		  <li><a href="/post/">Blog</a></li>
+		  
+		  <li><a href="/#contact">Contact</a></li>
+		  
+		</ul>
+	      </div>
+	      <div class="top-bar-right show-for-medium">
+		
+
+
+
+	      </div>
+	    </div>
+	  
+	</nav>
+      
+    </header>
+    
+    <main>
+      
+<div class="row">
+  <div class="column small-12 medium-10 medium-offset-1 end large-8 large-offset-0">
+    <article class="article" itemscope itemtype="http://schema.org/Article">
+      
+      <h1 itemprop="name">Tidy: Potential fraud in Guess My Word </h1>
+      <div class="post-metadata">
+  <span class="post-date">
+    <time datetime="2020-01-21 00:00:00 &#43;0000 UTC" itemprop="datePublished">21 January 2020</time>
+  </span>
+  
+  
+  
+  <span class="post-tags">
+    <span class="nowrap"><i class="fa fa-tags"></i>
+    
+    <a class="post-tag" href="/tags/tidy-tuesday">tidy-tuesday</a>
+    
+  </span>
+  
+  
+</div>
+
+      <div class="post-body" itemprop="articleBody">
+        
+
+
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>Like others, I’ve been surprised by my own addiction to Ryan Jones’s revival
+of “Guess My Word”.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>I grabbed a <a href="ttps://docs.google.com/spreadsheets/d/1-LWgLc0AsWJhOJKoE9k8X52dUB_Rcd8mRHpQJjkbxRk/edit?usp=sharing">snapshot</a>
+of the daily leaderboards from early 2020-01-21. For each participant, the
+number of guesses and the time to completion are recorded. In addition, entries
+are annotated with certain completion notes - first to respond, fewest guesses,
+fastest times, and “lucky”.</p>
+<pre><code>## Using an auto-discovered, cached token.
+## To suppress this message, modify your code or options to clearly consent to the use of a cached token.
+## See gargle&#39;s &quot;Non-interactive auth&quot; vignette for more details:
+## https://gargle.r-lib.org/articles/non-interactive-auth.html
+## The googlesheets4 package is using a cached token for ravichandrasekaran@gmail.com.</code></pre>
+<pre><code>## Reading from &#39;Guess My Word - Leaderboards&#39;</code></pre>
+<pre><code>## Range &quot;&#39;2020-01-21-normal&#39;&quot;</code></pre>
+<pre><code>## Reading from &#39;Guess My Word - Leaderboards&#39;</code></pre>
+<pre><code>## Range &quot;&#39;2020-01-21-hard&#39;&quot;</code></pre>
+<p><img src="/post/2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/num_guess_plots-1.png" width="672" /><img src="/post/2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/num_guess_plots-2.png" width="672" /></p>
+<pre><code>## # A tibble: 2 x 5
+##   difficulty     n mean_guesses sd_guesses threshold
+##   &lt;fct&gt;      &lt;int&gt;        &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+## 1 normal       668         14.7       4.57      2.91
+## 2 hard         391         17.8       5.38      3.97</code></pre>
+<pre><code>## # A tibble: 7 x 6
+##   difficulty name             number_guesses time     fraud_ind threshold
+##   &lt;fct&gt;      &lt;chr&gt;                     &lt;dbl&gt; &lt;Period&gt; &lt;lgl&gt;         &lt;dbl&gt;
+## 1 normal     Cheaters!                     2 1S       TRUE           2.91
+## 2 normal     top of the world              2 1S       TRUE           2.91
+## 3 normal     linkassistant                 2 4S       TRUE           2.91
+## 4 normal     Marce                         2 8S       TRUE           2.91
+## 5 normal     Jaymin patel                  2 10S      TRUE           2.91
+## 6 hard       cheated                       3 3S       TRUE           3.97
+## 7 hard       WASEEM                        3 14S      TRUE           3.97</code></pre>
+<p><img src="/post/2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/fraud_by_time-1.png" width="672" /></p>
+<pre><code>## # A tibble: 2 x 5
+##   difficulty     n mean_log_secs sd_log_secs threshold
+##   &lt;fct&gt;      &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+## 1 normal       668          2.07       0.395      7.09
+## 2 hard         391          2.32       0.382     13.8</code></pre>
+<pre><code>## # A tibble: 9 x 7
+##   difficulty name       number_guesses time   fraud_ind awards         threshold
+##   &lt;fct&gt;      &lt;chr&gt;               &lt;dbl&gt; &lt;Peri&gt; &lt;lgl&gt;     &lt;chr&gt;              &lt;dbl&gt;
+## 1 normal     Cheaters!               2 1S     TRUE      🍀 lucky?           7.09
+## 2 normal     top of th…              2 1S     TRUE      🍀 lucky?           7.09
+## 3 normal     linkassis…              2 4S     TRUE      🍀 lucky?           7.09
+## 4 normal     Marce                   2 8S     TRUE      🍀 lucky?           7.09
+## 5 normal     Jaymin pa…              2 10S    TRUE      🍀 lucky?           7.09
+## 6 normal     d p                     4 4S     FALSE     🏆 fastest, 🏆 …      7.09
+## 7 normal     BizDev 4 …              5 7S     FALSE     &lt;NA&gt;                7.09
+## 8 hard       cheated                 3 3S     TRUE      🍀 lucky?          13.8 
+## 9 hard       WASEEM                  3 14S    TRUE      🍀 lucky?          13.8</code></pre>
+<div id="guess-rate" class="section level3">
+<h3>Guess rate</h3>
+<p>I’m defining <em>guess rate</em> as the number of guesses divided by the total
+completion time in seconds. With the guess rate, we can try to see if
+there is an unexpected barrage of overly quick guesses.</p>
+<p>Here’s the distribution. (Notably, the guess rate is pretty similar
+between the normal and hard contests.) The guess rate frequency
+distribution looks log-normal, and the x-axis is on a log scale
+accordingly.</p>
+<p><img src="/post/2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/guess_rate-1.png" width="672" /></p>
+<p>Here’s a quick look at the mean, standard deviation of the log-normal
+estimated parameters.</p>
+<pre><code>## # A tibble: 2 x 5
+##   difficulty     n mean_log_guess_rate sd_log_guess_rate threshold
+##   &lt;fct&gt;      &lt;int&gt;               &lt;dbl&gt;             &lt;dbl&gt;     &lt;dbl&gt;
+## 1 normal       668               0.926             0.317     0.887
+## 2 hard         391               1.09              0.326     1.20</code></pre>
+<p>Also, have added in a 0.1% percentile threshold for identifying “🍀 <em>lucky?</em>”
+users. <strong>TK:</strong> Might be better to assign the <em>p</em>-value for seeing an
+observation that extreme.</p>
+<pre><code>## # A tibble: 7 x 7
+##   difficulty name             number_guesses  secs guess_rate threshold awards  
+##   &lt;fct&gt;      &lt;chr&gt;                     &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   
+## 1 normal     Cheaters!                     2     1       0.5      0.887 🍀 lucky…
+## 2 normal     top of the world              2     1       0.5      0.887 🍀 lucky…
+## 3 normal     linkassistant                 2     4       2        0.887 🍀 lucky…
+## 4 normal     Marce                         2     8       4        0.887 🍀 lucky…
+## 5 normal     Jaymin patel                  2    10       5        0.887 🍀 lucky…
+## 6 hard       cheated                       3     3       1        1.20  🍀 lucky…
+## 7 hard       WASEEM                        3    14       4.67     1.20  🍀 lucky…</code></pre>
+<p>Guess rate is presumably a function of the number of guesses performed –
+where fatigue and frustration set in. Let’s find out.</p>
+<p><img src="/post/2020-01-21-tidy-potential-fraud-in-guess-my-word_files/figure-html/guess_rate_by_guesses-1.png" width="672" /></p>
+</div>
+</div>
+
+      </div>
+
+      <meta itemprop="wordCount" content="663">
+      <meta itemprop="datePublished" content="2020-01-21">
+      <meta itemprop="url" content="/post/tidy-potential-fraud-in-guess-my-word/">
+    </article>
+
+    <ul class="pagination" role="navigation" aria-label="Pagination">
+      
+      <li class="arrow" aria-disabled="true"><a href="/post/extra-point-vs-two-point-conversion/">&laquo; <em>Previous<span class="show-for-sr"> page</span></em>: Extra point vs. two-point conversion</a></li>
+      
+      
+    </ul>
+
+    
+  </div>
+</div>
+
+    </main>
+    
+    
+<footer>
+  <hr>
+  <div class="row">
+   <div class="column small-10 small-centered text-center">
+     <em>Do you like this, or do you have a comment? Then please follow me at <a href="http://twitter.com/ravic_">@ravic_</a> on <span class="nowrap"><i class="fa fa-twitter-square"></i> Twitter</span>!</em>
+    </div>
+  </div>
+</footer>
+
+
+    
+    <div class="endofpage">
+    </div>
+
+    <script src="/js/jquery.js"></script>
+    <script src="/js/what-input.js"></script>
+    <script src="/js/foundation.min.js"></script>
+    <script src="/js/finite.js"></script>
+
+    
+    <script src="/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    
+    
+  </body>
+</html>
