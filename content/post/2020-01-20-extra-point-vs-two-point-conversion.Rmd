@@ -4,7 +4,6 @@ author: Ravi Chandrasekaran
 date: '2020-01-20'
 slug: extra-point-vs-two-point-conversion
 categories: []
-math: true
 tags:
   - riddler
 ---

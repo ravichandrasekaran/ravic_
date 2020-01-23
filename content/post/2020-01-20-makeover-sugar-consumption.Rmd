@@ -4,7 +4,6 @@ author: ravic_
 date: '2020-01-20'
 slug: makeover-sugar-consumption
 categories: []
-math: true
 tags:
   - makeover-monday
 ---
