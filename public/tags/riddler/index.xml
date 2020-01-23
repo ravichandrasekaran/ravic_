@@ -17,9 +17,12 @@
       <pubDate>Mon, 20 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/extra-point-vs-two-point-conversion/</guid>
-      <description>From the Riddler, a proposal for a new-and-improved post-touchdown extra-point system.
-The defense Simple strategies One simple, uniformed strategy the defense could employ would be to simply defend against the 2-point conversion all the time. What would the offense’s expected score be?
-\[ \begin{aligned} E[S_{CONV}] &amp;amp; = p_{XP} \cdot (1.0) + 2 \cdot (1 - p_{XP}) \cdot (0.4) \\ &amp;amp; = (0.2) \cdot p_{XP} + 0.8 \\ \end{aligned} \]</description>
+      <description>
+
+
+&lt;p&gt;From the Riddler, a &lt;a href=&#34;https://fivethirtyeight.com/features/can-you-track-the-delirious-ducks/&#34;&gt;proposal&lt;/a&gt;
+for a new-and-improved post-touchdown extra-point system to defeat the
+repetitive extra point kicks. (Yeah!) </description>
     </item>
     
   </channel>
