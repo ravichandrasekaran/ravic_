@@ -9,9 +9,9 @@ tags:
   - tidy-tuesday
 ---
 
-## Motivation
 Like others, I've been surprised by my own addiction to Ryan Jones's revival 
-of "Guess My Word". 
+of "Guess My Word". I've been particularly interested in the identification
+of suspiciously quick answers ("🍀 *lucky?*). Let's dig in. <!--more--> 
 
 
 ## Data

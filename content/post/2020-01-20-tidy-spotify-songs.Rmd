@@ -10,6 +10,10 @@ tags:
 ---
 
 
+From #tidy-tuesday, this week we have a rich dataset from Spotify. Let's dig in!
+<!--more--> 
+
+
 ```{r load_packages, echo = FALSE}
 options(tidyverse.quiet = TRUE)
 require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)

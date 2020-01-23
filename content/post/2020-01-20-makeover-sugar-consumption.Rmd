@@ -9,6 +9,11 @@ tags:
   - makeover-monday
 ---
 
+From #makeover-monday, this week we have an interesting data visualization 
+challenge regarding nutrition, specifically added/free sugar recommendations.
+<!--more--> 
+
+
 #### Original visualization
 ![](https://ichef.bbci.co.uk/news/624/cpsprodpb/D3A6/production/_107228145_teen_sugar_640-nc.png)
 

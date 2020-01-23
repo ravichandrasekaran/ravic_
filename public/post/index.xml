@@ -17,9 +17,12 @@
       <pubDate>Tue, 21 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/tidy-potential-fraud-in-guess-my-word/</guid>
-      <description>Motivation Like others, I’ve been surprised by my own addiction to Ryan Jones’s revival of “Guess My Word”.
- Data I grabbed a snapshot of the daily leaderboards from early 2020-01-21. For each participant, the number of guesses and the time to completion are recorded. In addition, entries are annotated with certain completion notes - first to respond, fewest guesses, fastest times, and “lucky”.
-## Using an auto-discovered, cached token.</description>
+      <description>
+
+
+&lt;p&gt;Like others, I’ve been surprised by my own addiction to Ryan Jones’s revival
+of “Guess My Word”. I’ve been particularly interested in the identification
+of suspiciously quick answers (&amp;quot;🍀 &lt;em&gt;lucky?&lt;/em&gt;). Let’s dig in. </description>
     </item>
     
     <item>
@@ -42,9 +45,12 @@ repetitive extra point kicks. (Yeah!) </description>
       <pubDate>Mon, 20 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/makeover-sugar-consumption/</guid>
-      <description>Original visualization  Source Article: BBC Data source: British Nutrition Foundation Additional: NHS guidelines Original survey: National Diet and Nutrition Survey   Critique What works with this chart?
-The headline is attention-grabbing. Triple the recommendation?!? How is that possible?  What doesn’t work with this chart?
-Age breakdown gets a lot of attention (17 groups!). But the message I pull down is that free sugar consumption is well above target for all ages.</description>
+      <description>
+
+
+&lt;p&gt;From #makeover-monday, this week we have an interesting data visualization
+challenge regarding nutrition, specifically added/free sugar recommendations.
+</description>
     </item>
     
     <item>
@@ -53,7 +59,11 @@ Age breakdown gets a lot of attention (17 groups!). But the message I pull down 
       <pubDate>Mon, 20 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/tidy-spotify-songs/</guid>
-      <description>## ## Attaching package: &amp;#39;janitor&amp;#39; ## The following objects are masked from &amp;#39;package:stats&amp;#39;: ## ## chisq.test, fisher.test ## ## Attaching package: &amp;#39;glue&amp;#39; ## The following object is masked from &amp;#39;package:dplyr&amp;#39;: ## ## collapse ## Parsed with column specification: ## cols( ## .default = col_double(), ## track_id = col_character(), ## track_name = col_character(), ## track_artist = col_character(), ## track_album_id = col_character(), ## track_album_name = col_character(), ## track_album_release_date = col_character(), ## playlist_name = col_character(), ## playlist_id = col_character(), ## playlist_genre = col_character(), ## playlist_subgenre = col_character() ## ) ## See spec(.</description>
+      <description>
+
+
+&lt;p&gt;From #tidy-tuesday, this week we have a rich dataset from Spotify. Let’s dig in!
+</description>
     </item>
     
     <item>
