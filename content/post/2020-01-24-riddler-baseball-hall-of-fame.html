@@ -1,0 +1,91 @@
+---
+title: 'Riddler: Baseball Hall of Fame'
+author: ravic_
+date: '2020-01-24'
+slug: riddler-baseball-hall-of-fame
+categories: []
+draft: true
+tags:
+  - riddler
+---
+
+
+
+<p>From 538’s Riddler column, we have a timely challenge – a thought experiment
+surrounding the {Baseball Hall of Fame}(<a href="https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/" class="uri">https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/</a>).
+<!--more--></p>
+<div id="the-challenge" class="section level2">
+<h2>The challenge</h2>
+<p>Derek Jeter and Larry Walker were just elected to the Baseball Hall of Fame! That got Stephanie thinking. Suppose there are 20 players on the ballot and 400 voters in a given year. Each voter can select up to 10 players for induction without voting for any given player more than once. To gain entry, a player must have been selected on at least 75 percent of the ballots.</p>
+<p>Under these circumstances, what is the maximum number of players that can be inducted into the Hall of Fame?</p>
+</div>
+<div id="early-thoughts" class="section level2">
+<h2>Early thoughts</h2>
+<p>A player needs to appear on 300 ballots (75% of 400 ballots). One scenario
+would involve 300 of the voters colluding and submitting identical ballots.
+This would give 10 players entry from their ballots, and render the remaining
+voters’ ballots either superfluous or irrelevant.</p>
+<p>Certainly, we can do better, and not waste quite so many votes!</p>
+<p>Let’s imagine instead that the voters collude, but in six smaller groups:</p>
+<p><span class="math display">\[
+\begin{matrix}
+1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 \\
+1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
+0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 
+\end{matrix}
+\]</span></p>
+<p>We’ve added 5 groups of voters. Each candidate now gets 5/6 * 400 votes,
+and we’re covering a bit more ground with 2 more candidates. But we’re
+still obviously wasting a lot of votes.</p>
+</div>
+<div id="approach" class="section level2">
+<h2>Approach</h2>
+<p>Let’s define:</p>
+<ul>
+<li>The number of ballots <span class="math inline">\(b\)</span>.</li>
+<li>The number of available votes per ballot <span class="math inline">\(a\)</span>.</li>
+<li>The threshold for the fraction of ballots to induct, <span class="math inline">\(t = 3/4 = 0.75\)</span>.</li>
+</ul>
+<p>Then, we have these expressions for the total number of votes <span class="math inline">\(v\)</span>, and
+the minimum number of votes required to induct <span class="math inline">\(i\)</span>:
+<span class="math display">\[
+\begin{aligned}
+v &amp;= ba = 400 \cdot 10 = 4000 \\
+i &amp;= bt = 400 \cdot (0.75) = 300
+\end{aligned}
+\]</span></p>
+<p>And we can develop an expression for the maximum number of inductees.
+Note that the expression doesn’t depend on the number of ballots cast,
+just the number of available votes per ballot and the threshold.</p>
+<p><span class="math display">\[
+\begin{aligned}
+c &amp; = \left\lfloor \frac{v}{t} \right\rfloor = \left\lfloor \frac{ba}{bt} \right\rfloor = \left\lfloor \frac{a}{t} \right\rfloor \\
+&amp; = \left\lfloor \frac{10}{.75} \right\rfloor = 13
+\end{aligned}
+\]</span></p>
+<p>Our ideal scenario is one where each winning candidate gets exactly the
+number of votes he needs with no waste. Here, we would have
+<span class="math display">\[ 
+A: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_10\}
+B: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7,   ., .  , .   , x_{11}, x_{12}, x_{13}\}
+C: \{x_1, x_2, x_3, x_4,   .,   ., .  , x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
+D: \{x_1,   .,   .,   ., x_5, x_6, x_7, x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
+\]</span></p>
+<hr />
+<p>So, what could have happened if every year the writers got together and
+colluded on their votes? Instead of the <strong>123</strong> actual
+inductees through 2018, we would have 13 new inductees each year of the
+voting, for <strong>949</strong> members of the Baseball Hall of Fame!</p>
+<hr />
+<p>References:</p>
+<ol style="list-style-type: decimal">
+<li><a href="https://baseballhall.org/hall-of-famers/rules/voting-rules-history" class="uri">https://baseballhall.org/hall-of-famers/rules/voting-rules-history</a></li>
+<li>Baseball Hall of Fame data through 2018 from the “Lahman” R package.
+Michael Friendly, Chris Dalzell, Martin Monkman and Dennis Murphy
+(2019). Lahman: Sean ‘Lahman’ Baseball Database. R package version
+7.0-1. <a href="https://CRAN.R-project.org/package=Lahman" class="uri">https://CRAN.R-project.org/package=Lahman</a></li>
+</ol>
+</div>

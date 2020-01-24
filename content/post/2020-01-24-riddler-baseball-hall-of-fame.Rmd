@@ -1,0 +1,136 @@
+---
+title: 'Riddler: Baseball Hall of Fame'
+author: ravic_
+date: '2020-01-24'
+slug: riddler-baseball-hall-of-fame
+categories: []
+draft: true
+tags:
+  - riddler
+---
+
+From 538's Riddler column, we have a timely challenge -- a thought experiment
+surrounding the {Baseball Hall of Fame}(https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/).
+<!--more-->
+
+## The challenge
+
+Derek Jeter and Larry Walker were just elected to the Baseball Hall of Fame! That got Stephanie thinking. Suppose there are 20 players on the ballot and 400 voters in a given year. Each voter can select up to 10 players for induction without voting for any given player more than once. To gain entry, a player must have been selected on at least 75 percent of the ballots.
+
+Under these circumstances, what is the maximum number of players that can be inducted into the Hall of Fame?
+
+## Early thoughts
+
+A player needs to appear on 300 ballots (75% of 400 ballots). One scenario
+would involve 300 of the voters colluding and submitting identical ballots.
+This would give 10 players entry from their ballots, and render the remaining
+voters' ballots either superfluous or irrelevant.
+
+Certainly, we can do better, and not waste quite so many votes! 
+
+Let's imagine instead that the voters collude, but in six smaller groups:
+
+$$
+\begin{matrix}
+1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 \\
+1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 
+\end{matrix}
+$$
+
+We've added 5 groups of voters. Each candidate now gets 5/6 * 400 votes,
+and we're covering a bit more ground with 2 more candidates. But we're 
+still obviously wasting a lot of votes.
+
+
+## Approach
+Let's define:  
+
+* The number of ballots $b$. 
+* The number of available votes per ballot $a$.
+* The threshold for the fraction of ballots to induct, $t = 3/4 = 0.75$.
+
+Then, we have these expressions for the total number of votes $v$, and 
+the minimum number of votes required to induct $i$:
+$$
+\begin{aligned}
+v &= ba = 400 \cdot 10 = 4000 \\
+i &= bt = 400 \cdot (0.75) = 300
+\end{aligned}
+$$
+
+And we can develop an expression for the maximum number of inductees. 
+Note that the expression doesn't depend on the number of ballots cast,
+just the number of available votes per ballot and the threshold.
+
+$$
+\begin{aligned}
+c & = \left\lfloor \frac{v}{t} \right\rfloor = \left\lfloor \frac{ba}{bt} \right\rfloor = \left\lfloor \frac{a}{t} \right\rfloor \\
+& = \left\lfloor \frac{10}{.75} \right\rfloor = 13
+\end{aligned}
+$$
+
+
+Our ideal scenario is one where each winning candidate gets exactly the 
+number of votes he needs with no waste. Here, we would have
+$$ 
+A: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_10\}
+B: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7,   ., .  , .   , x_{11}, x_{12}, x_{13}\}
+C: \{x_1, x_2, x_3, x_4,   .,   ., .  , x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
+D: \{x_1,   .,   .,   ., x_5, x_6, x_7, x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
+$$
+
+---
+
+```{r load_packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+require("lubridate", quietly = TRUE, warn.conflicts = FALSE)
+require(Lahman, quietly = TRUE, warn.conflicts = FALSE)
+```
+
+```{r import_data, echo = FALSE}
+data(Master)
+players <- Master %>%
+  mutate_at(vars(debut, finalGame), ymd) %>%
+  select(playerID, debut, finalGame, nameGiven, nameFirst, nameLast, deathDate)
+
+data(HallOfFame)
+df <- HallOfFame %>%
+  filter(votedBy == "BBWAA") %>%
+  left_join(players, by = "playerID") 
+```
+
+```{r max_inductees, echo = FALSE}
+inducted_actual <- as.numeric(df %>% filter(inducted == "Y") %>% nrow())
+inducted_potential <- 13 * (df %>% distinct(yearID) %>% nrow())
+```
+So, what could have happened if every year the writers got together and 
+colluded on their votes? Instead of the **`r {inducted_actual}`** actual 
+inductees through 2018, we would have 13 new inductees each year of the
+voting, for **`r {inducted_potential}`** members of the Baseball Hall of Fame!
+
+```{r compare_early_votes, eval = FALSE, echo = FALSE}
+df %>%
+  filter(yearID %in% c(1936, 1937)) %>%
+  group_by(yearID) %>%
+  mutate(year_rank = rank(desc(votes), ties.method = "min")) %>%
+  ungroup() %>%
+  filter(year_rank < 20) %>%
+  arrange(yearID, desc(votes)) %>%
+  select(yearID, nameFirst, nameLast, votes, year_rank, inducted, 
+         debut, finalGame, deathDate) 
+```
+
+---
+
+References:  
+
+1.  https://baseballhall.org/hall-of-famers/rules/voting-rules-history
+2.  Baseball Hall of Fame data through 2018 from the "Lahman" R package. 
+    Michael Friendly, Chris Dalzell, Martin Monkman and Dennis Murphy 
+    (2019). Lahman: Sean 'Lahman' Baseball Database. R package version 
+    7.0-1. https://CRAN.R-project.org/package=Lahman
