@@ -4,7 +4,6 @@ author: ravic_
 date: '2020-01-24'
 slug: riddler-baseball-hall-of-fame
 categories: []
-draft: true
 tags:
   - riddler
 ---
@@ -14,73 +13,117 @@ tags:
 <p>From 538’s Riddler column, we have a timely challenge – a thought experiment
 surrounding the {Baseball Hall of Fame}(<a href="https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/" class="uri">https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/</a>).
 <!--more--></p>
-<div id="the-challenge" class="section level2">
-<h2>The challenge</h2>
-<p>Derek Jeter and Larry Walker were just elected to the Baseball Hall of Fame! That got Stephanie thinking. Suppose there are 20 players on the ballot and 400 voters in a given year. Each voter can select up to 10 players for induction without voting for any given player more than once. To gain entry, a player must have been selected on at least 75 percent of the ballots.</p>
-<p>Under these circumstances, what is the maximum number of players that can be inducted into the Hall of Fame?</p>
-</div>
-<div id="early-thoughts" class="section level2">
-<h2>Early thoughts</h2>
-<p>A player needs to appear on 300 ballots (75% of 400 ballots). One scenario
-would involve 300 of the voters colluding and submitting identical ballots.
-This would give 10 players entry from their ballots, and render the remaining
-voters’ ballots either superfluous or irrelevant.</p>
-<p>Certainly, we can do better, and not waste quite so many votes!</p>
-<p>Let’s imagine instead that the voters collude, but in six smaller groups:</p>
-<p><span class="math display">\[
-\begin{matrix}
-1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 \\
-1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 \\
-1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
-1 &amp; 1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
-1 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
-0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 
-\end{matrix}
-\]</span></p>
-<p>We’ve added 5 groups of voters. Each candidate now gets 5/6 * 400 votes,
-and we’re covering a bit more ground with 2 more candidates. But we’re
-still obviously wasting a lot of votes.</p>
+<div id="challenge" class="section level2">
+<h2>Challenge</h2>
+<p>Here’s the description from the <a href="https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/">538 Riddler column</a>.</p>
+<blockquote>
+<p>Derek Jeter and Larry Walker were just elected to the Baseball Hall of Fame! That got Stephanie thinking. Suppose there are 20 players on the ballot and 400 voters in a given year. Each voter can select up to 10 players for induction without voting for any given player more than once. To gain entry, a player must have been selected on at least 75 percent of the ballots.<br />
+<br />
+Under these circumstances, what is the maximum number of players that can be inducted into the Hall of Fame?</p>
+</blockquote>
 </div>
 <div id="approach" class="section level2">
 <h2>Approach</h2>
 <p>Let’s define:</p>
 <ul>
-<li>The number of ballots <span class="math inline">\(b\)</span>.</li>
-<li>The number of available votes per ballot <span class="math inline">\(a\)</span>.</li>
+<li>The number of ballots <span class="math inline">\(b = 400\)</span>.</li>
+<li>The number of available votes per ballot <span class="math inline">\(a = 10\)</span>.</li>
 <li>The threshold for the fraction of ballots to induct, <span class="math inline">\(t = 3/4 = 0.75\)</span>.</li>
 </ul>
-<p>Then, we have these expressions for the total number of votes <span class="math inline">\(v\)</span>, and
-the minimum number of votes required to induct <span class="math inline">\(i\)</span>:
-<span class="math display">\[
+<p>Then, we have two simple expressions for the total number of votes <span class="math inline">\(v\)</span> and
+the minimum number of votes required to induct <span class="math inline">\(i\)</span>:</p>
+<p><span class="math display">\[
 \begin{aligned}
-v &amp;= ba = 400 \cdot 10 = 4000 \\
-i &amp;= bt = 400 \cdot (0.75) = 300
+v &amp; = ba \\
+i &amp; = bt \\
 \end{aligned}
 \]</span></p>
-<p>And we can develop an expression for the maximum number of inductees.
-Note that the expression doesn’t depend on the number of ballots cast,
-just the number of available votes per ballot and the threshold.</p>
+<p>And then we can express <span class="math inline">\(c\)</span>, the maximum number of inductees.</p>
 <p><span class="math display">\[
 \begin{aligned}
 c &amp; = \left\lfloor \frac{v}{t} \right\rfloor = \left\lfloor \frac{ba}{bt} \right\rfloor = \left\lfloor \frac{a}{t} \right\rfloor \\
 &amp; = \left\lfloor \frac{10}{.75} \right\rfloor = 13
 \end{aligned}
-\]</span></p>
-<p>Our ideal scenario is one where each winning candidate gets exactly the
-number of votes he needs with no waste. Here, we would have
-<span class="math display">\[ 
-A: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_10\}
-B: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7,   ., .  , .   , x_{11}, x_{12}, x_{13}\}
-C: \{x_1, x_2, x_3, x_4,   .,   ., .  , x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
-D: \{x_1,   .,   .,   ., x_5, x_6, x_7, x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
-\]</span></p>
+\]</span>
+<em>Note that the expression doesn’t depend on the number of ballots cast,
+just the number of available votes per ballot and the threshold. (And the
+screening for the ballot doesn’t matter either, as long as it provides
+more candidates than <span class="math inline">\(c\)</span>.)</em></p>
+</div>
+<div id="answer" class="section level2">
+<h2>Answer</h2>
+<p>The maximum number of inductees in a given voting year is <strong>13</strong>.</p>
 <hr />
+</div>
+<div id="ramifications" class="section level2">
+<h2>Ramifications</h2>
 <p>So, what could have happened if every year the writers got together and
-colluded on their votes? Instead of the <strong>123</strong> actual
-inductees through 2018, we would have 13 new inductees each year of the
-voting, for <strong>949</strong> members of the Baseball Hall of Fame!</p>
+colluded on their votes? Through 2018, we’ve seen <strong>123</strong>
+actual inductees – roughly <strong>2</strong> per year,
+or 0.6% of the players who’ve played the
+game.)</p>
+<p>Instead, if the writers maxed out the total number of inductees, we would have
+had <strong>13</strong> new inductees each year of the voting, for <strong>949</strong>
+members of the Baseball Hall of Fame! (That would work out to
+4.8% of all players.)</p>
+<p>That seems a bit overly generous, but maxing out the inductees would avoid
+the multi-year campaigning, and might ensure the induction of some players
+who were close to the 75% threshold without quite getting there.</p>
+<p><img src="/post/2020-01-24-riddler-baseball-hall-of-fame_files/figure-html/missed_out-1.png" width="672" /></p>
+</div>
+<div id="long-suffering-candidates" class="section level2">
+<h2>Long-suffering candidates</h2>
+<p>Let’s take a closer look at some of the players that missed the cutoff.
+Here, we’re looking at those who hit the 15-year maximum allowed voting,
+and came close but didn’t get to the 75% threshold.</p>
+<p><img src="/post/2020-01-24-riddler-baseball-hall-of-fame_files/figure-html/spotlight_missed_cut-1.png" width="672" /></p>
+<p>When would they have gotten in?</p>
+<pre class="r"><code># Get player and Hall of Fame voting data from the Lahman package
+require(&quot;Lahman&quot;, quietly = TRUE, warn.conflicts = FALSE)
+
+data(Master)
+players &lt;- Master %&gt;%
+  mutate_at(vars(debut, finalGame), ymd) %&gt;%
+  select(playerID, debut, finalGame, nameGiven, nameFirst, nameLast, deathDate)
+
+data(HallOfFame)
+df &lt;- HallOfFame %&gt;%
+  filter(votedBy == &quot;BBWAA&quot;) %&gt;%
+  left_join(players, by = &quot;playerID&quot;) 
+
+voting_years &lt;- df %&gt;%
+  distinct(yearID) %&gt;%
+  arrange(yearID) %&gt;%
+  pull(yearID)
+
+# Set up inductees dataframe
+inductees &lt;- df %&gt;% 
+  filter(0 == 1)
+
+# Starting in 1936, get the top ranked 13 players and induct them.
+# Then, for subsequent years, get the top-ranked 13 players that 
+# haven&#39;t already been inducted.
+
+for(idx in voting_years) {
+  current_inductees &lt;- df %&gt;% 
+    filter(yearID == idx) %&gt;%
+    anti_join(inductees, by = &quot;playerID&quot;) %&gt;%
+    mutate(year_rank = rank(desc(votes), ties.method = &quot;max&quot;)) %&gt;%
+    filter(year_rank &lt;= 13)
+  inductees &lt;- bind_rows(inductees, current_inductees)
+}</code></pre>
+<p>Not surprisingly, all of these players would have gotten in on their first
+voting year, even with some paltry votes in some cases.</p>
+<pre><code>##        full_name votes ballots year
+## 1    Red Ruffing    22     153 1949
+## 2     Nellie Fox    39     360 1971
+## 3    Jim Bunning   146     383 1977
+## 4 Orlando Cepeda    48     385 1980
+## 5    Jack Morris   111     499 2000</code></pre>
 <hr />
-<p>References:</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
 <ol style="list-style-type: decimal">
 <li><a href="https://baseballhall.org/hall-of-famers/rules/voting-rules-history" class="uri">https://baseballhall.org/hall-of-famers/rules/voting-rules-history</a></li>
 <li>Baseball Hall of Fame data through 2018 from the “Lahman” R package.

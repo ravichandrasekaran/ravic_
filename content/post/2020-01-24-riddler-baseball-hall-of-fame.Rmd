@@ -4,67 +4,42 @@ author: ravic_
 date: '2020-01-24'
 slug: riddler-baseball-hall-of-fame
 categories: []
-draft: true
 tags:
   - riddler
 ---
+
 
 From 538's Riddler column, we have a timely challenge -- a thought experiment
 surrounding the {Baseball Hall of Fame}(https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/).
 <!--more-->
 
-## The challenge
 
-Derek Jeter and Larry Walker were just elected to the Baseball Hall of Fame! That got Stephanie thinking. Suppose there are 20 players on the ballot and 400 voters in a given year. Each voter can select up to 10 players for induction without voting for any given player more than once. To gain entry, a player must have been selected on at least 75 percent of the ballots.
+## Challenge
+Here's the description from the [538 Riddler column](https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/).
 
+> Derek Jeter and Larry Walker were just elected to the Baseball Hall of Fame! That got Stephanie thinking. Suppose there are 20 players on the ballot and 400 voters in a given year. Each voter can select up to 10 players for induction without voting for any given player more than once. To gain entry, a player must have been selected on at least 75 percent of the ballots. \
+\
 Under these circumstances, what is the maximum number of players that can be inducted into the Hall of Fame?
-
-## Early thoughts
-
-A player needs to appear on 300 ballots (75% of 400 ballots). One scenario
-would involve 300 of the voters colluding and submitting identical ballots.
-This would give 10 players entry from their ballots, and render the remaining
-voters' ballots either superfluous or irrelevant.
-
-Certainly, we can do better, and not waste quite so many votes! 
-
-Let's imagine instead that the voters collude, but in six smaller groups:
-
-$$
-\begin{matrix}
-1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 \\
-1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 \\
-1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 \\
-1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 \\
-1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 
-\end{matrix}
-$$
-
-We've added 5 groups of voters. Each candidate now gets 5/6 * 400 votes,
-and we're covering a bit more ground with 2 more candidates. But we're 
-still obviously wasting a lot of votes.
-
 
 ## Approach
 Let's define:  
 
-* The number of ballots $b$. 
-* The number of available votes per ballot $a$.
+* The number of ballots $b = 400$. 
+* The number of available votes per ballot $a = 10$.
 * The threshold for the fraction of ballots to induct, $t = 3/4 = 0.75$.
 
-Then, we have these expressions for the total number of votes $v$, and 
+Then, we have two simple expressions for the total number of votes $v$ and 
 the minimum number of votes required to induct $i$:
+
 $$
 \begin{aligned}
-v &= ba = 400 \cdot 10 = 4000 \\
-i &= bt = 400 \cdot (0.75) = 300
+v & = ba \\
+i & = bt \\
 \end{aligned}
 $$
 
-And we can develop an expression for the maximum number of inductees. 
-Note that the expression doesn't depend on the number of ballots cast,
-just the number of available votes per ballot and the threshold.
+
+And then we can express $c$, the maximum number of inductees. 
 
 $$
 \begin{aligned}
@@ -72,22 +47,25 @@ c & = \left\lfloor \frac{v}{t} \right\rfloor = \left\lfloor \frac{ba}{bt} \right
 & = \left\lfloor \frac{10}{.75} \right\rfloor = 13
 \end{aligned}
 $$
+*Note that the expression doesn't depend on the number of ballots cast,
+just the number of available votes per ballot and the threshold. (And the
+screening for the ballot doesn't matter either, as long as it provides
+more candidates than $c$.)*
 
 
-Our ideal scenario is one where each winning candidate gets exactly the 
-number of votes he needs with no waste. Here, we would have
-$$ 
-A: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_10\}
-B: \{x_1, x_2, x_3, x_4, x_5, x_6, x_7,   ., .  , .   , x_{11}, x_{12}, x_{13}\}
-C: \{x_1, x_2, x_3, x_4,   .,   ., .  , x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
-D: \{x_1,   .,   .,   ., x_5, x_6, x_7, x_8, x_9, x_10, x_{11}, x_{12}, x_{13}\}
-$$
+## Answer
+
+The maximum number of inductees in a given voting year is **13**.
 
 ---
 
+## Ramifications
+
 ```{r load_packages, echo = FALSE}
 options(tidyverse.quiet = TRUE)
-require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+suppressPackageStartupMessages(
+  require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+)
 require("lubridate", quietly = TRUE, warn.conflicts = FALSE)
 require(Lahman, quietly = TRUE, warn.conflicts = FALSE)
 ```
@@ -105,15 +83,184 @@ df <- HallOfFame %>%
 ```
 
 ```{r max_inductees, echo = FALSE}
+num_players <- as.numeric(players %>% nrow())
+
 inducted_actual <- as.numeric(df %>% filter(inducted == "Y") %>% nrow())
+ind_act_pct <- inducted_actual / num_players
 inducted_potential <- 13 * (df %>% distinct(yearID) %>% nrow())
+ind_pot_pct <- inducted_potential / num_players
+
+mean_inductees <- mean(
+  df %>%
+    filter(inducted == "Y") %>%
+    count(yearID) %>%
+    pull(n)
+  )
+
+filtered_mean_inductees <- mean(
+  df %>%
+    filter(yearID >= 1950, yearID <= 2010) %>%
+    filter(inducted == "Y") %>%
+    count(yearID) %>%
+    pull(n)
+  )
 ```
 So, what could have happened if every year the writers got together and 
-colluded on their votes? Instead of the **`r {inducted_actual}`** actual 
-inductees through 2018, we would have 13 new inductees each year of the
-voting, for **`r {inducted_potential}`** members of the Baseball Hall of Fame!
+colluded on their votes? Through 2018, we've seen **`r {inducted_actual}`** 
+actual inductees -- roughly **`r {round(mean_inductees, 1)}`** per year, 
+or `r  {formattable::percent(ind_act_pct, 1)}` of the players who've played the
+game.) 
 
-```{r compare_early_votes, eval = FALSE, echo = FALSE}
+Instead, if the writers maxed out the total number of inductees, we would have
+had **13** new inductees each year of the voting, for **`r {inducted_potential}`** 
+members of the Baseball Hall of Fame! (That would work out to 
+`r  {formattable::percent(ind_pot_pct, 1)}` of all players.) 
+
+That seems a bit overly generous, but maxing out the inductees would avoid
+the multi-year campaigning, and might ensure the induction of some players
+who were close to the 75% threshold without quite getting there.
+
+
+
+
+
+
+
+
+```{r missed_out, echo = FALSE, eval = TRUE}
+player_summary <- df %>%
+  group_by(playerID) %>%
+  summarise(
+    voting_years = n(),
+    max_vote_pct = max(votes / ballots),
+    ever_inducted = any(inducted == "Y"),
+    min_voting_year = min(yearID),
+    max_voting_year = max(yearID))
+
+player_max_vote_pct <- df %>%
+  left_join(player_summary, by = "playerID") %>%
+  arrange(desc(max_vote_pct)) 
+
+player_max_vote_pct %>%
+  mutate(vote_pct_bin = floor(max_vote_pct * 25) / 25) %>%
+  mutate(vote_pct_group = case_when(
+    vote_pct_bin < .65 ~ "Shouldn't be in Hall",
+    between(vote_pct_bin, 0.65, 0.75) ~ "On bubble",
+    TRUE ~ "Definitely Hall of Famer")) %>%
+  ggplot(aes(vote_pct_bin)) +
+  geom_bar(aes(fill = vote_pct_group)) +
+  theme_light() +
+  labs(title = "Histogram of players by maximum vote percentage",
+       x = "Maximum vote percentage", 
+       y = "Players") +
+  scale_x_continuous(labels = scales::percent_format()) +
+  theme(legend.position = "bottom") +
+  scale_fill_manual(values=c("#56B4E9", "#E69F00", "#999999")) +
+  labs(title = "Histogram of players by maximum vote percentage",
+       x = "Maximum vote percentage", 
+       y = "Players",
+       fill = "") 
+```
+
+
+## Long-suffering candidates
+
+Let's take a closer look at some of the players that missed the cutoff.
+Here, we're looking at those who hit the 15-year maximum allowed voting,
+and came close but didn't get to the 75% threshold. 
+
+```{r spotlight_missed_cut, echo = FALSE, eval = TRUE}
+require(ggrepel, quietly = TRUE, warn.conflicts = FALSE)
+# Long-standing missed cut (lsmc)
+lsmc <- player_max_vote_pct %>%
+  filter(!ever_inducted) %>%
+  filter(max_vote_pct > 0.65) %>%
+  filter(voting_years == 15) %>%
+  mutate(full_name = str_c(nameFirst, nameLast, sep = " "))  %>%
+  arrange(desc(max_vote_pct))
+
+
+lsmc %>%
+  mutate(full_name = fct_reorder(full_name, -max_vote_pct)) %>%
+  ggplot(aes(yearID, votes / ballots)) +
+  geom_point(color = "grey60") +
+  facet_wrap(~ full_name, scales = "free_x") +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(expand = expand_scale(add = c(0, 3))) +
+  labs(title = "Voting percentage for long-suffering non-inductees",
+       subtitle = "Long-suffering: 15 years of voting, Max vote percentage > 65%",
+       x = "", y = "") +
+  coord_cartesian(ylim = c(0, 1.00)) +
+  geom_text_repel(aes(label = scales::percent(votes / ballots, accuracy = .1)), 
+            data = lsmc %>% filter(max_vote_pct == votes/ballots),
+            show.legend = FALSE, nudge_y = 1, size = 3)
+        
+```
+
+When would they have gotten in?
+
+```{r potential_inductees, echo = TRUE, eval = TRUE}
+# Get player and Hall of Fame voting data from the Lahman package
+require("Lahman", quietly = TRUE, warn.conflicts = FALSE)
+
+data(Master)
+players <- Master %>%
+  mutate_at(vars(debut, finalGame), ymd) %>%
+  select(playerID, debut, finalGame, nameGiven, nameFirst, nameLast, deathDate)
+
+data(HallOfFame)
+df <- HallOfFame %>%
+  filter(votedBy == "BBWAA") %>%
+  left_join(players, by = "playerID") 
+
+voting_years <- df %>%
+  distinct(yearID) %>%
+  arrange(yearID) %>%
+  pull(yearID)
+
+# Set up inductees dataframe
+inductees <- df %>% 
+  filter(0 == 1)
+
+# Starting in 1936, get the top ranked 13 players and induct them.
+# Then, for subsequent years, get the top-ranked 13 players that 
+# haven't already been inducted.
+
+for(idx in voting_years) {
+  current_inductees <- df %>% 
+    filter(yearID == idx) %>%
+    anti_join(inductees, by = "playerID") %>%
+    mutate(year_rank = rank(desc(votes), ties.method = "max")) %>%
+    filter(year_rank <= 13)
+  inductees <- bind_rows(inductees, current_inductees)
+}
+```
+
+Not surprisingly, all of these players would have gotten in on their first
+voting year, even with some paltry votes in some cases.
+
+```{r spotlight_inductee_model, echo = FALSE, eval = TRUE}
+inductees %>%
+  mutate(full_name = str_c(nameFirst, nameLast, sep = " ")) %>%
+  semi_join(lsmc, by = "full_name") %>%
+  select(full_name, votes, ballots, year = yearID)
+```
+
+
+
+---
+
+## References  
+
+1.  https://baseballhall.org/hall-of-famers/rules/voting-rules-history
+2.  Baseball Hall of Fame data through 2018 from the "Lahman" R package. 
+    Michael Friendly, Chris Dalzell, Martin Monkman and Dennis Murphy 
+    (2019). Lahman: Sean 'Lahman' Baseball Database. R package version 
+    7.0-1. https://CRAN.R-project.org/package=Lahman
+
+
+```{r appendix_compare_early_votes, eval = FALSE, echo = FALSE}
 df %>%
   filter(yearID %in% c(1936, 1937)) %>%
   group_by(yearID) %>%
@@ -123,14 +270,38 @@ df %>%
   arrange(yearID, desc(votes)) %>%
   select(yearID, nameFirst, nameLast, votes, year_rank, inducted, 
          debut, finalGame, deathDate) 
+
+yearly_summary <- df %>%
+  group_by(yearID) %>%
+  mutate(year_rank = rank(desc(votes), ties.method = "first")) %>%
+  ungroup() 
+
+yearly_summary %>%
+  arrange(playerID, yearID) %>%
+  select(yearID, nameFirst, nameLast, needed, votes, year_rank, inducted, 
+         debut, finalGame, deathDate) 
+
+
 ```
 
----
+```{r appendix_plot_induction_rate, echo = FALSE, eval = FALSE}
+df %>%
+  filter(inducted == "Y") %>%
+  count(yearID) %>%
+  ggplot(aes(yearID, n)) +
+  geom_point(color = "lightblue") +
+  geom_vline(xintercept = 1950, lty = 2, alpha = .8, color = "grey50") +
+  geom_vline(xintercept = 2010, lty = 2, alpha = .8, color = "grey50") +
+  #geom_segment(x = 1950, y = filtered_mean_inductees, 
+  #             xend = 2010, yend = filtered_mean_inductees,
+  #             lty = 1, color = "lightblue") +
+  theme_light() +
+  labs(
+    title = "Number of players inducted into Hall of Fame by year",
+    x = "",
+    y = "Inductees") +
+  coord_cartesian(ylim = c(0, 5)) +
+  scale_x_continuous(breaks = seq(1940, 2020, 10), 
+                     minor_breaks = seq(1940, 2020, 10))
 
-References:  
-
-1.  https://baseballhall.org/hall-of-famers/rules/voting-rules-history
-2.  Baseball Hall of Fame data through 2018 from the "Lahman" R package. 
-    Michael Friendly, Chris Dalzell, Martin Monkman and Dennis Murphy 
-    (2019). Lahman: Sean 'Lahman' Baseball Database. R package version 
-    7.0-1. https://CRAN.R-project.org/package=Lahman
+```
