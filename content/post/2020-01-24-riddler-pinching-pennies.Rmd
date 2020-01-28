@@ -1,0 +1,161 @@
+---
+title: 'Riddler: Pinching pennies'
+author: ravic_
+date: '2020-01-24'
+slug: riddler-pinching-pennies
+categories: []
+draft: true
+math: true
+tags:
+  - riddler
+---
+
+From 538's Riddler column, we have our next challenge -- a game of "[Pinching
+Pennies](https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/)".
+<!--more-->
+
+## The challenge
+From 538's Riddler column, a game of "[Pinching
+Pennies](https://fivethirtyeight.com/features/how-many-pennies-should-you-pinch/)".
+
+> The game starts with somewhere between 20 and 30 pennies, which I then divide into two piles any way I like. Then we alternate taking turns, with you first, until someone wins the game. For each turn, a player may take any number of pennies he or she likes from either pile, or instead take the same number of pennies from both piles. Each player must also take at least one penny every turn. The winner of the game is the one who takes the last penny.  \
+\
+If we both play optimally, what starting numbers of pennies (again, between 20 and 30) guarantee that you can win the game?
+
+## Approach
+Let’s start with 1 coin. You might be thinking, “Now hold on a sec!” But 
+your opponent can in fact split 1 coin two different ways:  
+
+* With 1 coin on the left, and 0 coins on the right.
+* Or 1 coin on the right, and 0 coins on the left.
+
+Let me show you.
+
+![Figure 1: One coin splits](/post/2020-01-24-riddler-pinching-pennies_files/1-one-coin-splits.png)
+
+And of course, if your  opponent does this, you’ll win right away --
+just grab all the coins on the left stack! Easy peasy.
+
+Now of course, it doesn’t really matter if it’s 1 coin in the left stack
+and 0 coins in the right stack -- or if it’s 1 coin in the right stack 
+and 0 coins in the left stack. Everything's symmetric. 
+ 
+ 
+---
+
+Well, that’s kinda lame. Let’s see what happens with two coins. 
+Your opponent can split them in these three ways:
+ 
+![Figure 2: Two coin splits](/post/2020-01-24-riddler-pinching-pennies_files/2-two-coin-splits.png)
+ 
+ 
+All of those are also going to be direct winners. The single stack 
+two coins you can grab. And the option with 1 coin in each stack?
+You can take an equal number of coins from each
+stack!
+
+
+Might seem like weak sauce, but we’ve already seen two examples 
+where the number of coins determines the winner, no matter how
+your opponent splits them!
+ 
+---
+
+For a given number of coins, we’re now seeing all possible splits 
+along the diagonal. And here, along the diagonal for 1 coin or 
+2 coins, all possible splits show imminent wins. 
+Everything is coming up roses.
+
+What about that weird square with no coins in either stack, for
+zero total coins? We’re going to call that a losing square, since
+there are no moves you can make, and you can’t take the last
+coin. It feels like a bizzaro scenario, but the answer is correct, 
+and having that square will help us in a sec.Let’s put all these 
+options on a grid.
+
+![Figure 3: Up to two coins, grid layout](/post/2020-01-24-riddler-pinching-pennies_files/3-le-two-coin-split-grid.png)
+
+---
+
+
+Let’s try 3 coins:The single stacks of 3 coins on the left or right are easy -- we know
+those are winning situations. But what about the 2 coins and 1 coin?
+There are four possible moves, but all of them result in a winning
+position for your opponent. Since they *all* result in a win for your
+opponent, they’re a losing scenario for you.
+
+
+![Figure 4: Up to three coins, grid layout](/post/2020-01-24-riddler-pinching-pennies_files/4-le-three-coin-split-grid.png)
+---
+
+And now let’s add in N = 4, 5, 6, and 7 total coins. They’re all winning
+situations, since they can move to a losing situation for your opponent
+in a single move.
+
+
+
+---
+
+Once we find a losing situation, we can actually fill in a lot of squares 
+at once. If we look from a losing square across the row, that shows us
+a variety of changes in the right stack. The rest of the row will be all
+winning situations. Why?
+
+A losing square is losing because all possible moves, including 
+decreasing the right stack -- will be winning situations for your 
+opponent. And if you had a scenario like the losing square but with
+more coins in the right stack, in a single move, you could remove those
+coins and your opponent would be confronted with a losing square.
+
+That same logic works for each row, column and principal diagonal.  
+
+**Once you’ve found a losing square, everything else along those directions
+will all be winning squares.**
+
+---
+
+
+Let’s include 8, 9, 10, and 11 coins. We’ll find a few more losing scenarios
+which come in pairs (5, 3), (3, 5), (4, 7), (7, 4). ... Some of
+these will take time to play out, but the outcome is well-defined for players
+who take the best possible move.
+
+---
+
+
+In fact, we can write an expression for the set of losing scenarios.
+
+$$
+\begin{aligned}
+\{(5x, 3x) \; \forall x \in \{0, 1, 2, 3, \dots \} \cup \\
+\{(5x + 2, 3x + 1) \forall x \in 0, 1, 2, 3, \dots \} \cup \\
+\{(3x, 5x) \; \forall x \in \{0, 1, 2, 3, \dots \} \cup \\
+\{(3x + 1, 5x + 2) \forall x \in 0, 1, 2, 3, \dots \}
+\end{aligned}
+$$
+
+It looks a little serpentine (like Chichen Itza?)
+
+
+---
+
+
+Once we map all the losing squares, then we can run across the 
+counter-diagonals, which represent all possible splits for a given number
+of total coins. If any of these contain a losing scenario, then that number
+of total coins doesn't guarantee us a win -- we're at the mercy of the 
+opponent's split. 
+
+But luckily, a great many will give us winning scenarios regardless of how
+the opponent makes the split: 20, 21, 22, 23, 25, 26, 28, 29, 30. 
+
+**So there are 9 possible total coins that guarantee us a win between 20 and
+30 total coins inclusive.** *We just need to ensure there aren't 24 or 27 
+coins. :)*
+ 
+
+
+
+
+
+ 
