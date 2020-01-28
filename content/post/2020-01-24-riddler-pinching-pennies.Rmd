@@ -4,7 +4,6 @@ author: ravic_
 date: '2020-01-24'
 slug: riddler-pinching-pennies
 categories: []
-draft: true
 math: true
 tags:
   - riddler
