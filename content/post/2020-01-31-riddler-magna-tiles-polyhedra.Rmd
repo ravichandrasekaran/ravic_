@@ -26,6 +26,8 @@ If Robert wanted to maximize the volume contained within the resulting pyramid (
 options(tidyverse.quiet = TRUE)
 library("tidyverse")
 require("glue", quietly = TRUE, warn.conflicts = FALSE)
+require("gghighlight", quietly = TRUE, warn.conflicts = FALSE)
+require("ggrepel", quietly = TRUE, warn.conflicts = FALSE)
 ```
 
 ---
@@ -35,7 +37,7 @@ require("glue", quietly = TRUE, warn.conflicts = FALSE)
 Let's save the trig for a moment, and check out the results!
 
 ```{r run_simulation, echo = FALSE}
-df <- tibble(n_flat = 3:100, side = 1) %>%
+df <- tibble(n_flat = c(5:12, 25, 100), side = 1) %>%
   mutate(n = map(n_flat, ~seq(3, .x))) %>%
   unnest(c(n))
 
@@ -48,18 +50,6 @@ summ <- df %>%
     wedge_volume = (1/3) * base_wedge_area * wedge_height,
     total_volume = n * wedge_volume) 
 
-plot_summ <- function(num_tiles_flat) {
-  plt <- summ %>%
-    filter(n_flat == num_tiles_flat) %>%
-    ggplot(aes(n, total_volume)) +
-    geom_point() +
-    theme_light() +
-    labs(
-      title = "Polyhedra volume",
-      subtitle = glue::glue("{num_tiles_flat} lay flat"),
-      x = "n", y = bquote("Volume" ~ (units^3)))
-  return(plt)
-}
 ```
 
 ```{r plot_main_answer, echo = FALSE}
@@ -71,13 +61,22 @@ summ %>%
   labs(
     title = "Polyhedra volume for n-sided regular polygon base",
     subtitle = "Assumes 12 tiles lay flat, side length = 1",
-    x = "n", y = bquote("Volume" ~ (units^3)))
+    x = "n", y = bquote("Volume" ~ (units^3))) +
+    gghighlight(total_volume == max(total_volume), label_key = n,
+                unhighlighted_params = list(colour = "grey60")) +
+  scale_x_continuous(breaks = seq(0, 12, 2))
 ```
 
 Instead of assuming that it lies flat with 12 tiles, let's try out some
 other values.
 
 ```{r plot_other_variants, echo = FALSE}
+max_volumes <- summ %>%
+  filter(n_flat %in% c(7, 10, 25, 100)) %>%
+  group_by(n_flat) %>%
+  arrange(desc(total_volume)) %>%
+  slice(1)
+
 summ %>%
   filter(n_flat %in% c(7, 10, 25, 100)) %>%
   ggplot(aes(n, total_volume)) +
@@ -86,7 +85,9 @@ summ %>%
   labs(
     title = "Polyhedra volume with varying angled tiles",
     x = "n", y = bquote("Volume" ~ (units^3))) +
-  facet_wrap(~ n_flat, scales = "free")
+  facet_wrap(~ n_flat, scales = "free") +
+  gghighlight(total_volume == max(total_volume), label_key = n,
+              unhighlighted_params = list(colour = "grey60")) 
 ```
 
 
