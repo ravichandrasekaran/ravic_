@@ -2,13 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
-
 # Ignore blogdown-specific directories
 blogdown/
 public/
-
 # Ignore virtual environments
 venv/
-
 # Mac - Ignore cache files
 .DS_Store
+.httr-oauth

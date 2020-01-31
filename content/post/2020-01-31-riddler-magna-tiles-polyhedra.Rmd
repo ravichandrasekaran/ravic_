@@ -1,0 +1,207 @@
+---
+title: 'Riddler: Magna-Tiles Polyhedra'
+author: ravic_
+date: '2020-01-31'
+slug: riddler-magna-tiles-polyhedra
+categories: []
+draft: true
+tags:
+  - riddler
+---
+
+From the [Riddler](https://fivethirtyeight.com/features/can-you-roll-the-perfect-bowl/), a little 3D puzzle with triangular tiles!
+
+<!--more-->
+
+From our friends at the [Riddler](https://fivethirtyeight.com/features/can-you-roll-the-perfect-bowl/):  
+
+> Robert’s daughter has a set of Magna-Tiles, which, as their name implies, are tiles with magnets on the edges that can be used to build various polygons and polyhedra. Some of the tiles are identical isosceles triangles with one 30 degree angle and two 75 degree angles. If you were to arrange 12 of these tiles with their 30 degree angles in the center, they would lay flat and form a regular dodecagon. If you were to put fewer (between three and 11) of those tiles together in a similar way, they would form a pyramid whose base is a regular polygon. Robert has graciously provided a [photo of the resulting pyramids when three and 11 tiles are used](https://fivethirtyeight.com/features/can-you-roll-the-perfect-bowl/) \
+\
+If Robert wanted to maximize the volume contained within the resulting pyramid (presumably to store as much candy for his daughter as possible), how many tiles should he use?
+
+
+
+
+```{r load_packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+
+---
+
+Welcome back to your trigonometry class!
+![Trig class](https://sites.google.com/site/therealworldtrigonometry/_/rsrc/1460486510342/home/image.gif)
+
+---
+
+## Results
+Let's save the trig, and check out the results!
+
+```{r run_simulation, echo = FALSE}
+n_flat <- 12
+df <- tibble(n = seq(3, n_flat), side = 1)
+# Degrees are implied from the flat config.
+
+summ <- df %>%
+  mutate(
+    tile_height = (side / 2 ) / tan(pi / n_flat),
+    base_center_side_dist = (side / 2) / tan(pi / n),
+    base_wedge_area = (1/2) * base_center_side_dist * side,
+    wedge_height = sqrt(tile_height ^2 - base_center_side_dist ^ 2),
+    wedge_volume = (1/3) * base_wedge_area * wedge_height,
+    total_volume = n * wedge_volume) 
+
+summ %>%
+  ggplot(aes(n, total_volume)) +
+  geom_point() +
+  theme_light() +
+  labs(
+    title = "Polyhedra volume for n-sided regular polygon base",
+    x = "n", y = "Volume")
+```
+
+```{r run_simulation_2, echo = FALSE}
+n_flat <- 100
+df <- tibble(n = seq(3, n_flat), side = 1)
+# Degrees are implied from the flat config.
+
+summ <- df %>%
+  mutate(
+    tile_height = (side / 2 ) / tan(pi / n_flat),
+    base_center_side_dist = (side / 2) / tan(pi / n),
+    base_wedge_area = (1/2) * base_center_side_dist * side,
+    wedge_height = sqrt(tile_height ^2 - base_center_side_dist ^ 2),
+    wedge_volume = (1/3) * base_wedge_area * wedge_height,
+    total_volume = n * wedge_volume) 
+
+summ %>%
+  ggplot(aes(n, total_volume)) +
+  geom_point() +
+  theme_light() +
+  labs(
+    title = "Polyhedra volume for n-sided regular polygon base",
+    x = "n", y = "Volume")
+```
+
+```{r run_simulation_3, echo = FALSE}
+n_flat <- 20
+df <- tibble(n = seq(3, n_flat), side = 1)
+# Degrees are implied from the flat config.
+
+summ <- df %>%
+  mutate(
+    tile_height = (side / 2 ) / tan(pi / n_flat),
+    base_center_side_dist = (side / 2) / tan(pi / n),
+    base_wedge_area = (1/2) * base_center_side_dist * side,
+    wedge_height = sqrt(tile_height ^2 - base_center_side_dist ^ 2),
+    wedge_volume = (1/3) * base_wedge_area * wedge_height,
+    total_volume = n * wedge_volume) 
+
+summ %>%
+  ggplot(aes(n, total_volume)) +
+  geom_point() +
+  theme_light() +
+  labs(
+    title = "Polyhedra volume for n-sided regular polygon base",
+    x = "n", y = "Volume")
+```
+
+## Approach
+
+Let's start by looking at the tile. We know that 12 of these tiles will lay 
+flat in a dodecahedron. That already tells us we have a 30-75-75 isoceles
+triangle. 
+$$
+\begin{aligned}
+\theta & = \frac{2\pi}{f} \\
+\end{aligned}
+$$
+
+
+#### The tile
+With side length $a$, the height of the tile $h_t$ is given by:
+
+$$
+\begin{aligned}
+\tan(\tfrac{1}{2}\theta) & = (\tfrac{1}{2}a) / h_t \\
+h_t & = (\tfrac{1}{2}a)  \cot (\tfrac{1}{2}\theta) \\
+& = (\tfrac{1}{2}a) \cot (\frac{\pi}{f})
+\end{aligned}
+$$
+
+#### The base  
+
+The base is a regular polygon with $n$ sides. We can divide that regular 
+polygon into $n$ triangles by connecting the vertices to the center. (That
+will represent the base of a wedge of the polyhedra that we're working 
+towards.)
+
+The interior angle $\phi$ for those $n$ triangles in the base polygon:
+$$
+\begin{aligned}
+\phi & = \frac{2\pi}{n} \\
+\end{aligned}
+$$
+
+And then we can divide each triangle again in half by dropping a perpendicular
+from the center to the side. How long is that perpendicular, $p$? Well, we have
+basically the same equation as before, just using a different number of sides
+for the regular polygon.
+
+$$
+\begin{aligned}
+\tan(\tfrac{1}{2}\phi) & = (\tfrac{1}{2}a) / p \\
+p & = (\tfrac{1}{2}a)  \cot (\tfrac{1}{2}\phi) \\
+p & = (\tfrac{1}{2}a) \cot (\frac{\pi}{n})
+
+\end{aligned}
+$$
+
+#### The wedge  
+
+With this perpendicular distance $p$, we can get the base area of a single 
+wedge.
+$$
+\begin{aligned}
+A_w & = \tfrac{1}{2} \cdot p \cdot a \\
+& = \tfrac{1}{2} \cdot (\tfrac{1}{2}a) \cot (\frac{\pi}{n}) \cdot a \\
+& = \tfrac{1}{4} a^2  \cot (\frac{\pi}{n})
+\end{aligned}
+$$
+
+And with the perpendicular distance along the base $p$, and the tile height 
+$h_t$ we obtained earlier, we can express the wedge height $h_w$:
+
+$$
+\begin{aligned}
+h_t^2 & = p^2 + h_w^2 \\
+h_w^2 & = h_t^2 - p^2 \\
+& = [ (\tfrac{1}{2}a) \cot (\frac{\pi}{f})]^2 - [(\tfrac{1}{2}a) \cot (\frac{\pi}{n})]^2 \\
+h_w & = \sqrt{[ (\tfrac{1}{2}a) \cot (\frac{\pi}{f})]^2 - [(\tfrac{1}{2}a) \cot (\frac{\pi}{n})]^2} \\
+& = (\tfrac{1}{2}a) \sqrt{ \cot^2 (\frac{\pi}{f}) -  \cot^2 (\frac{\pi}{n})} \\
+\end{aligned}
+$$
+
+#### The volume  
+
+The volume of a single wedge $V_w$ as a function of $n$ is given by:
+$$
+\begin{aligned}
+V_w & = \tfrac{1}{3} \cdot A_w \cdot h_w \\
+& = \tfrac{1}{3} \cdot [\tfrac{1}{4} a^2  \cot (\frac{\pi}{n})] \cdot [(\tfrac{1}{2}a) \sqrt{ \cot^2 (\frac{\pi}{f}) -  \cot^2 (\frac{\pi}{n})}] \\
+& = \frac{1}{24} \cdot a^3 \cdot \cot(\frac{\pi}{n}) \sqrt{ \cot^2 (\frac{\pi}{f}) -  \cot^2 (\frac{\pi}{n})}
+\end{aligned}
+$$
+
+And let's not forget that we're trying to get the total volume, $V$:
+$$
+\begin{aligned}
+V & = n \cdot V_w \\
+& = n \cdot [\frac{1}{24} \cdot a^3 \cdot \cot(\frac{\pi}{n}) \sqrt{ \cot^2 (\frac{\pi}{f}) -  \cot^2 (\frac{\pi}{n})}]
+\end{aligned}
+$$
+
+## Code
+
+```{r ref.label = "run_simulation", eval = FALSE}
+```
