@@ -204,5 +204,16 @@ is pretty low. So, let's leave this here.
 ```{r ref.label = "run_simulation", eval = FALSE}
 ```
 
+```{r summary_table, eval = TRUE, echo = TRUE}
+# Summary for 12-tile 
+options(digits = 3)
+summ %>%
+  filter(n_flat == 12) %>%
+  select(n, h_t = tile_height, base_perp = base_center_side_dist, 
+         base_wedge_area, wedge_height, wedge_volume,
+         total_volume) 
+  
+```
+
 ```{r ref.label = "plot_main_answer", eval = FALSE}
 ```
