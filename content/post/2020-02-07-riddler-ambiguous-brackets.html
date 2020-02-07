@@ -28,9 +28,11 @@ How many different values can the expression |−1|−2|−3|−4|−5|−6|−7
 </blockquote>
 <div id="results" class="section level2">
 <h2>Results</h2>
-<p>There are 42 pathways, but there are a few different
-formulations that lead to the same answer, so only 39
-unique answers. (The duplicate answers are: -375, -25, 105.)</p>
+<p>There are 42 pathways, and a prettier way to get at that
+than this code-heavy approach. But different formulations can – and
+do – lead to the same answer. So we have to evaluate all the paths. :(</p>
+<p>In the end, there are only 39 unique answers.
+(The duplicate answers are: -375, -25, 105.)</p>
 <p>The full list of paths, equations and answers follows at the end.</p>
 <hr />
 </div>
@@ -38,7 +40,8 @@ unique answers. (The duplicate answers are: -375, -25, 105.)</p>
 <h2>Code</h2>
 <p>The code relies on a recursive solution, building up both the option of
 opening a new bracket or closing an existing bracket at each turn.</p>
-<pre class="r"><code>evaluate_options &lt;- function(eqtn, remnant, num_used, num_open, pathway) {
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+evaluate_options &lt;- function(eqtn, remnant, num_used, num_open, pathway) {
   
   # Cannot leave the final expression unclosed
   if ((num_open &gt; 0) &amp;

@@ -31,6 +31,7 @@ library("tidyverse")
 ```
 
 ```{r define_functions, echo = FALSE}
+library("tidyverse")
 evaluate_options <- function(eqtn, remnant, num_used, num_open, pathway) {
   
   # Cannot leave the final expression unclosed
@@ -108,9 +109,12 @@ duplicate_answers <- unique(
 
 
 ## Results
-There are `r {num_pathways}` pathways, but there are a few different
-formulations that lead to the same answer, so only `r {num_unq_answers}`
-unique answers. (The duplicate answers are: `r {duplicate_answers}`.)
+There are `r {num_pathways}` pathways, and a prettier way to get at that 
+than this code-heavy approach. But different formulations can -- and 
+do -- lead to the same answer. So we have to evaluate all the paths. :(
+
+In the end, there are only `r {num_unq_answers}` unique answers. 
+(The duplicate answers are: `r {duplicate_answers}`.)
 
 The full list of paths, equations and answers follows at the end.
 
