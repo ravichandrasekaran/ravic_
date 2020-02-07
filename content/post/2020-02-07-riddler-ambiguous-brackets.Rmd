@@ -1,0 +1,141 @@
+---
+title: 'Riddler: Ambiguous brackets'
+author: ravic_
+date: '2020-02-07'
+slug: riddler-ambiguous-brackets
+categories: []
+tags:
+  - riddler
+---
+On the ambiguity in absolute values, from the 
+[Riddler](https://fivethirtyeight.com/features/how-many-more-palindrome-dates-will-you-see/):
+
+<!--more-->
+
+On the ambiguity in absolute values, from the 
+[Riddler](https://fivethirtyeight.com/features/how-many-more-palindrome-dates-will-you-see/):
+
+> The pairings of other mathematical symbols can be more ambiguous. Take the absolute value symbols in Jim’s example, which are vertical bars, regardless of whether they mark the opening or closing of the absolute value. As Jim points out, |−1|−2|−3| has two possible interpretations: \
+\
+1. The two left bars are a pair and the two right bars are a pair. \
+In this case, we have 1−2·3 = 1−6 = −5.  \
+\
+2. The two outer bars are a pair and the two inner bars are a pair. \
+In this case, we have |−1·2−3| = |−2−3| = |−5| = 5. \
+\
+How many different values can the expression |−1|−2|−3|−4|−5|−6|−7|−8|−9| have?
+
+```{r load_packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+
+```{r define_functions, echo = FALSE}
+evaluate_options <- function(eqtn, remnant, num_used, num_open, pathway) {
+  
+  # Cannot leave the final expression unclosed
+  if ((num_open > 0) &
+      (num_used >= NUM_BRACKETS)) {
+    return(NULL)
+  }
+  
+  # Cannot have a negative number of open brackets
+  if (num_open < 0) {
+    return(NULL)
+  }
+  
+  # Terminal state
+  # Evaluate equation string using:
+  # https://stackoverflow.com/questions/1743698/evaluate-expression-given-as-a-string
+  if ((num_open == 0) & 
+      (num_used >= NUM_BRACKETS)) {
+    rslt_tibble <- tibble(equation = eqtn, pathway = pathway) %>%
+      mutate(evaluation = eval(parse(text = eqtn)))
+    return(rslt_tibble)
+  }
+  
+  # Pull off first number and bracket 
+  # Results include both opening and closing the brackets
+  numeric <- str_extract(remnant, "[^|]+")
+  new_remnant <- sub("[^|]+\\|", "", remnant)
+
+  return(bind_rows(
+    evaluate_options(
+      # When opening a bracket, the new equation will be a concatenation:
+      # existing equation + numeric token + "* abs("
+      eqtn = paste0(eqtn, numeric, "* abs("), 
+      remnant = new_remnant, 
+      num_used = num_used + 1, 
+      num_open = num_open + 1, 
+      pathway = paste0(pathway, "O")),
+    evaluate_options(
+      # When closing a bracket, the new equation will be a concatenation:
+      # existing equation + numeric token + ")"
+      eqtn = paste0(eqtn, numeric, ")"), 
+      remnant = new_remnant, 
+      num_used = num_used +1, 
+      num_open = num_open - 1, 
+      pathway = paste0(pathway, "C"))))
+}
+```
+
+```{r eval_test_data, echo = FALSE}
+# Adding 1 in front just for convenience
+TEST_STRING <- "1|-1|-2|-3|-4|-5|-6|-7|-8|-9|"
+NUM_BRACKETS <- 10
+
+answers <- evaluate_options(
+  eqtn = "", 
+  remnant = TEST_STRING, 
+  num_used = 0, 
+  num_open = 0, 
+  pathway = "")
+```
+
+```{r summarise_results, echo = FALSE}
+answer_summary <- answers %>% arrange(evaluation)
+num_pathways <- nrow(answer_summary)
+unq_answers <- unique(answers %>% pull(evaluation))
+num_unq_answers <- length(unq_answers)
+
+duplicate_answers <- unique(
+  answer_summary %>% 
+    add_count(evaluation) %>% 
+    filter(n > 1) %>% 
+    pull(evaluation))
+
+```
+
+
+## Results
+There are `r {num_pathways}` pathways, but there are a few different
+formulations that lead to the same answer, so only `r {num_unq_answers}`
+unique answers. (The duplicate answers are: `r {duplicate_answers}`.)
+
+The full list of paths, equations and answers follows at the end.
+
+---
+
+## Code
+
+The code relies on a recursive solution, building up both the option of
+opening a new bracket or closing an existing bracket at each turn. 
+
+```{r ref.label = "define_functions", eval = FALSE, echo = TRUE}
+```
+
+```{r ref.label = "eval_test_data", eval = FALSE, echo = TRUE}
+```
+
+---
+
+## Appendix  
+
+Detailed results:
+```{r display_table, echo = FALSE}
+knitr::kable(answer_summary)
+```
+
+
+
+
