@@ -32,11 +32,12 @@ library("tidyverse")
 
 ```{r define_functions, echo = FALSE}
 library("tidyverse")
-evaluate_options <- function(eqtn, remnant, num_used, num_open, pathway) {
+evaluate_options <- function(remnant, num_brackets, eqtn = "", num_used = 0, 
+                             num_open = 0, pathway = "") {
   
   # Cannot leave the final expression unclosed
   if ((num_open > 0) &
-      (num_used >= NUM_BRACKETS)) {
+      (num_used >= num_brackets)) {
     return(NULL)
   }
   
@@ -49,7 +50,7 @@ evaluate_options <- function(eqtn, remnant, num_used, num_open, pathway) {
   # Evaluate equation string using:
   # https://stackoverflow.com/questions/1743698/evaluate-expression-given-as-a-string
   if ((num_open == 0) & 
-      (num_used >= NUM_BRACKETS)) {
+      (num_used >= num_brackets)) {
     rslt_tibble <- tibble(equation = eqtn, pathway = pathway) %>%
       mutate(evaluation = eval(parse(text = eqtn)))
     return(rslt_tibble)
@@ -64,34 +65,32 @@ evaluate_options <- function(eqtn, remnant, num_used, num_open, pathway) {
     evaluate_options(
       # When opening a bracket, the new equation will be a concatenation:
       # existing equation + numeric token + "* abs("
-      eqtn = paste0(eqtn, numeric, "* abs("), 
       remnant = new_remnant, 
+      num_brackets = num_brackets,
+      eqtn = paste0(eqtn, numeric, "* abs("), 
       num_used = num_used + 1, 
       num_open = num_open + 1, 
       pathway = paste0(pathway, "O")),
     evaluate_options(
       # When closing a bracket, the new equation will be a concatenation:
       # existing equation + numeric token + ")"
-      eqtn = paste0(eqtn, numeric, ")"), 
       remnant = new_remnant, 
+      num_brackets = num_brackets,
+      eqtn = paste0(eqtn, numeric, ")"), 
       num_used = num_used +1, 
       num_open = num_open - 1, 
-      pathway = paste0(pathway, "C"))))
+      pathway = paste0(pathway, "C")))
+    )
 }
 ```
 
 ```{r eval_test_data, echo = FALSE}
 # Adding 1 in front just for convenience
 TEST_STRING <- "1|-1|-2|-3|-4|-5|-6|-7|-8|-9|"
-NUM_BRACKETS <- 10
 
-answers <- evaluate_options(
-  eqtn = "", 
-  remnant = TEST_STRING, 
-  num_used = 0, 
-  num_open = 0, 
-  pathway = "")
+answers <- evaluate_options(remnant = TEST_STRING, num_brackets = 10)
 ```
+
 
 ```{r summarise_results, echo = FALSE}
 answer_summary <- answers %>% arrange(evaluation)
@@ -113,10 +112,10 @@ There are `r {num_pathways}` pathways, and a prettier way to get at that
 than this code-heavy approach. But different formulations can -- and 
 do -- lead to the same answer. So we have to evaluate all the paths. :(
 
-In the end, there are only `r {num_unq_answers}` unique answers. 
-(The duplicate answers are: `r {duplicate_answers}`.)
+In the end, there are only **`r {num_unq_answers}` unique answers**. 
+(The duplicate answers are: `r {duplicate_answers}`.) The full list of paths, 
+equations and answers follows at the end.
 
-The full list of paths, equations and answers follows at the end.
 
 ---
 
@@ -134,6 +133,8 @@ opening a new bracket or closing an existing bracket at each turn.
 ---
 
 ## Appendix  
+
+Pathway diagram:  
 
 ```{r pathway_diagram, echo = FALSE}
 library(ggrepel)
@@ -179,6 +180,27 @@ Detailed results:
 knitr::kable(answer_summary)
 ```
 
+
+
+```{r generalized_string, echo = FALSE, eval = FALSE}
+# A generalized approach to handle longer and longer strings
+gen_bracketed_string <- function(num_pairs) {
+  innards <- paste0(seq(-1, num_pairs * (-2) + 1, -1), collapse = "|")
+  return(paste0("1|", innards, "|"))
+}
+
+df <- tibble(num_bracket_pairs = 1:10) %>%
+  mutate(bracketed_string = purrr::map(num_bracket_pairs, gen_bracketed_string)) %>%
+  mutate(answers = map2(bracketed_string, num_bracket_pairs * 2, evaluate_options)) %>%
+  mutate(num_pathways = map_int(answers, nrow)) %>%
+  mutate(num_unique_answers = map_int(answers, 
+                                  function(x) { length(unique(x %>% pull(evaluation))) })) %>%
+  mutate(pct_unique = num_unique_answers / num_pathways)
+
+df %>%
+  select(num_bracket_pairs, num_pathways, num_unique_answers, 
+        pct_unique)
+```
 
 
 

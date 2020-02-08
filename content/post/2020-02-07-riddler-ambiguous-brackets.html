@@ -31,9 +31,9 @@ How many different values can the expression |−1|−2|−3|−4|−5|−6|−7
 <p>There are 42 pathways, and a prettier way to get at that
 than this code-heavy approach. But different formulations can – and
 do – lead to the same answer. So we have to evaluate all the paths. :(</p>
-<p>In the end, there are only 39 unique answers.
-(The duplicate answers are: -375, -25, 105.)</p>
-<p>The full list of paths, equations and answers follows at the end.</p>
+<p>In the end, there are only <strong>39 unique answers</strong>.
+(The duplicate answers are: -375, -25, 105.) The full list of paths,
+equations and answers follows at the end.</p>
 <hr />
 </div>
 <div id="code" class="section level2">
@@ -41,11 +41,12 @@ do – lead to the same answer. So we have to evaluate all the paths. :(</p>
 <p>The code relies on a recursive solution, building up both the option of
 opening a new bracket or closing an existing bracket at each turn.</p>
 <pre class="r"><code>library(&quot;tidyverse&quot;)
-evaluate_options &lt;- function(eqtn, remnant, num_used, num_open, pathway) {
+evaluate_options &lt;- function(remnant, num_brackets, eqtn = &quot;&quot;, num_used = 0, 
+                             num_open = 0, pathway = &quot;&quot;) {
   
   # Cannot leave the final expression unclosed
   if ((num_open &gt; 0) &amp;
-      (num_used &gt;= NUM_BRACKETS)) {
+      (num_used &gt;= num_brackets)) {
     return(NULL)
   }
   
@@ -58,7 +59,7 @@ evaluate_options &lt;- function(eqtn, remnant, num_used, num_open, pathway) {
   # Evaluate equation string using:
   # https://stackoverflow.com/questions/1743698/evaluate-expression-given-as-a-string
   if ((num_open == 0) &amp; 
-      (num_used &gt;= NUM_BRACKETS)) {
+      (num_used &gt;= num_brackets)) {
     rslt_tibble &lt;- tibble(equation = eqtn, pathway = pathway) %&gt;%
       mutate(evaluation = eval(parse(text = eqtn)))
     return(rslt_tibble)
@@ -73,34 +74,32 @@ evaluate_options &lt;- function(eqtn, remnant, num_used, num_open, pathway) {
     evaluate_options(
       # When opening a bracket, the new equation will be a concatenation:
       # existing equation + numeric token + &quot;* abs(&quot;
-      eqtn = paste0(eqtn, numeric, &quot;* abs(&quot;), 
       remnant = new_remnant, 
+      num_brackets = num_brackets,
+      eqtn = paste0(eqtn, numeric, &quot;* abs(&quot;), 
       num_used = num_used + 1, 
       num_open = num_open + 1, 
       pathway = paste0(pathway, &quot;O&quot;)),
     evaluate_options(
       # When closing a bracket, the new equation will be a concatenation:
       # existing equation + numeric token + &quot;)&quot;
-      eqtn = paste0(eqtn, numeric, &quot;)&quot;), 
       remnant = new_remnant, 
+      num_brackets = num_brackets,
+      eqtn = paste0(eqtn, numeric, &quot;)&quot;), 
       num_used = num_used +1, 
       num_open = num_open - 1, 
-      pathway = paste0(pathway, &quot;C&quot;))))
+      pathway = paste0(pathway, &quot;C&quot;)))
+    )
 }</code></pre>
 <pre class="r"><code># Adding 1 in front just for convenience
 TEST_STRING &lt;- &quot;1|-1|-2|-3|-4|-5|-6|-7|-8|-9|&quot;
-NUM_BRACKETS &lt;- 10
 
-answers &lt;- evaluate_options(
-  eqtn = &quot;&quot;, 
-  remnant = TEST_STRING, 
-  num_used = 0, 
-  num_open = 0, 
-  pathway = &quot;&quot;)</code></pre>
+answers &lt;- evaluate_options(remnant = TEST_STRING, num_brackets = 10)</code></pre>
 <hr />
 </div>
 <div id="appendix" class="section level2">
 <h2>Appendix</h2>
+<p>Pathway diagram:</p>
 <p><img src="/post/2020-02-07-riddler-ambiguous-brackets_files/figure-html/pathway_diagram-1.png" width="672" /></p>
 <p>Detailed results:</p>
 <table>
