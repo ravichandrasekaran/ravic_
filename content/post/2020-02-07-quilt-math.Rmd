@@ -1,0 +1,52 @@
+---
+title: Quilt math
+author: ravic_
+date: '2020-02-07'
+slug: quilt-math
+categories: []
+draft: true
+tags: []
+---
+
+Some quilt math..
+<!--more-->
+
+Quilt math!
+
+```{r}
+library("tidyverse")
+
+quilt_length = 70
+quilt_width = 70
+
+material_width = 45
+material_length = 64
+
+num_strip_range = 1:20
+strip_width_range = 1:10
+
+df <- crossing(num_strips = num_strip_range, strip_width = strip_width_range) %>%
+  filter(
+    num_strips * strip_width <= material_width,
+    num_strips * material_length >= 2 * quilt_length + 2 * quilt_width + 4 * strip_width
+  ) %>%
+  mutate(leftover_material = material_width - strip_width * num_strips)
+
+
+df %>%
+  ggplot(aes(num_strips, strip_width)) +
+  geom_point() +
+  scale_y_continuous(breaks = strip_width_range, minor_breaks = NULL) +
+  scale_x_continuous(breaks = num_strip_range, minor_breaks = NULL) +
+  theme_light() +
+  labs(title = "Potential number of strips to provide exterior quilt border",
+       subtitle = glue::glue("Quilt: {quilt_length} x {quilt_width}; ",
+                             "Material: {material_length} x {material_width}"),
+       x = "Number of strips",
+       y = "Strip width") +
+  coord_cartesian(xlim = num_strip_range, ylim = strip_width_range) +
+  geom_vline(xintercept = (2 * quilt_length + 2 * quilt_width) / material_length, lty = 2) +
+  stat_function(fun = function(x) { (material_width) / x}, lty = 2)
+
+```
+

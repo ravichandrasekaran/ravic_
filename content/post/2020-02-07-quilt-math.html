@@ -1,0 +1,56 @@
+---
+title: Quilt math
+author: ravic_
+date: '2020-02-07'
+slug: quilt-math
+categories: []
+draft: true
+tags: []
+---
+
+
+
+<p>Some quilt math..
+<!--more--></p>
+<p>Quilt math!</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.2.1     ✓ purrr   0.3.3
+## ✓ tibble  2.1.3     ✓ dplyr   0.8.3
+## ✓ tidyr   1.0.0     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ─────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>quilt_length = 70
+quilt_width = 70
+
+material_width = 45
+material_length = 64
+
+num_strip_range = 1:20
+strip_width_range = 1:10
+
+df &lt;- crossing(num_strips = num_strip_range, strip_width = strip_width_range) %&gt;%
+  filter(
+    num_strips * strip_width &lt;= material_width,
+    num_strips * material_length &gt;= 2 * quilt_length + 2 * quilt_width + 4 * strip_width
+  ) %&gt;%
+  mutate(leftover_material = material_width - strip_width * num_strips)
+
+
+df %&gt;%
+  ggplot(aes(num_strips, strip_width)) +
+  geom_point() +
+  scale_y_continuous(breaks = strip_width_range, minor_breaks = NULL) +
+  scale_x_continuous(breaks = num_strip_range, minor_breaks = NULL) +
+  theme_light() +
+  labs(title = &quot;Potential number of strips to provide exterior quilt border&quot;,
+       subtitle = glue::glue(&quot;Quilt: {quilt_length} x {quilt_width}; &quot;,
+                             &quot;Material: {material_length} x {material_width}&quot;),
+       x = &quot;Number of strips&quot;,
+       y = &quot;Strip width&quot;) +
+  coord_cartesian(xlim = num_strip_range, ylim = strip_width_range) +
+  geom_vline(xintercept = (2 * quilt_length + 2 * quilt_width) / material_length, lty = 2) +
+  stat_function(fun = function(x) { (material_width) / x}, lty = 2)</code></pre>
+<p><img src="/post/2020-02-07-quilt-math_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
