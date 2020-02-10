@@ -4,6 +4,7 @@ author: ravic_
 date: '2020-02-07'
 slug: riddler-ambiguous-brackets
 categories: []
+fig_caption: yes
 tags:
   - riddler
 ---
@@ -18,19 +19,19 @@ tags:
 <blockquote>
 <p>The pairings of other mathematical symbols can be more ambiguous. Take the absolute value symbols in Jim’s example, which are vertical bars, regardless of whether they mark the opening or closing of the absolute value. As Jim points out, |−1|−2|−3| has two possible interpretations:<br />
 <br />
-1. The two left bars are a pair and the two right bars are a pair.<br />
-In this case, we have 1−2·3 = 1−6 = −5.<br />
+1. The two left bars are a pair and the two right bars are a pair. In this case, we have 1−2·3 = 1−6 = −5.<br />
 <br />
-2. The two outer bars are a pair and the two inner bars are a pair.<br />
-In this case, we have |−1·2−3| = |−2−3| = |−5| = 5.<br />
+2. The two outer bars are a pair and the two inner bars are a pair. In this case, we have |−1·2−3| = |−2−3| = |−5| = 5.<br />
 <br />
 How many different values can the expression |−1|−2|−3|−4|−5|−6|−7|−8|−9| have?</p>
 </blockquote>
-<div id="results" class="section level2">
-<h2>Results</h2>
-<p>There are 42 pathways, and a prettier way to get at that
-than this code-heavy approach. But different formulations can – and
-do – lead to the same answer. So we have to evaluate all the paths. :(</p>
+<hr />
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>There are 42 possible expressions, and a prettier way to get
+at that fact than this code-heavy approach. But unfortunately, different
+formulations can – and do – lead to the same answer. So we have no choice
+but to evaluate all the paths. :(</p>
 <p>In the end, there are only <strong>39 unique answers</strong>.
 (The duplicate answers are: -375, -25, 105.) The full list of paths,
 equations and answers follows at the end.</p>
@@ -38,289 +39,69 @@ equations and answers follows at the end.</p>
 </div>
 <div id="code" class="section level2">
 <h2>Code</h2>
-<p>The code relies on a recursive solution, building up both the option of
-opening a new bracket or closing an existing bracket at each turn.</p>
-<pre class="r"><code>library(&quot;tidyverse&quot;)
-evaluate_options &lt;- function(remnant, num_brackets, eqtn = &quot;&quot;, num_used = 0, 
-                             num_open = 0, pathway = &quot;&quot;) {
-  
-  # Cannot leave the final expression unclosed
-  if ((num_open &gt; 0) &amp;
-      (num_used &gt;= num_brackets)) {
-    return(NULL)
-  }
-  
-  # Cannot have a negative number of open brackets
-  if (num_open &lt; 0) {
-    return(NULL)
-  }
-  
-  # Terminal state
-  # Evaluate equation string using:
-  # https://stackoverflow.com/questions/1743698/evaluate-expression-given-as-a-string
-  if ((num_open == 0) &amp; 
-      (num_used &gt;= num_brackets)) {
-    rslt_tibble &lt;- tibble(equation = eqtn, pathway = pathway) %&gt;%
-      mutate(evaluation = eval(parse(text = eqtn)))
-    return(rslt_tibble)
-  }
-  
-  # Pull off first number and bracket 
-  # Results include both opening and closing the brackets
-  numeric &lt;- str_extract(remnant, &quot;[^|]+&quot;)
-  new_remnant &lt;- sub(&quot;[^|]+\\|&quot;, &quot;&quot;, remnant)
-
-  return(bind_rows(
-    evaluate_options(
-      # When opening a bracket, the new equation will be a concatenation:
-      # existing equation + numeric token + &quot;* abs(&quot;
-      remnant = new_remnant, 
-      num_brackets = num_brackets,
-      eqtn = paste0(eqtn, numeric, &quot;* abs(&quot;), 
-      num_used = num_used + 1, 
-      num_open = num_open + 1, 
-      pathway = paste0(pathway, &quot;O&quot;)),
-    evaluate_options(
-      # When closing a bracket, the new equation will be a concatenation:
-      # existing equation + numeric token + &quot;)&quot;
-      remnant = new_remnant, 
-      num_brackets = num_brackets,
-      eqtn = paste0(eqtn, numeric, &quot;)&quot;), 
-      num_used = num_used +1, 
-      num_open = num_open - 1, 
-      pathway = paste0(pathway, &quot;C&quot;)))
-    )
-}</code></pre>
-<pre class="r"><code># Adding 1 in front just for convenience
-TEST_STRING &lt;- &quot;1|-1|-2|-3|-4|-5|-6|-7|-8|-9|&quot;
-
-answers &lt;- evaluate_options(remnant = TEST_STRING, num_brackets = 10)</code></pre>
+<p>Upon encountering a bracket while reading the string, we have a choice: we
+can either open a new bracket or close an already open bracket. This code
+relies on a recursive solution to explore all those possible choices and
+evaluate the resulting final expressions.</p>
+<p>We’re using a nice trick in R, which allows us to easily evaluate a string
+as an expression.</p>
+<hr />
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<pre><code>## # A tibble: 42 x 3
+##    equation                                               pathway    evaluation
+##    &lt;chr&gt;                                                  &lt;chr&gt;           &lt;dbl&gt;
+##  1 1* abs(-1)-2* abs(-3)-4* abs(-5* abs(-6* abs(-7)-8)-9) OCOCOOOCCC      -1041
+##  2 1* abs(-1* abs(-2)-3)-4* abs(-5* abs(-6* abs(-7)-8)-9) OOCCOOOCCC      -1031
+##  3 1* abs(-1)-2* abs(-3* abs(-4* abs(-5* abs(-6)-7)-8)-9) OCOOOOCCCC       -953
+##  4 1* abs(-1)-2* abs(-3* abs(-4)-5* abs(-6* abs(-7)-8)-9) OCOOCOOCCC       -541
+##  5 1* abs(-1)-2* abs(-3* abs(-4* abs(-5)-6* abs(-7)-8)-9) OCOOOCOCCC       -437
+##  6 1* abs(-1)-2* abs(-3* abs(-4)-5)-6* abs(-7* abs(-8)-9) OCOOCCOOCC       -423
+##  7 1* abs(-1)-2* abs(-3)-4* abs(-5)-6* abs(-7* abs(-8)-9) OCOCOCOOCC       -415
+##  8 1* abs(-1* abs(-2)-3)-4* abs(-5)-6* abs(-7* abs(-8)-9) OOCCOCOOCC       -405
+##  9 1* abs(-1)-2* abs(-3)-4* abs(-5* abs(-6)-7* abs(-8)-9) OCOCOOCOCC       -385
+## 10 1* abs(-1* abs(-2* abs(-3)-4)-5)-6* abs(-7* abs(-8)-9) OOOCCCOOCC       -375
+## 11 1* abs(-1* abs(-2)-3)-4* abs(-5* abs(-6)-7* abs(-8)-9) OOCCOOCOCC       -375
+## 12 1* abs(-1* abs(-2)-3* abs(-4)-5)-6* abs(-7* abs(-8)-9) OOCOCCOOCC       -371
+## 13 1* abs(-1)-2* abs(-3* abs(-4* abs(-5)-6)-7* abs(-8)-9) OCOOOCCOCC       -285
+## 14 1* abs(-1)-2* abs(-3* abs(-4* abs(-5)-6)-7)-8* abs(-9) OCOOOCCCOC       -241
+## 15 1* abs(-1)-2* abs(-3)-4* abs(-5* abs(-6)-7)-8* abs(-9) OCOCOOCCOC       -225
+## 16 1* abs(-1* abs(-2)-3)-4* abs(-5* abs(-6)-7)-8* abs(-9) OOCCOOCCOC       -215
+## 17 1* abs(-1)-2* abs(-3* abs(-4)-5* abs(-6)-7* abs(-8)-9) OCOOCOCOCC       -213
+## 18 1* abs(-1)-2* abs(-3* abs(-4)-5* abs(-6)-7)-8* abs(-9) OCOOCOCCOC       -169
+## 19 1* abs(-1)-2* abs(-3* abs(-4)-5)-6* abs(-7)-8* abs(-9) OCOOCCOCOC       -147
+## 20 1* abs(-1)-2* abs(-3)-4* abs(-5)-6* abs(-7)-8* abs(-9) OCOCOCOCOC       -139
+## 21 1* abs(-1* abs(-2)-3)-4* abs(-5)-6* abs(-7)-8* abs(-9) OOCCOCOCOC       -129
+## 22 1* abs(-1* abs(-2* abs(-3)-4)-5)-6* abs(-7)-8* abs(-9) OOOCCCOCOC        -99
+## 23 1* abs(-1* abs(-2)-3* abs(-4)-5)-6* abs(-7)-8* abs(-9) OOCOCCOCOC        -95
+## 24 1* abs(-1* abs(-2* abs(-3)-4* abs(-5)-6)-7)-8* abs(-9) OOOCOCCCOC        -33
+## 25 1* abs(-1* abs(-2* abs(-3* abs(-4)-5)-6)-7)-8* abs(-9) OOOOCCCCOC        -25
+## 26 1* abs(-1* abs(-2* abs(-3)-4)-5* abs(-6)-7)-8* abs(-9) OOOCCOCCOC        -25
+## 27 1* abs(-1* abs(-2)-3* abs(-4)-5* abs(-6)-7)-8* abs(-9) OOCOCOCCOC        -21
+## 28 1* abs(-1* abs(-2)-3* abs(-4* abs(-5)-6)-7)-8* abs(-9) OOCOOCCCOC         15
+## 29 1* abs(-1* abs(-2* abs(-3)-4* abs(-5)-6* abs(-7)-8)-9) OOOCOCOCCC         85
+## 30 1* abs(-1* abs(-2* abs(-3* abs(-4)-5)-6* abs(-7)-8)-9) OOOOCCOCCC         93
+## 31 1* abs(-1* abs(-2* abs(-3)-4* abs(-5)-6)-7* abs(-8)-9) OOOCOCCOCC         97
+## 32 1* abs(-1* abs(-2* abs(-3* abs(-4)-5)-6)-7* abs(-8)-9) OOOOCCCOCC        105
+## 33 1* abs(-1* abs(-2* abs(-3)-4)-5* abs(-6)-7* abs(-8)-9) OOOCCOCOCC        105
+## 34 1* abs(-1* abs(-2)-3* abs(-4)-5* abs(-6)-7* abs(-8)-9) OOCOCOCOCC        109
+## 35 1* abs(-1* abs(-2* abs(-3* abs(-4)-5* abs(-6)-7)-8)-9) OOOOCOCCCC        115
+## 36 1* abs(-1* abs(-2)-3* abs(-4* abs(-5)-6)-7* abs(-8)-9) OOCOOCCOCC        145
+## 37 1* abs(-1* abs(-2* abs(-3)-4* abs(-5* abs(-6)-7)-8)-9) OOOCOOCCCC        171
+## 38 1* abs(-1* abs(-2* abs(-3* abs(-4* abs(-5)-6)-7)-8)-9) OOOOOCCCCC        187
+## 39 1* abs(-1* abs(-2)-3* abs(-4* abs(-5)-6* abs(-7)-8)-9) OOCOOCOCCC        221
+## 40 1* abs(-1* abs(-2* abs(-3)-4)-5* abs(-6* abs(-7)-8)-9) OOOCCOOCCC        269
+## 41 1* abs(-1* abs(-2)-3* abs(-4)-5* abs(-6* abs(-7)-8)-9) OOCOCOOCCC        273
+## 42 1* abs(-1* abs(-2)-3* abs(-4* abs(-5* abs(-6)-7)-8)-9) OOCOOOCCCC        479</code></pre>
 <hr />
 </div>
 <div id="appendix" class="section level2">
 <h2>Appendix</h2>
-<p>Pathway diagram:</p>
-<p><img src="/post/2020-02-07-riddler-ambiguous-brackets_files/figure-html/pathway_diagram-1.png" width="672" /></p>
-<p>Detailed results:</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">equation</th>
-<th align="left">pathway</th>
-<th align="right">evaluation</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3)-4* abs(-5* abs(-6* abs(-7)-8)-9)</td>
-<td align="left">OCOCOOOCCC</td>
-<td align="right">-1041</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3)-4* abs(-5* abs(-6* abs(-7)-8)-9)</td>
-<td align="left">OOCCOOOCCC</td>
-<td align="right">-1031</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4* abs(-5* abs(-6)-7)-8)-9)</td>
-<td align="left">OCOOOOCCCC</td>
-<td align="right">-953</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4)-5* abs(-6* abs(-7)-8)-9)</td>
-<td align="left">OCOOCOOCCC</td>
-<td align="right">-541</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4* abs(-5)-6* abs(-7)-8)-9)</td>
-<td align="left">OCOOOCOCCC</td>
-<td align="right">-437</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4)-5)-6* abs(-7* abs(-8)-9)</td>
-<td align="left">OCOOCCOOCC</td>
-<td align="right">-423</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3)-4* abs(-5)-6* abs(-7* abs(-8)-9)</td>
-<td align="left">OCOCOCOOCC</td>
-<td align="right">-415</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3)-4* abs(-5)-6* abs(-7* abs(-8)-9)</td>
-<td align="left">OOCCOCOOCC</td>
-<td align="right">-405</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3)-4* abs(-5* abs(-6)-7* abs(-8)-9)</td>
-<td align="left">OCOCOOCOCC</td>
-<td align="right">-385</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4)-5)-6* abs(-7* abs(-8)-9)</td>
-<td align="left">OOOCCCOOCC</td>
-<td align="right">-375</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2)-3)-4* abs(-5* abs(-6)-7* abs(-8)-9)</td>
-<td align="left">OOCCOOCOCC</td>
-<td align="right">-375</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4)-5)-6* abs(-7* abs(-8)-9)</td>
-<td align="left">OOCOCCOOCC</td>
-<td align="right">-371</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4* abs(-5)-6)-7* abs(-8)-9)</td>
-<td align="left">OCOOOCCOCC</td>
-<td align="right">-285</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4* abs(-5)-6)-7)-8* abs(-9)</td>
-<td align="left">OCOOOCCCOC</td>
-<td align="right">-241</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3)-4* abs(-5* abs(-6)-7)-8* abs(-9)</td>
-<td align="left">OCOCOOCCOC</td>
-<td align="right">-225</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3)-4* abs(-5* abs(-6)-7)-8* abs(-9)</td>
-<td align="left">OOCCOOCCOC</td>
-<td align="right">-215</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4)-5* abs(-6)-7* abs(-8)-9)</td>
-<td align="left">OCOOCOCOCC</td>
-<td align="right">-213</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4)-5* abs(-6)-7)-8* abs(-9)</td>
-<td align="left">OCOOCOCCOC</td>
-<td align="right">-169</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1)-2* abs(-3* abs(-4)-5)-6* abs(-7)-8* abs(-9)</td>
-<td align="left">OCOOCCOCOC</td>
-<td align="right">-147</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1)-2* abs(-3)-4* abs(-5)-6* abs(-7)-8* abs(-9)</td>
-<td align="left">OCOCOCOCOC</td>
-<td align="right">-139</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2)-3)-4* abs(-5)-6* abs(-7)-8* abs(-9)</td>
-<td align="left">OOCCOCOCOC</td>
-<td align="right">-129</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4)-5)-6* abs(-7)-8* abs(-9)</td>
-<td align="left">OOOCCCOCOC</td>
-<td align="right">-99</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4)-5)-6* abs(-7)-8* abs(-9)</td>
-<td align="left">OOCOCCOCOC</td>
-<td align="right">-95</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4* abs(-5)-6)-7)-8* abs(-9)</td>
-<td align="left">OOOCOCCCOC</td>
-<td align="right">-33</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2* abs(-3* abs(-4)-5)-6)-7)-8* abs(-9)</td>
-<td align="left">OOOOCCCCOC</td>
-<td align="right">-25</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4)-5* abs(-6)-7)-8* abs(-9)</td>
-<td align="left">OOOCCOCCOC</td>
-<td align="right">-25</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4)-5* abs(-6)-7)-8* abs(-9)</td>
-<td align="left">OOCOCOCCOC</td>
-<td align="right">-21</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4* abs(-5)-6)-7)-8* abs(-9)</td>
-<td align="left">OOCOOCCCOC</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4* abs(-5)-6* abs(-7)-8)-9)</td>
-<td align="left">OOOCOCOCCC</td>
-<td align="right">85</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3* abs(-4)-5)-6* abs(-7)-8)-9)</td>
-<td align="left">OOOOCCOCCC</td>
-<td align="right">93</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4* abs(-5)-6)-7* abs(-8)-9)</td>
-<td align="left">OOOCOCCOCC</td>
-<td align="right">97</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3* abs(-4)-5)-6)-7* abs(-8)-9)</td>
-<td align="left">OOOOCCCOCC</td>
-<td align="right">105</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4)-5* abs(-6)-7* abs(-8)-9)</td>
-<td align="left">OOOCCOCOCC</td>
-<td align="right">105</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4)-5* abs(-6)-7* abs(-8)-9)</td>
-<td align="left">OOCOCOCOCC</td>
-<td align="right">109</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2* abs(-3* abs(-4)-5* abs(-6)-7)-8)-9)</td>
-<td align="left">OOOOCOCCCC</td>
-<td align="right">115</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4* abs(-5)-6)-7* abs(-8)-9)</td>
-<td align="left">OOCOOCCOCC</td>
-<td align="right">145</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4* abs(-5* abs(-6)-7)-8)-9)</td>
-<td align="left">OOOCOOCCCC</td>
-<td align="right">171</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3* abs(-4* abs(-5)-6)-7)-8)-9)</td>
-<td align="left">OOOOOCCCCC</td>
-<td align="right">187</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4* abs(-5)-6* abs(-7)-8)-9)</td>
-<td align="left">OOCOOCOCCC</td>
-<td align="right">221</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2* abs(-3)-4)-5* abs(-6* abs(-7)-8)-9)</td>
-<td align="left">OOOCCOOCCC</td>
-<td align="right">269</td>
-</tr>
-<tr class="odd">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4)-5* abs(-6* abs(-7)-8)-9)</td>
-<td align="left">OOCOCOOCCC</td>
-<td align="right">273</td>
-</tr>
-<tr class="even">
-<td align="left">1* abs(-1* abs(-2)-3* abs(-4* abs(-5* abs(-6)-7)-8)-9)</td>
-<td align="left">OOCOOOCCCC</td>
-<td align="right">479</td>
-</tr>
-</tbody>
-</table>
+<div class="figure"><span id="fig:pathway-diagram"></span>
+<img src="/post/2020-02-07-riddler-ambiguous-brackets_files/figure-html/pathway-diagram-1.svg" alt="Pathway diagram" width="672" />
+<p class="caption">
+Figure 1: Pathway diagram
+</p>
+</div>
 </div>

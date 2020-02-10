@@ -64,6 +64,7 @@ body {
 /* Main content.  */
 main {
     margin-top: 2ex;
+    margin-left: 5ex;
 }
 
 a
@@ -107,7 +108,7 @@ code
 /* Code highlighting: Code block.  */
 pre > code {
     font-family: 'DejaVuSansMono', 'Courier New', 'Courier', monospace;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     background-color: transparent;
     border: none;
     overflow: auto;
@@ -226,6 +227,60 @@ ul.taxonomy-terms {
     transition: none;
 }
 
+blockquote {
+    color: #8a8a8a;
+    line-height: 1.0;
+    font-size: 0.9em; 
+}
+
+.longquote {
+    color: #8a8a8a;
+    line-height: 1.0;
+    font-size: 0.9em;
+    padding: 1.5em 1.5em;
+    border-left: 1px solid #e5dada;
+}
+
+.customdt.table {
+  width: 95%;
+  margin-bottom: 1rem;
+  border-radius: 0; }
+  table thead,
+  table tbody,
+  table tfoot {
+    background-color: #fffef5;
+    font-size: 10pt;
+    font-family: Inter;}
+  table thead {
+    border-bottom: 1px solid #e5dada;
+    background-color: #ffffff;
+  }
+  table caption {
+    font-weight: bold;
+    padding: 0.5rem 0.625rem 0.625rem; }
+  table thead,
+  table tfoot {
+    background: #ffffff;
+    color: #0a0a0a; }
+    table thead tr,
+    table tfoot tr {
+      background: transparent; }
+    table thead th,
+    table thead td,
+    table tfoot th,
+    table tfoot td {
+      padding: 0.5rem 0.625rem 0.625rem;
+      font-weight: normal;
+      font-size: 10pt;
+      text-transform: uppercase;
+      text-align: left; 
+    }
+  table tbody tr:nth-child(even) {
+    background-color: #fffef5; }
+  table tbody th,
+  table tbody td {
+    padding: 0.5rem 0.625rem 0.625rem; }
+    
 
 /**************************************************
  *  Publications

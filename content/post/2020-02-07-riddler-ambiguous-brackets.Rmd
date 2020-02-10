@@ -4,6 +4,7 @@ author: ravic_
 date: '2020-02-07'
 slug: riddler-ambiguous-brackets
 categories: []
+fig_caption: yes
 tags:
   - riddler
 ---
@@ -17,20 +18,21 @@ On the ambiguity in absolute values, from the
 
 > The pairings of other mathematical symbols can be more ambiguous. Take the absolute value symbols in Jim’s example, which are vertical bars, regardless of whether they mark the opening or closing of the absolute value. As Jim points out, |−1|−2|−3| has two possible interpretations: \
 \
-1. The two left bars are a pair and the two right bars are a pair. \
-In this case, we have 1−2·3 = 1−6 = −5.  \
+1. The two left bars are a pair and the two right bars are a pair. In this case, we have 1−2·3 = 1−6 = −5. \
 \
-2. The two outer bars are a pair and the two inner bars are a pair. \
-In this case, we have |−1·2−3| = |−2−3| = |−5| = 5. \
+2. The two outer bars are a pair and the two inner bars are a pair. In this case, we have |−1·2−3| = |−2−3| = |−5| = 5.\
 \
 How many different values can the expression |−1|−2|−3|−4|−5|−6|−7|−8|−9| have?
 
-```{r load_packages, echo = FALSE}
+---
+
+
+```{r load-packages, echo = FALSE}
 options(tidyverse.quiet = TRUE)
 library("tidyverse")
 ```
 
-```{r define_functions, echo = FALSE}
+```{r define-functions, echo = FALSE}
 library("tidyverse")
 evaluate_options <- function(remnant, num_brackets, eqtn = "", num_used = 0, 
                              num_open = 0, pathway = "") {
@@ -77,14 +79,14 @@ evaluate_options <- function(remnant, num_brackets, eqtn = "", num_used = 0,
       remnant = new_remnant, 
       num_brackets = num_brackets,
       eqtn = paste0(eqtn, numeric, ")"), 
-      num_used = num_used +1, 
+      num_used = num_used + 1, 
       num_open = num_open - 1, 
       pathway = paste0(pathway, "C")))
     )
 }
 ```
 
-```{r eval_test_data, echo = FALSE}
+```{r eval-test-data, echo = FALSE}
 # Adding 1 in front just for convenience
 TEST_STRING <- "1|-1|-2|-3|-4|-5|-6|-7|-8|-9|"
 
@@ -92,7 +94,7 @@ answers <- evaluate_options(remnant = TEST_STRING, num_brackets = 10)
 ```
 
 
-```{r summarise_results, echo = FALSE}
+```{r summarise-results, echo = FALSE}
 answer_summary <- answers %>% arrange(evaluation)
 num_pathways <- nrow(answer_summary)
 unq_answers <- unique(answers %>% pull(evaluation))
@@ -107,10 +109,11 @@ duplicate_answers <- unique(
 ```
 
 
-## Results
-There are `r {num_pathways}` pathways, and a prettier way to get at that 
-than this code-heavy approach. But different formulations can -- and 
-do -- lead to the same answer. So we have to evaluate all the paths. :(
+## Summary
+There are `r {num_pathways}` possible expressions, and a prettier way to get
+at that fact than this code-heavy approach. But unfortunately, different 
+formulations can -- and do -- lead to the same answer. So we have no choice
+but to evaluate all the paths. :(
 
 In the end, there are only **`r {num_unq_answers}` unique answers**. 
 (The duplicate answers are: `r {duplicate_answers}`.) The full list of paths, 
@@ -121,22 +124,36 @@ equations and answers follows at the end.
 
 ## Code
 
-The code relies on a recursive solution, building up both the option of
-opening a new bracket or closing an existing bracket at each turn. 
+Upon encountering a bracket while reading the string, we have a choice: we 
+can either open a new bracket or close an already open bracket. This code 
+relies on a recursive solution to explore all those possible choices and
+evaluate the resulting final expressions. 
+
+We're using a nice trick in R, which allows us to easily evaluate a string
+as an expression.
+
 
 ```{r ref.label = "define_functions", eval = FALSE, echo = TRUE}
 ```
 
+---
+
+## Results
+
 ```{r ref.label = "eval_test_data", eval = FALSE, echo = TRUE}
+```
+
+```{r display_raw, echo = FALSE}
+answer_summary %>% 
+  print(n = nrow(answer_summary))
 ```
 
 ---
 
 ## Appendix  
 
-Pathway diagram:  
 
-```{r pathway_diagram, echo = FALSE}
+```{r pathway-diagram, echo = FALSE, fig.cap = "Pathway diagram", dev="svg"}
 library(ggrepel)
 df <- crossing(num_used = seq(0, 10), num_open = seq(0, 5))
 qdf <- tibble(
@@ -174,15 +191,9 @@ df %>%
   coord_fixed() 
 ```
 
-Detailed results:  
-
-```{r display_table, echo = FALSE}
-knitr::kable(answer_summary)
-```
 
 
-
-```{r generalized_string, echo = FALSE, eval = FALSE}
+```{r generalized-string, echo = FALSE, eval = FALSE}
 # A generalized approach to handle longer and longer strings
 gen_bracketed_string <- function(num_pairs) {
   innards <- paste0(seq(-1, num_pairs * (-2) + 1, -1), collapse = "|")
