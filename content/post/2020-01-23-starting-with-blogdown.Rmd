@@ -1,0 +1,78 @@
+---
+title: Starting with blogdown
+author: ravic_
+date: '2020-01-23'
+slug: starting-with-blogdown
+categories: []
+draft: true
+tags:
+  - writing
+---
+
+
+Here I am writing a blog post using blogdown! Amazing stuff!
+<!--more--> 
+
+First and foremost, thank you to Yihui Xie, Amber Thomas, and 
+Alison Presmanes Hill! 
+
+Guides:  
+
+1.  Step-by-step: [Up & Running with blogdown](https://alison.rbind.io/post/2017-06-12-up-and-running-with-blogdown/), 
+    Alison Presmanes Hill  \
+    \
+2.  Full reference: [Creating Websites with R Markdown](https://bookdown.org/yihui/blogdown/), 
+    Yihui Xie, Amber Thomas, and Alison Presmanes Hill
+
+The process is a little tedious, with some minor tweaks, but it's still
+magical that it works, and flows so easily from within RStudio.
+
+Notes:
+
+1.  Dr. Hill mentions being careful with the `baseurl` parameter two or three 
+    times. *Please, please do that.* I can say from experience that it's not 
+    obvious why the blog doesn't look right without that attention. :)   
+    \ 
+2.  Both references mention to edit the `.gitignore` file if using Netlify,
+    to exclude the `public/` directory that is generated when serving the 
+    site locally. That's a really good thing to follow -- it avoids tracking
+    a ton of extra files that you don't want to track.  
+    \
+3.  I'm using Marcus Brinkmann's [hugo-finite](https://github.com/lambdafu/hugo-finite) 
+    theme, in part because it comes out-of-the-box with equation support, and 
+    in part because [Kieran Healy's blog](https://kieranhealy.org/blog/) based 
+    on a similar theme looks gorgeous.   
+      \
+    Hugo-finite requires a higher version of Hugo for the Netlify build than the default, 
+    so pay attention to the environment variable.  \
+    \
+4.  Using math?  
+    4.1.  Make sure you include `math = true` in the `[params]` section.  
+          \
+    4.2.  The underlying KaTeX system doesn't use the `align` environment, but 
+          instead uses `aligned`.  \
+          \
+    4.3.  This isn't purely about math, but the default content summary for the
+          index page is the first 70 words of the post. This doesn't work well,
+          especially if an equation appears early. Using `<!--more-->`, as shown
+          in the [Hugo docs](https://gohugo.io/content-management/summaries/) 
+          is definitely helpful.
+
+Next steps:
+
+1.  There is more to look at in the equation setup, like line height. Saving 
+    the [KaTeX Common Issues page](https://katex.org/docs/issues.html) for later. 
+    :) \
+    \
+2.  Yihui Xie mentions broadly that tables are complicated. The default 
+    rendering for the HTML table using `kable` and `kableExtra` libraries and
+    the underlying Zurb Foundation library leaves a lot to be desired. Will
+    want to dig in when I have more time. \
+    \
+3.  Use hyphens in your chunks!
+
+
+    
+
+
+

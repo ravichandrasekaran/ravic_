@@ -1,0 +1,76 @@
+---
+title: Starting with blogdown
+author: ravic_
+date: '2020-01-23'
+slug: starting-with-blogdown
+categories: []
+draft: true
+tags:
+  - writing
+---
+
+
+
+<p>Here I am writing a blog post using blogdown! Amazing stuff!
+<!--more--></p>
+<p>First and foremost, thank you to Yihui Xie, Amber Thomas, and
+Alison Presmanes Hill!</p>
+<p>Guides:</p>
+<ol style="list-style-type: decimal">
+<li>Step-by-step: <a href="https://alison.rbind.io/post/2017-06-12-up-and-running-with-blogdown/">Up &amp; Running with blogdown</a>,
+Alison Presmanes Hill<br />
+<br />
+</li>
+<li>Full reference: <a href="https://bookdown.org/yihui/blogdown/">Creating Websites with R Markdown</a>,
+Yihui Xie, Amber Thomas, and Alison Presmanes Hill</li>
+</ol>
+<p>The process is a little tedious, with some minor tweaks, but it’s still
+magical that it works, and flows so easily from within RStudio.</p>
+<p>Notes:</p>
+<ol style="list-style-type: decimal">
+<li>Dr. Hill mentions being careful with the <code>baseurl</code> parameter two or three
+times. <em>Please, please do that.</em> I can say from experience that it’s not
+obvious why the blog doesn’t look right without that attention. :)<br />
+ </li>
+<li>Both references mention to edit the <code>.gitignore</code> file if using Netlify,
+to exclude the <code>public/</code> directory that is generated when serving the
+site locally. That’s a really good thing to follow – it avoids tracking
+a ton of extra files that you don’t want to track.<br />
+<br />
+</li>
+<li>I’m using Marcus Brinkmann’s <a href="https://github.com/lambdafu/hugo-finite">hugo-finite</a>
+theme, in part because it comes out-of-the-box with equation support, and
+in part because <a href="https://kieranhealy.org/blog/">Kieran Healy’s blog</a> based
+on a similar theme looks gorgeous.<br />
+<br />
+Hugo-finite requires a higher version of Hugo for the Netlify build than the default,
+so pay attention to the environment variable.<br />
+<br />
+</li>
+<li>Using math?<br />
+4.1. Make sure you include <code>math = true</code> in the <code>[params]</code> section.<br />
+<br />
+4.2. The underlying KaTeX system doesn’t use the <code>align</code> environment, but
+instead uses <code>aligned</code>.<br />
+<br />
+4.3. This isn’t purely about math, but the default content summary for the
+index page is the first 70 words of the post. This doesn’t work well,
+especially if an equation appears early. Using <code>&lt;!--more--&gt;</code>, as shown
+in the <a href="https://gohugo.io/content-management/summaries/">Hugo docs</a>
+is definitely helpful.</li>
+</ol>
+<p>Next steps:</p>
+<ol style="list-style-type: decimal">
+<li>There is more to look at in the equation setup, like line height. Saving
+the <a href="https://katex.org/docs/issues.html">KaTeX Common Issues page</a> for later.
+:)<br />
+<br />
+</li>
+<li>Yihui Xie mentions broadly that tables are complicated. The default
+rendering for the HTML table using <code>kable</code> and <code>kableExtra</code> libraries and
+the underlying Zurb Foundation library leaves a lot to be desired. Will
+want to dig in when I have more time.<br />
+<br />
+</li>
+<li>Use hyphens in your chunks!</li>
+</ol>

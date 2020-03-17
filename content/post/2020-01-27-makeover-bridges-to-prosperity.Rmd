@@ -1,0 +1,69 @@
+---
+title: 'Makeover: Bridges to Prosperity'
+author: ravic_
+date: '2020-01-27'
+slug: makeover-bridges-to-prosperity
+categories: []
+draft: true
+tags:
+  - makeover-monday
+---
+
+## What works
+
+1.  Interactivity is good. Stories in each country are very 
+    different. 
+2.  People and bridges in the key box are amazing testaments
+    to impact. And divide by time for rate of impact, and it
+    is pretty remarkable.
+
+## What doesn't work
+
+1.  Dry, CIA-briefing style. 
+2.  Some metrics like HDI and rural access index are tough to
+    understand or score. And are they trending up -- do they
+    show our impact (more than people and bridges)?
+3.  Is this better? 
+    [Coko suspended footbridge](https://bridgestoprosperity.org/projects/coko-suspended-footbridge/)
+4.  Under-selling where we'd go next? "Total identified sites",
+    and "Estimated people without safe access" metrics.
+
+
+## Early thoughts
+
+Message:
+1.  We're trying to show that this activity has had a strong 
+    impact - we're turning investment into changed lives. And
+    we have a proven record, so re-up the investment. (Maybe
+    where we'd go next?)
+2.  Country-level maps feel empty - how do we connect with these
+    far-flung areas? 
+
+Bridge data:
+1.  Each bridge has a span length, and they are surprisingly long.
+    Does this help ground the challenge of the river - size, storm
+    surge, etc? Walking time?
+2.  For each bridge, there's an estimate of population affected.
+    Can we make this feel real? Show clusters near the river, 
+    alternative routes? Isotype? Animation of figures crossing 
+    bridges?
+3.  Completion year. Change to do some temporo-spatial animation?
+
+Can we obtain:
+1.  Tax records?
+2.  Population centers?
+3.  Cleaned maps, high-resolution of Rwanda?
+
+
+## References:
+
+1.  [Overview](https://data.world/makeovermonday/2020w4)
+2.  [Brief from Bridges to Prosperity](https://query.data.world/s/nncedew7kmofpbpyis42nxon66z74z)
+3.  [Google image search](https://www.google.com/search?q=Nyirakibehe+bridge&safe=active&sxsrf=ACYBGNTM9fNOomFfcOPAG468_PXvHXb-nw:1580101276292&tbm=isch&source=iu&ictx=1&fir=oxpcC35SfaP94M%253A%252CtFTM2mAKE30K-M%252C_&vet=1&usg=AI4_-kQQjdT_ABCUHcwsWaD5BrFqF8-1IA&sa=X&ved=2ahUKEwiB8qD6_6LnAhVKpZ4KHbZcAVAQ9QEwAnoECAoQBw#imgrc=qHt4jTxa5qELDM:&vet=1)
+4.  Volunteers: [HannisWhittam](https://twitter.com/HannisWhittam/status/1093811173022203904) and
+    [AVB](https://avb.home.blog/2019/02/08/80-degrees-to-0-degrees/)
+6.  [Project list](https://bridgestoprosperity.org/projects/) and 
+    [Coko suspended footbridge](https://bridgestoprosperity.org/projects/coko-suspended-footbridge/)
+
+
+

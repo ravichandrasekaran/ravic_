@@ -1,0 +1,18 @@
+---
+title: 'Ridder: Powers of 2'
+author: kolya
+date: '2020-03-16'
+slug: ridder-powers-of-2
+categories: []
+tags:
+  - riddler
+---
+
+For this week's Riddler, my son Kolya decided to try his hand,
+since he's off school anyways. Here's his answer!
+
+(We're going to try covering logs tomorrow, since he wanted to know
+how to jump straight to the ones near the powers of 10!)
+
+![Kolya's work](/post/2020-03-16-ridder-powers-of-2_files/Kolya - Powers of 2.jpg)
+
