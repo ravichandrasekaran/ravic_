@@ -1,0 +1,62 @@
+---
+title: 'Tidy Tuesday: Hotel booking data'
+author: ravic_
+date: '2020-02-11'
+slug: tidy-tuesday-hotel-booking-data
+categories: []
+draft: true
+tags:
+  - tidy-tuesday
+---
+
+Hotel data!
+<!--more-->
+
+https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-11/readme.md
+
+```{r load-packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+
+```{r import-data, echo = FALSE, messages = FALSE, warnings = FALSE}
+library("janitor")
+library("glue")
+
+url <- paste0(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/",
+  "2020/2020-02-11/hotels.csv")
+df <- readr::read_csv(url) %>%
+  mutate_at(
+    vars(meal, country, market_segment, distribution_channel,
+         reservation_status, hotel),
+    as.factor) %>%
+  mutate_at(vars(ends_with("_type")), as.factor) %>%
+  mutate_at(vars(starts_with("is_")), as.logical)
+```
+```{r clean-data, echo = FALSE}
+library("lubridate")
+df <- df %>%
+  mutate(children = replace_na(children, 0)) %>%
+  mutate(arrival_date = ymd(paste(arrival_date_year, arrival_date_month, 
+                                  arrival_date_day_of_month, sep = "-"))) %>%
+  select(-arrival_date_year, -arrival_date_month, -arrival_date_week_number, 
+         -arrival_date_day_of_month)
+```
+
+```{r skim-data, echo = FALSE}
+library("skimr")
+skimr::skim(df)
+```
+
+```{r}
+df %>%
+  mutate(lead_weeks = floor(lead_time / 7)) %>%
+  group_by(lead_weeks) %>%
+  summarise(pct = sum(is_canceled) / n(),
+            count = n()) %>%
+  ggplot(aes(lead_weeks, pct)) +
+  geom_point(aes(size = count)) 
+
+```
+

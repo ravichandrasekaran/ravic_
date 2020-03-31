@@ -1,0 +1,33 @@
+---
+title: 'Riddler: Risky coin flipping'
+author: ravic_
+date: '2020-02-21'
+slug: riddler-risky-coin-flipping
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From the <a href="https://fivethirtyeight.com/features/can-you-flip-your-way-to-victory/">Riddler</a>, flipping your way to victory!</p>
+<!--more-->
+<p>From the <a href="https://fivethirtyeight.com/features/can-you-flip-your-way-to-victory/">Riddler</a>, flipping your way to victory!</p>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<p>As the game concludes, your approach becomes obvious. Let’s say after the 99th
+coin toss, you’re confronted with a score of 3 or more. Well, you’ve already
+won the game regardless of your choice here. Or -2 or less - you’ve already
+lost.</p>
+<p>So the interesting ones are: -1, 0, 1, 2. At -1, you must choose the 2-point
+possibility. At 2 you should choose the 1-point possibility (let’s not snatch
+defeat from the jaws of victory). At 0 or 1, either path is equally likely to
+win, although neither is assured. And both are 50% win given fair coins.</p>
+<p>But like many of these problems, let’s consider after the 100th coin toss.
+You either have a positive score (win) or a non-positive score (loss).</p>
+<p>Work backwards. Where are we after 98th coin toss?
+* And at 4+ points, all paths are guaranteed 100% to win.
+* At 3 pts, we’d use the 1-pt coin, for a 100% guaranteed win. (We could consider both paths, and choose the greater win percentage.)
+* At 2 pts, let’s say we use the 2-pt coin. We have a 50% chance of score 2 more, for 4 pts. But we’d also have a 50% chance of going to zero. We work that
+out to 50% * 100% + 50% * 50% = 75%. We could consider the 1-pt coin, too, which could get us to 3-pts, or 1pt. Turns out that is 50% * 100% + 50% * 50% too.</p>
+</div>

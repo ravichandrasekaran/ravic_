@@ -1,0 +1,99 @@
+---
+title: 'Riddler: Pedestrian Puzzle (Diagonals)'
+author: ravic_
+date: '2020-02-16'
+slug: riddler-pedestrian-puzzle-diagonals
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>Re-making urban sidewalks, from the <a href="https://fivethirtyeight.com/features/can-you-solve-this-rather-pedestrian-puzzle/">Riddler</a></p>
+<!--more-->
+<p>Re-making urban sidewalks, from the <a href="https://fivethirtyeight.com/features/can-you-solve-this-rather-pedestrian-puzzle/">Riddler</a></p>
+<p>Let’s consider City Hall to be at <span class="math inline">\((0, 0)\)</span> on the street coordinates. Let’s
+also consider $p = (p_1, p_2) $ to be the coordinates for nearest street
+intersection for a home <span class="math inline">\(h\)</span>.</p>
+<p>The Manhattan distance <span class="math inline">\(d_1\)</span> from the nearest street intersection <span class="math inline">\(p\)</span> to the
+origin is simply:</p>
+<p><span class="math display">\[
+\begin{aligned}
+d_1(p, 0) &amp; = | p_1 | + | p_2 | \\
+\end{aligned}
+\]</span></p>
+<p>Now, let’s consider the new sidewalk layout. The sidewalks are laid out on
+a grid too, so we can use Manhattan distance here, too. But first, we have
+to project our points onto new axes, with a scale and rotation.</p>
+<p><span class="math display">\[
+\begin{aligned}
+p^{\prime} &amp; = \begin{bmatrix} 
+1 &amp; 1 \\
+-1 &amp; 1 \\
+\end{bmatrix} \cdot 
+\begin{bmatrix}
+p_1 \\
+p_2 \\
+\end{bmatrix} \\
+&amp; = \begin{bmatrix}
+p_1 + p_2 \\
+-p_1  + p_2 \\
+\end{bmatrix} \\
+\end{aligned}
+\]</span></p>
+<p>And the Manhattan distance of the point projected into the new coordinate
+system, scaled by the unit length, gives us:</p>
+<p><span class="math display">\[
+\begin{aligned}
+d_1^{\prime}(p^{\prime}, 0) &amp; = | p_1^{\prime} | + | p_2^{\prime} | \\
+&amp; = | p_1 + p_2 | + | -p_1 + p_2 | \\
+\end{aligned}
+\]</span></p>
+<p>Before we can compare the two distances, we have to account for the different
+unit lengths in the coordinate systems.</p>
+<p><span class="math display">\[
+\begin{aligned}
+u^{\prime} = \frac{\sqrt{2}}{2} \\
+\end{aligned}
+\]</span></p>
+<p>So now, we’re comparing the two distances, using the unit length from
+our first coordinate system, and looking to find where the sidewalk
+system has a shorter length.</p>
+<p><span class="math display">\[
+\begin{aligned}
+d_1(p, 0) &amp; &gt; d^{\prime}(p^\prime, 0) \cdot u^{\prime} \\
+| p_1 | + | p_2 | &amp; &gt; [| p_1 + p_2 | + | -p_1 + p_2 |] \cdot \frac{\sqrt{2}}{2} \\
+\end{aligned}
+\]</span></p>
+<p>For a moment, let’s limit ourselves to the first quadrant, so that <span class="math inline">\(p_1, p_2 \ge 0\)</span>.
+Then:</p>
+<p><span class="math display">\[
+\begin{aligned}
+| p_1 | + | p_2 | &amp; &gt; [| p_1 + p_2 | + | -p_1 + p_2 |] \cdot \frac{\sqrt{2}}{2} \\
+p_1 +  p_2 &amp; &gt; [p_1 + p_2 + | -p_1 + p_2 |] \cdot \frac{\sqrt{2}}{2} \\
+(p_1 + p_2)(1 - \frac{\sqrt{2}}{2}) &amp; &gt; | -p_1 + p_2 | \cdot \frac{\sqrt{2}}{2} \\
+(p_1 + p_2)(1 - \frac{\sqrt{2}}{2}) &amp; &gt;  (-p_1 + p_2)  \cdot \frac{\sqrt{2}}{2} \\
+p_1  &amp; &gt;  p_2 \cdot (-2 \cdot \frac{\sqrt{2}}{2} - 1) \\
+p_1  &amp; &gt;  p_2 \cdot (\sqrt{2} - 1) \\
+(p_1 + p_2)(1 - \frac{\sqrt{2}}{2}) &amp; &gt; | -p_1 + p_2 | \cdot \frac{\sqrt{2}}{2} \\
+(p_1 + p_2)(1 - \frac{\sqrt{2}}{2}) &amp; &lt;  (p_1 - p_2) \cdot \frac{\sqrt{2}}{2} \\
+p_1 &amp; &lt; p_2 \cdot (\sqrt{2} - 1) \\
+\end{aligned}
+\]</span></p>
+<p>The two lines in the first quadrant gives us two angles for the circular
+city, using <span class="math inline">\(\arctan\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+p_1 &amp; = p_2 \cdot (\sqrt{2} - 1) \\
+\frac{p_2}{p_1} &amp; = \frac{1}{\sqrt{2} - 1} \\
+\tan{\theta_2} &amp; = \frac{1}{\sqrt{2} - 1} \\
+\theta_2 &amp; = \arctan{(\frac{1}{\sqrt{2} - 1})} \\
+\end{aligned} \\
+\begin{aligned}
+p_2 &amp; = p_1 \cdot (\sqrt{2} - 1) \\
+\frac{p_2}{p_1} &amp; = \sqrt{2} - 1 \\
+\tan{\theta_1} &amp; = \sqrt{2} - 1 \\
+\theta_2 &amp; = \arctan{(\sqrt{2} - 1)} \\
+\end{aligned} \\
+\]</span></p>

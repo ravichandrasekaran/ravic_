@@ -1,0 +1,68 @@
+---
+title: 'Makeover: Living in the Shadow of War'
+author: ravic_
+date: '2020-02-10'
+slug: makeover-living-in-the-shadow-of-war
+categories: []
+draft: true
+tags:
+  - makeover-monday
+---
+
+Like Philip Bump, my son has always lived under a shadow of war.
+<!--more-->
+
+## Motivation
+Like Philip Bump, my son has always lived under a shadow of war.
+
+* Link: https://data.world/makeovermonday/2020w6
+* Source article: "Nearly a quarter of Americans have never experienced the U.S. in a time of peace", [Washington Post](https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/), Philip Bump 
+
+
+```{r original-graphic, echo = FALSE, fig.cap="Original graphic", out.width = '70%'}
+knitr::include_graphics("https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/4A5YOKSYL5C4TNCAO6CPQDQL4U.png&w=800")
+```
+
+---
+
+## Critique
+
+**What works?**
+
+**What doesn't work?**
+
+1.  Perhaps because of the constraints of print, there is a lot to look at.
+    Each year is detailed as a small multiple, but as a reader, I'm likely
+    to explore only a handful of birth years -- my own, my child's, and my 
+    parents. Interactivity?
+2.  The outside dial doesn't show the years under war, but the *fraction of 
+    life* under war. That's a harder concept, and because the lifespans change
+    across the figure, the fractions also change.
+3.  The dual dial structure is challenging, especially without the individual
+    example shown in the article. The inside pie is an aggregation of the 
+    outside progression.
+4.  The really reductive view could be that this is a lot of ink to say that 
+    the conflict in Afghanistan is historically long. 
+5.  Another strange artifact is that the 3-year olds present have 100% of their
+    lifespan in the shadow of war -- but that many other 3-year olds have faced
+    similar. Something like a survival analysis here, where we cannot foretell
+    how the lifes unfold -- but could look at it like a cohort.
+    
+https://en.wikipedia.org/wiki/Declaration_of_war_by_the_United_States#Declarations_of_war
+https://en.wikipedia.org/wiki/List_of_the_lengths_of_United_States_participation_in_wars
+
+
+
+```{r load-packages, echo = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+
+```{r import-data, echo = FALSE, include = FALSE}
+library("httr")
+library("readxl")
+GET("https://query.data.world/s/ucwtms4u76fwjr4kmecoh2ncldi6f2", 
+    write_disk(tf <- tempfile(fileext = ".xlsx")))
+df <- read_excel(tf)
+```
+
