@@ -1,0 +1,100 @@
+---
+title: 'Makeover Monday: Unpaid Labor'
+author: ravic
+date: '2020-04-06'
+slug: makeover-monday-unpaid-labor
+categories: []
+tags:
+  - makeover-monday
+---
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("janitor")
+```
+
+
+```{r import_data, include=FALSE}
+df <- readr::read_csv("https://query.data.world/s/dgm572ybtukupkkld2ghdr4h2qvm6r") %>%
+  janitor::clean_names()
+
+```
+
+```{r clean_data, include=FALSE}
+df <- df %>% 
+  mutate(gender = factor(tolower(gender))) %>%
+  mutate_at(vars(time_use, age, survey_availability), factor) %>%
+  mutate(start_year = as.numeric(str_sub(year, 0, 4)))
+
+# Some countries provide data with regional breakdown.
+# We will filter these countries out of the analysis.
+countries_with_area <- df %>%
+  filter(!is.na(area)) %>%
+  pull(country) %>%
+  unique()
+
+df <- df %>%
+  filter(!(country %in% countries_with_area)) %>%
+  select(everything(), -area)
+
+```
+
+```{r skim_data, include=FALSE}
+library("skimr")
+skimr::skim(df)
+```
+
+### Spotlight: United States
+The United States has steady data from 2003-2015 in this dataset (perhaps
+from the Census Time Use Survey?). 
+
+The timeframe includes some significant events (recoveries from 9/11, 2008 
+financial shocks). The 2008 shock does seem visible in the men's paid labor
+metrics -- without recovery -- but without any concurrent changes in men's
+unpaid labor or women's labor metrics.
+
+It's hard to gauge from the survey results, but it does seem like there is
+some reduction in women's reported unpaid labor into early part of 2010's.
+Is this simply choosing to spend less time here?
+
+#### Ideas:
+1.  "Pull your weight". A comparison of weight to unpaid labor by gender.
+2.  "Bring home the bacon." 
+3.  Rosie the Riveter is about women's paid labor. Timely brief (COVID vs. WW2)?
+
+```{r usa_spotlight, echo = FALSE}
+usa_detail <- df %>% 
+  filter(country == "United States of America") %>% 
+  arrange(start_year, gender) %>%
+  select(start_year, gender, everything(), 
+         -year, -survey_availability, -country, -age) %>% 
+  mutate(time_use = fct_recode(
+    time_use,
+    unpaid = "Unpaid domestic, care and volunteer work",
+    paid = "Paid and subsistence work"))
+
+  
+usa_gathered <- usa_detail %>% 
+  pivot_wider(
+    id_cols=start_year, 
+    names_from=c(gender, time_use), 
+    values_from=average_time_hours)
+
+usa_detail %>%
+  ggplot(aes(x=start_year, y=average_time_hours)) + 
+  geom_line() +
+  facet_grid(gender ~ time_use) + 
+  theme_light() +
+  labs(
+    title = "Time use: Paid vs. unpaid, Male vs. Female",
+    subtitle = "Country: USA",
+    x = "",
+    y = "Avg. time (hrs)"
+  ) +
+  scale_x_continuous(
+    limits = c(2002, 2016),
+    labels = scales::number_format(accuracy = 1, big.mark = ""),
+    breaks = seq(2002, 2016, 2)) + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
