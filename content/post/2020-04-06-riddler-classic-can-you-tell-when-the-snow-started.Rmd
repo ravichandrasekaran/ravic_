@@ -1,0 +1,143 @@
+---
+title: 'Riddler Classic: Can You Tell When the Snow Started'
+author: ravic_
+date: '2020-04-06'
+slug: riddler-classic-can-you-tell-when-the-snow-started
+categories: []
+tags:
+  - riddler
+---
+
+
+From our friends at the Riddler, a new Riddler Classic that returns us to high school calculus: [Can you tell when the snow started?](https://fivethirtyeight.com/features/can-you-tell-when-the-snow-started/)
+
+<!--more-->
+
+### Challenge
+From our friends at the Riddler, a new Riddler Classic that returns us to high school calculus: [Can you tell when the snow started?](https://fivethirtyeight.com/features/can-you-tell-when-the-snow-started/)
+
+> *From Phil Imming comes his favorite riddle, which he was the only student in his calculus class to solve back in 1965:\
+\
+One morning, it starts snowing. The snow falls at a constant rate, and it continues the rest of the day. \
+\
+At noon, a snowplow begins to clear the road. The more snow there is on the ground, the slower the plow moves. In fact, the plow’s speed is inversely proportional to the depth of the snow — if you were to double the amount of snow on the ground, the plow would move half as fast. \
+\
+In its first hour on the road, the plow travels 2 miles. In the second hour, the plow travels only 1 mile. \
+\
+When did it start snowing?*
+
+### Approach
+
+Let's start mapping some of our information into equations. Let $h$ represent 
+the snow depth at hour $t$, $p$ the rate of snowfall per hour, and $t_s$ be
+the hour at which snowfall started. Then, we have:
+
+$$
+\begin{aligned}
+h(t) = & \begin{cases}
+  0 && t < t_s \\
+  p(t - t_s) && t \ge t_s  \\
+  \end{cases}
+\end{aligned}
+$$
+
+For some convenient math later, we're going to set **noon to $t = 0$**. That 
+means our snowfall **start hour must be negative**.
+
+Now, we know that our velocity of our plow, $v(t)$ varies based on the depth
+of the snow (which of course is a function of time). (Here, we'll use a 
+constant $k$ to represent that relationship.)
+
+$$
+\begin{aligned}
+v(t) & \propto \frac{1}{h(t)} \\
+v(t) & = \frac{k}{h(t)} \\
+\end{aligned}
+$$
+
+So, now we get to the distances. Let's dig in. The distance is just the 
+integral of the speed function. For the first distance, we're evaluating
+it from $t=0$ to $t=1$. (*Remember, we're indexing our time with noon as
+$t=0$.*)
+
+$$
+\begin{aligned}
+d_1 - d_0 = & \int_{t=0}^{t=1} v(t) \; dt \\
+= & \int_{t=0}^{t=1} \frac{k}{h(t)} \; dt \\
+= & \int_{t=0}^{t=1} \frac{k}{p(t - t_s)} \; dt \\
+= & \frac{k}{p}\ln(t - t_s) \big|_0^1 \\
+= & \frac{k}{p}(\ln(1 - t_s) - \ln(-t_s)) \\
+= & \frac{k}{p} \cdot \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+2= & \frac{k}{p} \cdot \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\frac{2p}{k} = & \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\end{aligned}
+$$
+
+
+Now, we've got the same sort of math for the following hour.
+
+$$
+\begin{aligned}
+d_2 - d_1 = & \int_{t=1}^{t=2} v(t)\; dt \\
+= & \frac{k}{p}\ln(t - t_s) \big|_1^2 \\
+= & \frac{k}{p}\left(\ln(2 - t_s) - \ln(1 - t_s)\right) \\
+= & \frac{k}{p} \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) \\
+1 = & \frac{k}{p} \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) \\
+\frac{p}{k} = & \ln \left(\frac{2 - t_s}{1 -t_s}\right) \\
+\end{aligned}
+$$
+
+Now, we can pull these equations together with some old favorite log tricks:
+
+$$
+\begin{aligned}
+2 \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) = & \frac{2p}{k} = \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+2 \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) = & \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\ln \left(\left(\frac{2 - t_s}{1 -t_s}\right)^2\right)  = & \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\left(\frac{2 - t_s}{1 -t_s}\right) ^ 2 = & \left(\frac{1 - t_s}{-t_s}\right) \\
+(2 - t_s) ^2 \cdot (-t_s) = & (1 - t_s) ^3 \\
+(4 - 4t_s + {t_s}^2) \cdot (-t_s) = & 1 - 3t_s + 3{t_s}^2 - {t_s}^3 \\
+- {t_s}^3 + 4{t_s}^2 - 4t_s = & 1 - 3t_s + 3{t_s}^2 - {t_s}^3 \\
+0 = & {t_s}^2 - t_s - 1
+\end{aligned}
+$$
+
+The final equation, $0 = {t_s}^2 - t_s - 1$ has two irrational roots. (Ah, 
+remember that old quadratic formula):
+
+$$
+\begin{aligned}
+t_s = & \frac{1 \pm \sqrt{5}}{2} \\
+\end{aligned}
+$$
+
+Remember, though, that we set up our equations needing a **negative start 
+hour $t_s$**. Only one of those roots is negative, so we have a start hour
+expression below. 
+
+```{r answer, include=FALSE}
+t_s = (1 - sqrt(5)) / 2
+min_before_noon = round(abs(t_s) * 60, 0)
+min_after_eleven = 60 - min_before_noon
+dt = lubridate::hm(paste("11", as.character(min_after_eleven), ":"))
+timestamp = format(dt, "%H:%M")
+```
+
+
+$$
+\begin{aligned}
+t_s = & \frac{1 - \sqrt{5}}{2} \\
+= & `r {t_s}` \\
+\end{aligned}
+$$
+
+The start hour $t_s = `r {t_s}`$. A slightly more human time would be **`r {format(dt, "%H:%M")}`.**
+
+
+
+
+
+
+
+
+

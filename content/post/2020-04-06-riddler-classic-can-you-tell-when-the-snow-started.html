@@ -1,0 +1,111 @@
+---
+title: 'Riddler Classic: Can You Tell When the Snow Started'
+author: ravic_
+date: '2020-04-06'
+slug: riddler-classic-can-you-tell-when-the-snow-started
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From our friends at the Riddler, a new Riddler Classic that returns us to high school calculus: <a href="https://fivethirtyeight.com/features/can-you-tell-when-the-snow-started/">Can you tell when the snow started?</a></p>
+<!--more-->
+<div id="challenge" class="section level3">
+<h3>Challenge</h3>
+<p>From our friends at the Riddler, a new Riddler Classic that returns us to high school calculus: <a href="https://fivethirtyeight.com/features/can-you-tell-when-the-snow-started/">Can you tell when the snow started?</a></p>
+<blockquote>
+<p><em>From Phil Imming comes his favorite riddle, which he was the only student in his calculus class to solve back in 1965:<br />
+<br />
+One morning, it starts snowing. The snow falls at a constant rate, and it continues the rest of the day.<br />
+<br />
+At noon, a snowplow begins to clear the road. The more snow there is on the ground, the slower the plow moves. In fact, the plow’s speed is inversely proportional to the depth of the snow — if you were to double the amount of snow on the ground, the plow would move half as fast.<br />
+<br />
+In its first hour on the road, the plow travels 2 miles. In the second hour, the plow travels only 1 mile.<br />
+<br />
+When did it start snowing?</em></p>
+</blockquote>
+</div>
+<div id="approach" class="section level3">
+<h3>Approach</h3>
+<p>Let’s start mapping some of our information into equations. Let <span class="math inline">\(h\)</span> represent
+the snow depth at hour <span class="math inline">\(t\)</span>, <span class="math inline">\(p\)</span> the rate of snowfall per hour, and <span class="math inline">\(t_s\)</span> be
+the hour at which snowfall started. Then, we have:</p>
+<p><span class="math display">\[
+\begin{aligned}
+h(t) = &amp; \begin{cases}
+  0 &amp;&amp; t &lt; t_s \\
+  p(t - t_s) &amp;&amp; t \ge t_s  \\
+  \end{cases}
+\end{aligned}
+\]</span></p>
+<p>For some convenient math later, we’re going to set <strong>noon to <span class="math inline">\(t = 0\)</span></strong>. That
+means our snowfall <strong>start hour must be negative</strong>.</p>
+<p>Now, we know that our velocity of our plow, <span class="math inline">\(v(t)\)</span> varies based on the depth
+of the snow (which of course is a function of time). (Here, we’ll use a
+constant <span class="math inline">\(k\)</span> to represent that relationship.)</p>
+<p><span class="math display">\[
+\begin{aligned}
+v(t) &amp; \propto \frac{1}{h(t)} \\
+v(t) &amp; = \frac{k}{h(t)} \\
+\end{aligned}
+\]</span></p>
+<p>So, now we get to the distances. Let’s dig in. The distance is just the
+integral of the speed function. For the first distance, we’re evaluating
+it from <span class="math inline">\(t=0\)</span> to <span class="math inline">\(t=1\)</span>. (<em>Remember, we’re indexing our time with noon as
+<span class="math inline">\(t=0\)</span>.</em>)</p>
+<p><span class="math display">\[
+\begin{aligned}
+d_1 - d_0 = &amp; \int_{t=0}^{t=1} v(t) \; dt \\
+= &amp; \int_{t=0}^{t=1} \frac{k}{h(t)} \; dt \\
+= &amp; \int_{t=0}^{t=1} \frac{k}{p(t - t_s)} \; dt \\
+= &amp; \frac{k}{p}\ln(t - t_s) \big|_0^1 \\
+= &amp; \frac{k}{p}(\ln(1 - t_s) - \ln(-t_s)) \\
+= &amp; \frac{k}{p} \cdot \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+2= &amp; \frac{k}{p} \cdot \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\frac{2p}{k} = &amp; \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\end{aligned}
+\]</span></p>
+<p>Now, we’ve got the same sort of math for the following hour.</p>
+<p><span class="math display">\[
+\begin{aligned}
+d_2 - d_1 = &amp; \int_{t=1}^{t=2} v(t)\; dt \\
+= &amp; \frac{k}{p}\ln(t - t_s) \big|_1^2 \\
+= &amp; \frac{k}{p}\left(\ln(2 - t_s) - \ln(1 - t_s)\right) \\
+= &amp; \frac{k}{p} \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) \\
+1 = &amp; \frac{k}{p} \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) \\
+\frac{p}{k} = &amp; \ln \left(\frac{2 - t_s}{1 -t_s}\right) \\
+\end{aligned}
+\]</span></p>
+<p>Now, we can pull these equations together with some old favorite log tricks:</p>
+<p><span class="math display">\[
+\begin{aligned}
+2 \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) = &amp; \frac{2p}{k} = \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+2 \cdot \ln \left(\frac{2 - t_s}{1 -t_s}\right) = &amp; \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\ln \left(\left(\frac{2 - t_s}{1 -t_s}\right)^2\right)  = &amp; \ln \left(\frac{1 - t_s}{-t_s}\right) \\
+\left(\frac{2 - t_s}{1 -t_s}\right) ^ 2 = &amp; \left(\frac{1 - t_s}{-t_s}\right) \\
+(2 - t_s) ^2 \cdot (-t_s) = &amp; (1 - t_s) ^3 \\
+(4 - 4t_s + {t_s}^2) \cdot (-t_s) = &amp; 1 - 3t_s + 3{t_s}^2 - {t_s}^3 \\
+- {t_s}^3 + 4{t_s}^2 - 4t_s = &amp; 1 - 3t_s + 3{t_s}^2 - {t_s}^3 \\
+0 = &amp; {t_s}^2 - t_s - 1
+\end{aligned}
+\]</span></p>
+<p>The final equation, <span class="math inline">\(0 = {t_s}^2 - t_s - 1\)</span> has two irrational roots. (Ah,
+remember that old quadratic formula):</p>
+<p><span class="math display">\[
+\begin{aligned}
+t_s = &amp; \frac{1 \pm \sqrt{5}}{2} \\
+\end{aligned}
+\]</span></p>
+<p>Remember, though, that we set up our equations needing a <strong>negative start
+hour <span class="math inline">\(t_s\)</span></strong>. Only one of those roots is negative, so we have a start hour
+expression below.</p>
+<p><span class="math display">\[
+\begin{aligned}
+t_s = &amp; \frac{1 - \sqrt{5}}{2} \\
+= &amp; -0.618034 \\
+\end{aligned}
+\]</span></p>
+<p>The start hour <span class="math inline">\(t_s = -0.618034\)</span>. A slightly more human time would be <strong>11H 23M 0S.</strong></p>
+</div>
