@@ -1,0 +1,151 @@
+---
+title: 'Riddler Express: Maximize your chances of a t-shirt'
+author: ravic
+date: '2020-04-10'
+slug: riddler-express-where-should-you-sit-for-t-shirt-cannon
+categories: []
+tags:
+  - riddler
+---
+
+From our friends at the Riddler, where should you sit to [catch a free t-shirt](https://fivethirtyeight.com/features/can-you-catch-the-free-t-shirt/)?
+
+<!--more-->
+
+From our friends at the Riddler, where should you sit to [catch a free t-shirt](https://fivethirtyeight.com/features/can-you-catch-the-free-t-shirt/)?
+
+> During a break at a music festival, the crew is launching T-shirts into the audience using a T-shirt cannon. And you’re in luck — your seat happens to be in the line of flight for one of the T-shirts! In other words, if the cannon is strong enough and the shirt is launched at the right angle, it will land in your arms. \
+\
+The rows of seats in the audience are all on the same level (i.e., there is no incline), they are numbered 1, 2, 3, etc., and the T-shirts are being launched from directly in front of Row 1. Assume also that there is no air resistance (yes, I know, that’s a big assumption). You also happen to know quite a bit about the particular model of T-shirt cannon being used — with no air resistance, it can launch T-shirts to the very back of Row 100 in the audience, but no farther. \
+\
+The crew member aiming in your direction is still figuring out the angle for the launch, which you figure will be a random angle between zero degrees (straight at the unfortunate person seated in Row 1) and 90 degrees (straight up). Which row should you be sitting in to maximize your chances of nabbing the T-shirt?
+
+#### Answer
+**Sit in the last row!**
+
+#### Simulation
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("purrr")
+```
+
+```{r simulate_data}
+tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %>%
+  mutate(distance = 100 * sin(2 * theta)) %>%
+  ggplot(aes(x = distance)) +
+  geom_histogram(bins=50, fill="lightblue") +
+  theme_light() +
+  labs(
+    title = "Simulated frequency distribution of t-shirt distance",
+    subtitle = "Assumes a uniform distribution of cannon angle from 0 to 90°",
+    x = "Distance",
+    y = "Trials"
+  ) 
+```
+
+#### Maths
+
+
+The angle of the t-shirt cannon is a random uniform variable, $\Theta$.
+It has a constant probability for each angle $\theta$ as follows:
+
+$$
+\begin{aligned}
+f_{\Theta}(\theta) = \frac{1}{\frac{\pi}{2}} = \frac{2}{\pi}
+\end{aligned}
+$$
+
+
+We'll represent the distance the t-shirt travels as a random variable $X$.
+But first, we need to establish the relationship of the distance as a 
+function of the angle $\theta$.
+
+
+
+
+$$
+\begin{aligned}
+v(t) & =  v_0 - gt \\
+v_Y(\theta) & = v \sin{\Theta} \\
+y(t) & = \int_0^t (v_y(\theta) - gt) \; dt \\
+& = \int_0^t (v \sin{\theta} - gt) \; dt \\
+& = vt \sin{\theta} - \frac{1}{2}gt^2 \\
+\end{aligned}
+$$
+
+The time $T$ that the t-shirt is in flight and the distance $X$ that the 
+t-shirt travels are both random variables that are transformations of the
+angle $\Theta$. 
+
+$$
+\begin{aligned}
+0 & = vT\sin(\Theta) - \frac{1}{2}gT^2 \\
+T & = \frac{2v}{g}\sin(\Theta) \\
+\\
+X & = v_X(\Theta) \cdot T \\
+& = v \cos{\Theta} \cdot \frac{2v}{g}\sin{\Theta} \\
+& = \left(\frac{v^2}{g}\right) \cdot 2 \sin{\Theta} \cos{\Theta} \\
+& = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
+& = h(\Theta) \\
+\end{aligned}
+$$
+
+How can we use the maximum distance $x_{max} = 100$? 
+
+$$
+\begin{aligned}
+x_{max} & = \max_{0 \le \theta \le \frac{\pi}{2}} \left(\frac{v^2}{g}\right) \sin{2\theta} \\
+& = \frac{v^2}{g}, &\text{where } \theta = \frac{\pi}{4} \\
+100 & = \frac{v^2}{g}
+\end{aligned}
+$$
+
+This gives us a convenient alternative expression for the distance $X$.
+(We used this expression in our simulation code above):
+
+$$ 
+\begin{aligned}
+X & = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
+& = 100 \sin{2\Theta} \\
+\end{aligned}
+$$
+
+Now, we have $X$ as a functional transformation of $\Theta$. We're going to
+try to develop a density function $f_X(x)$ using the density function we 
+already have $f_{\Theta}(\theta)$ using this formulation, 
+[recap here, courtesy of Professor Watkins](https://www.math.arizona.edu/~jwatkins/f-transform.pdf):
+
+$$
+\begin{aligned}
+f_X(x) & = f_{\Theta}(h^{-1}(x)) \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
+\end{aligned}
+$$
+
+We'll need the inverse of the transformation $X = h(\Theta)$. This presents
+a bit of a bind, since the $\sin$ function doesn't have a straightforward
+inverse without piecewise limiting the domain. And we'll find that our formula
+has an undefined cusp.
+
+$$
+\begin{aligned}
+h^{-1}(X) & = \Theta \\
+& = \frac{1}{2}\arcsin(\frac{g}{v^2}X) \\
+\\
+\frac{d}{dx}h^{-1}(x) & = \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \\
+\end{aligned}
+$$
+
+
+
+
+$$
+\begin{aligned}
+f_X(x) & = f_{\Theta}(h^{-1}(x)) \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
+& = \frac{2}{\pi} \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
+& = \frac{2}{\pi} \cdot \left| \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \right| \\
+\end{aligned}
+$$
+The density function $f_X(x)$ is maximized when $x$ approaches $\frac{v^2}{g}$, or when $x$ approaches 100.
+
+
