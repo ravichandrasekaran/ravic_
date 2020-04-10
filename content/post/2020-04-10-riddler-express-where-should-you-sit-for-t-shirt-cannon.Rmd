@@ -12,6 +12,14 @@ From our friends at the Riddler, where should you sit to [catch a free t-shirt](
 
 <!--more-->
 
+## TODO
+
+1. Deal with the double domains in the prob density function $f_X(x)$.
+2. Discretize
+
+
+#### Problem
+
 From our friends at the Riddler, where should you sit to [catch a free t-shirt](https://fivethirtyeight.com/features/can-you-catch-the-free-t-shirt/)?
 
 > During a break at a music festival, the crew is launching T-shirts into the audience using a T-shirt cannon. And you’re in luck — your seat happens to be in the line of flight for one of the T-shirts! In other words, if the cannon is strong enough and the shirt is launched at the right angle, it will land in your arms. \
