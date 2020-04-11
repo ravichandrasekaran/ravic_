@@ -38,7 +38,7 @@ The crew member aiming in your direction is still figuring out the angle for the
 <pre class="r"><code>tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %&gt;%
   mutate(distance = 100 * sin(2 * theta)) %&gt;%
   ggplot(aes(x = distance)) +
-  geom_histogram(bins=50, fill=&quot;lightblue&quot;) +
+  geom_histogram(binwidth=1, fill=&quot;lightblue&quot;) +
   theme_light() +
   labs(
     title = &quot;Simulated frequency distribution of t-shirt distance&quot;,
@@ -51,15 +51,19 @@ The crew member aiming in your direction is still figuring out the angle for the
 <div id="maths" class="section level4">
 <h4>Maths</h4>
 <p>The angle of the t-shirt cannon is a random uniform variable, <span class="math inline">\(\Theta\)</span>.
-It has a constant probability for each angle <span class="math inline">\(\theta\)</span> as follows:</p>
+We can represent the probability density function <span class="math inline">\(f_{\Theta}\)</span> and the
+cumulative distribution function <span class="math inline">\(F_{\Theta}\)</span> as:</p>
 <p><span class="math display">\[
 \begin{aligned}
-f_{\Theta}(\theta) = \frac{1}{\frac{\pi}{2}} = \frac{2}{\pi}
+f_{\Theta}(\theta) &amp; = \frac{1}{\frac{\pi}{2}} = \frac{2}{\pi} \\
+F_{\Theta}(\theta) &amp; = \int_0^{\theta} f_{\Theta}(u) \; du \\
+&amp; = \frac{2\theta}{\pi}
 \end{aligned}
 \]</span></p>
 <p>We’ll represent the distance the t-shirt travels as a random variable <span class="math inline">\(X\)</span>.
 But first, we need to establish the relationship of the distance as a
-function of the angle <span class="math inline">\(\theta\)</span>.</p>
+function of the angle <span class="math inline">\(\theta\)</span>. We’ll start on that path by looking at the
+height as a function of angle and time after launch:</p>
 <p><span class="math display">\[
 \begin{aligned}
 v(t) &amp; =  v_0 - gt \\
@@ -74,32 +78,96 @@ t-shirt travels are both random variables that are transformations of the
 angle <span class="math inline">\(\Theta\)</span>.</p>
 <p><span class="math display">\[
 \begin{aligned}
-0 &amp; = vT\sin(\Theta) - \frac{1}{2}gT^2 \\
-T &amp; = \frac{2v}{g}\sin(\Theta) \\
+0 &amp; = vT\sin{\Theta} - \frac{1}{2}gT^2 \\
+T &amp; = \frac{2v}{g}\sin{\Theta} \\
 \\
 X &amp; = v_X(\Theta) \cdot T \\
 &amp; = v \cos{\Theta} \cdot \frac{2v}{g}\sin{\Theta} \\
 &amp; = \left(\frac{v^2}{g}\right) \cdot 2 \sin{\Theta} \cos{\Theta} \\
 &amp; = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
-&amp; = h(\Theta) \\
 \end{aligned}
 \]</span></p>
 <p>How can we use the maximum distance <span class="math inline">\(x_{max} = 100\)</span>?</p>
 <p><span class="math display">\[
 \begin{aligned}
-x_{max} &amp; = \max_{0 \le \theta \le \frac{\pi}{2}} \left(\frac{v^2}{g}\right) \sin{2\theta} \\
+x_{\max} &amp; = \max_{0 \le \theta \le \frac{\pi}{2}} \left(\frac{v^2}{g}\right) \sin{2\theta} \\
 &amp; = \frac{v^2}{g}, &amp;\text{where } \theta = \frac{\pi}{4} \\
-100 &amp; = \frac{v^2}{g}
 \end{aligned}
 \]</span></p>
-<p>This gives us a convenient alternative expression for the distance <span class="math inline">\(X\)</span>.
-(We used this expression in our simulation code above):</p>
+<p>This gives us a convenient alternative transformation <span class="math inline">\(h\)</span> for the distance
+<span class="math inline">\(X\)</span> as a function of the angle <span class="math inline">\(\Theta\)</span>. (We used this expression in our
+simulation code above):</p>
 <p><span class="math display">\[ 
 \begin{aligned}
 X &amp; = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
-&amp; = 100 \sin{2\Theta} \\
+&amp; = x_{\max} \sin{2\Theta} \\
+&amp; = h(\Theta) \\
 \end{aligned}
 \]</span></p>
+<p>We’re going to need to invert the function <span class="math inline">\(h\)</span> to proceed, and that’s a
+problem, since it’s not invertible over the domain <span class="math inline">\([0, \frac{\pi}{2}]\)</span>.
+Instead, we’re going to look at a subset of that domain –
+<span class="math inline">\([0, \frac{\pi}{4}]\)</span> – where we can invert <span class="math inline">\(h\)</span>, and then use the
+symmetry in the problem to double up.</p>
+<p><span class="math display">\[
+\begin{aligned}
+X &amp; = h(\Theta), &amp;&amp; 0 \le \Theta \le \frac{\pi}{4} \\
+&amp; = x_{\max}\sin{2\Theta} \\
+\\
+\Theta &amp; = h^{-1}(X) \\
+&amp; = \frac{1}{2}\arcsin{\left(\frac{X}{x_{\max}}\right)}
+\end{aligned}
+\]</span></p>
+<p>Now, we can return to our cumulative distribution function
+<span class="math inline">\(F_{\Theta}(\theta)\)</span>. But we’re making a slight modification, to account
+for our more limited domain. Then, we can develop a corresponding cdf for
+<span class="math inline">\(F_X(x)\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+F_{\Theta}(\theta) &amp; = \frac{4\theta}{\pi}, &amp;&amp; 0 \le \Theta \le \frac{\pi}{4} \\
+F_X(x) &amp; = \Pr(X \le x) \\
+&amp; = \Pr(\Theta \le h^{-1}(x)) \\
+&amp; = F_{\Theta}(h^{-1}(x)) \\
+&amp; = F_{\Theta}\left(\frac{1}{2}\arcsin{\left(\frac{x}{x_{\max}}\right)}\right) \\
+&amp; = \left(\frac{4}{\pi}\right)\left(\frac{1}{2}\arcsin{\left(\frac{x}{x_{\max}}\right)}\right) \\
+&amp; = \left(\frac{2}{\pi}\right)\arcsin{\left(\frac{x}{x_{\max}}\right)} \\
+\end{aligned}
+\]</span></p>
+<p>We can use this cdf to discretize to a probability mass function for the
+probability of the t-shirt arriving in row <span class="math inline">\(R\)</span>. In general, this looks like:</p>
+<p><span class="math display">\[
+\begin{aligned}
+p_R(r) = \begin{cases}
+  F_X(1.5) &amp;&amp; r = 1 \\
+  F_X(r + 0.5) - F_X(r - 0.5) &amp;&amp; 1 &lt; r &lt; 100 \\
+  F_X(100) - F_X(99.5) &amp;&amp; r = 100 \\
+  \end{cases}
+\end{aligned}
+\]</span></p>
+<pre class="r"><code>cdf_x &lt;- function(x) {
+  x_max &lt;- 100
+  return(2 / pi * asin(x / x_max))
+}
+pmf_r &lt;- function(r) {
+  ifelse(r == 1, cdf_x(1.5), 
+         ifelse(r == 100, cdf_x(100) - cdf_x(99.5), 
+                cdf_x(r + 0.5) - cdf_x(r - 0.5)))
+}
+est_probs &lt;- tibble(r = seq(1, 100)) %&gt;%
+  mutate(prob = map_dbl(r, pmf_r))
+est_probs %&gt;%
+  ggplot(aes(x = r, y = prob)) + 
+  geom_point(col = &quot;lightblue&quot;) +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), 
+                     breaks = seq(0, .06, .01),
+                     minor_breaks = seq(0, .06, .01)) +
+  labs(
+    title = &quot;Estimated probabilities at each row&quot;,
+    y = &quot;Probabilities&quot;,
+    x = &quot;Row&quot;
+  )</code></pre>
+<p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/pmf-1.png" width="672" /></p>
 <p>Now, we have <span class="math inline">\(X\)</span> as a functional transformation of <span class="math inline">\(\Theta\)</span>. We’re going to
 try to develop a density function <span class="math inline">\(f_X(x)\)</span> using the density function we
 already have <span class="math inline">\(f_{\Theta}(\theta)\)</span> using this formulation,
@@ -111,21 +179,33 @@ f_X(x) &amp; = f_{\Theta}(h^{-1}(x)) \cdot \left| \frac{d}{dx}h^{-1}(x) \right| 
 \]</span></p>
 <p>We’ll need the inverse of the transformation <span class="math inline">\(X = h(\Theta)\)</span>. This presents
 a bit of a bind, since the <span class="math inline">\(\sin\)</span> function doesn’t have a straightforward
-inverse without piecewise limiting the domain. And we’ll find that our formula
-has an undefined cusp.</p>
+inverse without piecewise limiting the domain. We’ll consider <span class="math inline">\(\Theta\)</span> on two
+symmetric domains – <span class="math inline">\([0, \frac{\pi}{4}]\)</span> and <span class="math inline">\([\frac{\pi}{4}, \frac{\pi}{2}]\)</span> –
+where we can consider an inverse function <span class="math inline">\(h^{-1}\)</span>.</p>
 <p><span class="math display">\[
 \begin{aligned}
-h^{-1}(X) &amp; = \Theta \\
-&amp; = \frac{1}{2}\arcsin(\frac{g}{v^2}X) \\
-\\
+\Theta &amp; = h^{-1}(X)  \\
+h^{-1}(X) &amp; = \begin{cases}
+  \frac{1}{2}\arcsin(\frac{g}{v^2}X), &amp;&amp; 0 \le x \le \frac{\pi}{4} \\
+  \frac{1}{2}\arcsin(\frac{g}{v^2}X), &amp;&amp; \frac{\pi}{4} \le x \le \frac{\pi}{2} \\
+  \end{cases}
+\end{aligned}
+\]</span></p>
+<p>And we’ll find that our formula for the derivative has an undefined cusp.
+We’ll deal with that a bit later.
+<span class="math display">\[
+\begin{aligned}
 \frac{d}{dx}h^{-1}(x) &amp; = \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \\
 \end{aligned}
 \]</span></p>
+<p>Because of the symmetry in the two domains of <span class="math inline">\(\Theta\)</span> for the inverse
+function <span class="math inline">\(h^{-1}\)</span>, we can simply double the probability density function
+for <span class="math inline">\(f_X(x)\)</span>.</p>
 <p><span class="math display">\[
 \begin{aligned}
 f_X(x) &amp; = f_{\Theta}(h^{-1}(x)) \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
-&amp; = \frac{2}{\pi} \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
-&amp; = \frac{2}{\pi} \cdot \left| \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \right| \\
+&amp; = 2 \cdot \frac{2}{\pi} \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
+&amp; = \frac{4}{\pi} \cdot \left( \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \right) \\
 \end{aligned}
 \]</span>
 The density function <span class="math inline">\(f_X(x)\)</span> is maximized when <span class="math inline">\(x\)</span> approaches <span class="math inline">\(\frac{v^2}{g}\)</span>, or when <span class="math inline">\(x\)</span> approaches 100.</p>
