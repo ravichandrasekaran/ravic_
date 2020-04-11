@@ -12,12 +12,6 @@ tags:
 
 <p>From our friends at the Riddler, where should you sit to <a href="https://fivethirtyeight.com/features/can-you-catch-the-free-t-shirt/">catch a free t-shirt</a>?</p>
 <!--more-->
-<div id="todo" class="section level2">
-<h2>TODO</h2>
-<ol style="list-style-type: decimal">
-<li>Deal with the double domains in the prob density function <span class="math inline">\(f_X(x)\)</span>.</li>
-<li>Discretize</li>
-</ol>
 <div id="problem" class="section level4">
 <h4>Problem</h4>
 <p>From our friends at the Riddler, where should you sit to <a href="https://fivethirtyeight.com/features/can-you-catch-the-free-t-shirt/">catch a free t-shirt</a>?</p>
@@ -31,10 +25,14 @@ The crew member aiming in your direction is still figuring out the angle for the
 </div>
 <div id="answer" class="section level4">
 <h4>Answer</h4>
-<p><strong>Sit in the last row!</strong></p>
+<p><strong>Sit in the last row!</strong> You’ve got a 6.37% chance of getting the t-shirt!</p>
+<hr />
 </div>
 <div id="simulation" class="section level4">
 <h4>Simulation</h4>
+<p>My son says the proper approach to this problem is to buy a t-shirt cannon
+and start firing t-shirts. It’s hard to argue with this notion, but this is
+as close as I can come to that:</p>
 <pre class="r"><code>df &lt;- tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %&gt;%
   mutate(distance = 100 * sin(2 * theta)) 
 sim_plt &lt;- df %&gt;%
@@ -49,6 +47,7 @@ sim_plt &lt;- df %&gt;%
   ) 
 sim_plt</code></pre>
 <p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/simulate_data-1.png" width="672" /></p>
+<hr />
 </div>
 <div id="formulation" class="section level4">
 <h4>Formulation</h4>
@@ -161,14 +160,14 @@ pmf_r &lt;- function(r) {
          ifelse(r == 100, cdf_x(100) - cdf_x(99.5), 
                 cdf_x(r + 0.5) - cdf_x(r - 0.5)))
 }</code></pre>
-<p>In particular, we can see that the probability for the last row is
-<span class="math inline">\(p_R(100) = 6.37%\)</span>, which
+<p>In particular, we can see that the <strong>probability for the last row is
+<span class="math inline">\(p_R(100) = 6.37%\)</span>%</strong>, which
 will where we will choose to sit!</p>
+<hr />
 </div>
 <div id="plotting-estimates-vs.simulations" class="section level4">
 <h4>Plotting estimates vs. simulations</h4>
 <p>We can now establish the probabilities of the t-shirt landing in each row.
 (We’ll find it compares pretty favorably to our simulation from earlier.)</p>
 <p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/est_plt-1.png" width="672" /><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/est_plt-2.png" width="672" /></p>
-</div>
 </div>

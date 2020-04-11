@@ -12,12 +12,6 @@ From our friends at the Riddler, where should you sit to [catch a free t-shirt](
 
 <!--more-->
 
-## TODO
-
-1. Deal with the double domains in the prob density function $f_X(x)$.
-2. Discretize
-
-
 #### Problem
 
 From our friends at the Riddler, where should you sit to [catch a free t-shirt](https://fivethirtyeight.com/features/can-you-catch-the-free-t-shirt/)?
@@ -29,9 +23,15 @@ The rows of seats in the audience are all on the same level (i.e., there is no i
 The crew member aiming in your direction is still figuring out the angle for the launch, which you figure will be a random angle between zero degrees (straight at the unfortunate person seated in Row 1) and 90 degrees (straight up). Which row should you be sitting in to maximize your chances of nabbing the T-shirt?
 
 #### Answer
-**Sit in the last row!**
+**Sit in the last row!** You've got a 6.37% chance of getting the t-shirt!
+
+---
 
 #### Simulation
+My son says the proper approach to this problem is to buy a t-shirt cannon
+and start firing t-shirts. It's hard to argue with this notion, but this is
+as close as I can come to that:
+
 
 ```{r load_packages, include=FALSE}
 library("tidyverse")
@@ -55,6 +55,8 @@ sim_plt <- df %>%
   ) 
 sim_plt
 ```
+
+---
 
 #### Formulation
 
@@ -194,9 +196,11 @@ pmf_r <- function(r) {
 }
 ```
 
-In particular, we can see that the probability for the last row is 
-$p_R(100) = `r {scales::percent(pmf_r(100), accuracy=.01, suffix = "%")}`$, which
+In particular, we can see that the **probability for the last row is 
+$p_R(100) = `r {scales::percent(pmf_r(100), accuracy=.01, suffix = "%")}`$%**, which
 will where we will choose to sit!
+
+---
 
 
 #### Plotting estimates vs. simulations
