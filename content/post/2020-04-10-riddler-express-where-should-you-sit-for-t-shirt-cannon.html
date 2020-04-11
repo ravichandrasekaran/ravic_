@@ -168,46 +168,5 @@ est_probs %&gt;%
     x = &quot;Row&quot;
   )</code></pre>
 <p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/pmf-1.png" width="672" /></p>
-<p>Now, we have <span class="math inline">\(X\)</span> as a functional transformation of <span class="math inline">\(\Theta\)</span>. We’re going to
-try to develop a density function <span class="math inline">\(f_X(x)\)</span> using the density function we
-already have <span class="math inline">\(f_{\Theta}(\theta)\)</span> using this formulation,
-<a href="https://www.math.arizona.edu/~jwatkins/f-transform.pdf">recap here, courtesy of Professor Watkins</a>:</p>
-<p><span class="math display">\[
-\begin{aligned}
-f_X(x) &amp; = f_{\Theta}(h^{-1}(x)) \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
-\end{aligned}
-\]</span></p>
-<p>We’ll need the inverse of the transformation <span class="math inline">\(X = h(\Theta)\)</span>. This presents
-a bit of a bind, since the <span class="math inline">\(\sin\)</span> function doesn’t have a straightforward
-inverse without piecewise limiting the domain. We’ll consider <span class="math inline">\(\Theta\)</span> on two
-symmetric domains – <span class="math inline">\([0, \frac{\pi}{4}]\)</span> and <span class="math inline">\([\frac{\pi}{4}, \frac{\pi}{2}]\)</span> –
-where we can consider an inverse function <span class="math inline">\(h^{-1}\)</span>.</p>
-<p><span class="math display">\[
-\begin{aligned}
-\Theta &amp; = h^{-1}(X)  \\
-h^{-1}(X) &amp; = \begin{cases}
-  \frac{1}{2}\arcsin(\frac{g}{v^2}X), &amp;&amp; 0 \le x \le \frac{\pi}{4} \\
-  \frac{1}{2}\arcsin(\frac{g}{v^2}X), &amp;&amp; \frac{\pi}{4} \le x \le \frac{\pi}{2} \\
-  \end{cases}
-\end{aligned}
-\]</span></p>
-<p>And we’ll find that our formula for the derivative has an undefined cusp.
-We’ll deal with that a bit later.
-<span class="math display">\[
-\begin{aligned}
-\frac{d}{dx}h^{-1}(x) &amp; = \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \\
-\end{aligned}
-\]</span></p>
-<p>Because of the symmetry in the two domains of <span class="math inline">\(\Theta\)</span> for the inverse
-function <span class="math inline">\(h^{-1}\)</span>, we can simply double the probability density function
-for <span class="math inline">\(f_X(x)\)</span>.</p>
-<p><span class="math display">\[
-\begin{aligned}
-f_X(x) &amp; = f_{\Theta}(h^{-1}(x)) \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
-&amp; = 2 \cdot \frac{2}{\pi} \cdot \left| \frac{d}{dx}h^{-1}(x) \right| \\
-&amp; = \frac{4}{\pi} \cdot \left( \frac{g}{2v^2} \sqrt{\frac{1}{1 - (\frac{gx}{v^2})^2}} \right) \\
-\end{aligned}
-\]</span>
-The density function <span class="math inline">\(f_X(x)\)</span> is maximized when <span class="math inline">\(x\)</span> approaches <span class="math inline">\(\frac{v^2}{g}\)</span>, or when <span class="math inline">\(x\)</span> approaches 100.</p>
 </div>
 </div>
