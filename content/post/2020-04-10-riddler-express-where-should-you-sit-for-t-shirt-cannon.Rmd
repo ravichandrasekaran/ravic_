@@ -23,7 +23,7 @@ The rows of seats in the audience are all on the same level (i.e., there is no i
 The crew member aiming in your direction is still figuring out the angle for the launch, which you figure will be a random angle between zero degrees (straight at the unfortunate person seated in Row 1) and 90 degrees (straight up). Which row should you be sitting in to maximize your chances of nabbing the T-shirt?
 
 #### Answer
-**Sit in the last row!** You've got a 6.37% chance of getting the t-shirt!
+**Sit in the last row!** You've got a 9.01% chance of getting the t-shirt!
 
 ---
 
@@ -43,16 +43,25 @@ library("ggrepel")
 ```{r simulate_data}
 df <- tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %>%
   mutate(distance = 100 * sin(2 * theta)) 
-sim_plt <- df %>%
-  ggplot(aes(x = distance)) +
-  geom_histogram(binwidth=1, fill="lightblue") +
+df_summary <- df %>%
+  count(row = ceiling(distance))
+sim_plt <- df_summary %>%
+  ggplot(aes(x = row, y = n)) +
+  geom_col(fill="lightblue") +
   theme_light() +
   labs(
     title = "Simulated frequency distribution of t-shirt distance",
     subtitle = "Assumes a uniform distribution of cannon angle from 0 to 90°",
     x = "Distance",
     y = "Trials"
-  ) 
+  ) +
+  scale_y_continuous(limits = c(0, 1000)) +
+  geom_text_repel(data = (
+    df_summary %>% 
+      filter(n > 750) %>% 
+      mutate(prob_label = scales::comma(n))),
+    aes(label = prob_label),
+    size=3, nudge_x = -6) 
 sim_plt
 ```
 
@@ -169,16 +178,15 @@ $$
 
 
 We can use this cdf to discretize to a probability mass function for the 
-probability of the t-shirt arriving in row $R$. There's a little weirdness
-at the edges:
+probability of the t-shirt arriving in row $R$. There are a few ways to 
+think about this, but I'm basically using a `ceiling` function on the 
+distance to translate to rows. (Hopefully consistent with "the back of
+row 100".)
+
 
 $$
 \begin{aligned}
-p_R(r) = \begin{cases}
-  F_X(1.5) && r = 1 \\
-  F_X(r + 0.5) - F_X(r - 0.5) && 1 < r < 100 \\
-  F_X(100) - F_X(99.5) && r = 100 \\
-  \end{cases}
+p_R(r) = F_X(r) - F_X(r - 1)
 \end{aligned}
 $$
 
@@ -189,11 +197,8 @@ cdf_x <- function(x) {
   x_max <- 100
   return(2 / pi * asin(x / x_max))
 }
-pmf_r <- function(r) {
-  ifelse(r == 1, cdf_x(1.5), 
-         ifelse(r == 100, cdf_x(100) - cdf_x(99.5), 
-                cdf_x(r + 0.5) - cdf_x(r - 0.5)))
-}
+pmf_r <- function(r) { cdf_x(r) - cdf_x(r - 1) }
+
 ```
 
 In particular, we can see that the **probability for the last row is 
@@ -215,9 +220,8 @@ est_plt <- est_probs %>%
   ggplot(aes(x = r, y = prob)) + 
   geom_point(col = "lightblue") +
   theme_light() +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1), 
-                     breaks = seq(0, .06, .01),
-                     minor_breaks = seq(0, .06, .01)) +
+  scale_y_continuous(limits = c(0, .1),
+                     labels = scales::percent_format(accuracy = .1)) +
   labs(
     title = "Estimated probabilities at each row",
     y = "Probabilities",
@@ -227,13 +231,7 @@ est_plt <- est_probs %>%
       filter(prob > .05) %>% 
       mutate(prob_label = scales::percent(prob, accuracy=.01))),
     aes(label = prob_label),
-    size=3, nudge_x = -6) +
-  geom_text_repel(data = (
-    est_probs %>%
-      filter(r == 1) %>%
-      mutate(prob_label = "Row 1 catches extra zero-distance throws")),
-    aes(label = prob_label),
-    size = 3, nudge_x = 6, nudge_y = .005, hjust=0)
+    size=3, nudge_x = -6) 
   
 est_plt
 sim_plt

@@ -25,7 +25,7 @@ The crew member aiming in your direction is still figuring out the angle for the
 </div>
 <div id="answer" class="section level4">
 <h4>Answer</h4>
-<p><strong>Sit in the last row!</strong> You’ve got a 6.37% chance of getting the t-shirt!</p>
+<p><strong>Sit in the last row!</strong> You’ve got a 9.01% chance of getting the t-shirt!</p>
 <hr />
 </div>
 <div id="simulation" class="section level4">
@@ -35,16 +35,25 @@ and start firing t-shirts. It’s hard to argue with this notion, but this is
 as close as I can come to that:</p>
 <pre class="r"><code>df &lt;- tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %&gt;%
   mutate(distance = 100 * sin(2 * theta)) 
-sim_plt &lt;- df %&gt;%
-  ggplot(aes(x = distance)) +
-  geom_histogram(binwidth=1, fill=&quot;lightblue&quot;) +
+df_summary &lt;- df %&gt;%
+  count(row = ceiling(distance))
+sim_plt &lt;- df_summary %&gt;%
+  ggplot(aes(x = row, y = n)) +
+  geom_col(fill=&quot;lightblue&quot;) +
   theme_light() +
   labs(
     title = &quot;Simulated frequency distribution of t-shirt distance&quot;,
     subtitle = &quot;Assumes a uniform distribution of cannon angle from 0 to 90°&quot;,
     x = &quot;Distance&quot;,
     y = &quot;Trials&quot;
-  ) 
+  ) +
+  scale_y_continuous(limits = c(0, 1000)) +
+  geom_text_repel(data = (
+    df_summary %&gt;% 
+      filter(n &gt; 750) %&gt;% 
+      mutate(prob_label = scales::comma(n))),
+    aes(label = prob_label),
+    size=3, nudge_x = -6) 
 sim_plt</code></pre>
 <p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/simulate_data-1.png" width="672" /></p>
 <hr />
@@ -139,15 +148,13 @@ F_X(x) &amp; = \Pr(X \le x) \\
 \end{aligned}
 \]</span></p>
 <p>We can use this cdf to discretize to a probability mass function for the
-probability of the t-shirt arriving in row <span class="math inline">\(R\)</span>. There’s a little weirdness
-at the edges:</p>
+probability of the t-shirt arriving in row <span class="math inline">\(R\)</span>. There are a few ways to
+think about this, but I’m basically using a <code>ceiling</code> function on the
+distance to translate to rows. (Hopefully consistent with “the back of
+row 100”.)</p>
 <p><span class="math display">\[
 \begin{aligned}
-p_R(r) = \begin{cases}
-  F_X(1.5) &amp;&amp; r = 1 \\
-  F_X(r + 0.5) - F_X(r - 0.5) &amp;&amp; 1 &lt; r &lt; 100 \\
-  F_X(100) - F_X(99.5) &amp;&amp; r = 100 \\
-  \end{cases}
+p_R(r) = F_X(r) - F_X(r - 1)
 \end{aligned}
 \]</span></p>
 <p>We can encode these formulae, and generate probabilities for each row:</p>
@@ -155,13 +162,9 @@ p_R(r) = \begin{cases}
   x_max &lt;- 100
   return(2 / pi * asin(x / x_max))
 }
-pmf_r &lt;- function(r) {
-  ifelse(r == 1, cdf_x(1.5), 
-         ifelse(r == 100, cdf_x(100) - cdf_x(99.5), 
-                cdf_x(r + 0.5) - cdf_x(r - 0.5)))
-}</code></pre>
+pmf_r &lt;- function(r) { cdf_x(r) - cdf_x(r - 1) }</code></pre>
 <p>In particular, we can see that the <strong>probability for the last row is
-<span class="math inline">\(p_R(100) = 6.37%\)</span>%</strong>, which
+<span class="math inline">\(p_R(100) = 9.01%\)</span>%</strong>, which
 will where we will choose to sit!</p>
 <hr />
 </div>
