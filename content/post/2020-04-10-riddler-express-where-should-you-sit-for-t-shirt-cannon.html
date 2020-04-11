@@ -35,8 +35,9 @@ The crew member aiming in your direction is still figuring out the angle for the
 </div>
 <div id="simulation" class="section level4">
 <h4>Simulation</h4>
-<pre class="r"><code>tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %&gt;%
-  mutate(distance = 100 * sin(2 * theta)) %&gt;%
+<pre class="r"><code>df &lt;- tibble(theta = runif(n = 10000, min = 0, max = pi / 2)) %&gt;%
+  mutate(distance = 100 * sin(2 * theta)) 
+sim_plt &lt;- df %&gt;%
   ggplot(aes(x = distance)) +
   geom_histogram(binwidth=1, fill=&quot;lightblue&quot;) +
   theme_light() +
@@ -45,17 +46,19 @@ The crew member aiming in your direction is still figuring out the angle for the
     subtitle = &quot;Assumes a uniform distribution of cannon angle from 0 to 90°&quot;,
     x = &quot;Distance&quot;,
     y = &quot;Trials&quot;
-  ) </code></pre>
+  ) 
+sim_plt</code></pre>
 <p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/simulate_data-1.png" width="672" /></p>
 </div>
-<div id="maths" class="section level4">
-<h4>Maths</h4>
-<p>The angle of the t-shirt cannon is a random uniform variable, <span class="math inline">\(\Theta\)</span>.
-We can represent the probability density function <span class="math inline">\(f_{\Theta}\)</span> and the
-cumulative distribution function <span class="math inline">\(F_{\Theta}\)</span> as:</p>
+<div id="formulation" class="section level4">
+<h4>Formulation</h4>
+<p>The angle of the t-shirt cannon is a random uniform variable, <span class="math inline">\(\Theta\)</span>,
+with a defined domain of <span class="math inline">\([0, \frac{\pi}{2}]\)</span>. (The domain piece will
+be important later on.) We can represent the probability density function
+<span class="math inline">\(f_{\Theta}\)</span> and the cumulative distribution function <span class="math inline">\(F_{\Theta}\)</span> as:</p>
 <p><span class="math display">\[
 \begin{aligned}
-f_{\Theta}(\theta) &amp; = \frac{1}{\frac{\pi}{2}} = \frac{2}{\pi} \\
+f_{\Theta}(\theta) &amp; = \frac{1}{\frac{\pi}{2}} = \frac{2}{\pi}, &amp;&amp; 0 \le \theta \le \frac{\pi}{2} \\
 F_{\Theta}(\theta) &amp; = \int_0^{\theta} f_{\Theta}(u) \; du \\
 &amp; = \frac{2\theta}{\pi}
 \end{aligned}
@@ -68,8 +71,8 @@ height as a function of angle and time after launch:</p>
 \begin{aligned}
 v(t) &amp; =  v_0 - gt \\
 v_Y(\theta) &amp; = v \sin{\Theta} \\
-y(t) &amp; = \int_0^t (v_y(\theta) - gt) \; dt \\
-&amp; = \int_0^t (v \sin{\theta} - gt) \; dt \\
+y(t) &amp; = \int_0^t (v_y(\theta) - gu) \; du \\
+&amp; = \int_0^t (v \sin{\theta} - gu) \; du \\
 &amp; = vt \sin{\theta} - \frac{1}{2}gt^2 \\
 \end{aligned}
 \]</span></p>
@@ -87,7 +90,7 @@ X &amp; = v_X(\Theta) \cdot T \\
 &amp; = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
 \end{aligned}
 \]</span></p>
-<p>How can we use the maximum distance <span class="math inline">\(x_{max} = 100\)</span>?</p>
+<p>How can we use the maximum distance <span class="math inline">\(x_{\max} = 100\)</span>?</p>
 <p><span class="math display">\[
 \begin{aligned}
 x_{\max} &amp; = \max_{0 \le \theta \le \frac{\pi}{2}} \left(\frac{v^2}{g}\right) \sin{2\theta} \\
@@ -95,8 +98,9 @@ x_{\max} &amp; = \max_{0 \le \theta \le \frac{\pi}{2}} \left(\frac{v^2}{g}\right
 \end{aligned}
 \]</span></p>
 <p>This gives us a convenient alternative transformation <span class="math inline">\(h\)</span> for the distance
-<span class="math inline">\(X\)</span> as a function of the angle <span class="math inline">\(\Theta\)</span>. (We used this expression in our
-simulation code above):</p>
+<span class="math inline">\(X\)</span> as a function of the angle <span class="math inline">\(\Theta\)</span>, without having the t-shirt’s launch
+velocity <span class="math inline">\(v\)</span> or the gravity constant <span class="math inline">\(g\)</span> in our formulae. (We used this
+expression in our simulation code above):</p>
 <p><span class="math display">\[ 
 \begin{aligned}
 X &amp; = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
@@ -108,7 +112,7 @@ X &amp; = \left(\frac{v^2}{g}\right) \sin{2\Theta} \\
 problem, since it’s not invertible over the domain <span class="math inline">\([0, \frac{\pi}{2}]\)</span>.
 Instead, we’re going to look at a subset of that domain –
 <span class="math inline">\([0, \frac{\pi}{4}]\)</span> – where we can invert <span class="math inline">\(h\)</span>, and then use the
-symmetry in the problem to double up.</p>
+symmetry to help us.</p>
 <p><span class="math display">\[
 \begin{aligned}
 X &amp; = h(\Theta), &amp;&amp; 0 \le \Theta \le \frac{\pi}{4} \\
@@ -125,16 +129,19 @@ for our more limited domain. Then, we can develop a corresponding cdf for
 <p><span class="math display">\[
 \begin{aligned}
 F_{\Theta}(\theta) &amp; = \frac{4\theta}{\pi}, &amp;&amp; 0 \le \Theta \le \frac{\pi}{4} \\
+\\
 F_X(x) &amp; = \Pr(X \le x) \\
 &amp; = \Pr(\Theta \le h^{-1}(x)) \\
 &amp; = F_{\Theta}(h^{-1}(x)) \\
+\\
 &amp; = F_{\Theta}\left(\frac{1}{2}\arcsin{\left(\frac{x}{x_{\max}}\right)}\right) \\
 &amp; = \left(\frac{4}{\pi}\right)\left(\frac{1}{2}\arcsin{\left(\frac{x}{x_{\max}}\right)}\right) \\
 &amp; = \left(\frac{2}{\pi}\right)\arcsin{\left(\frac{x}{x_{\max}}\right)} \\
 \end{aligned}
 \]</span></p>
 <p>We can use this cdf to discretize to a probability mass function for the
-probability of the t-shirt arriving in row <span class="math inline">\(R\)</span>. In general, this looks like:</p>
+probability of the t-shirt arriving in row <span class="math inline">\(R\)</span>. There’s a little weirdness
+at the edges:</p>
 <p><span class="math display">\[
 \begin{aligned}
 p_R(r) = \begin{cases}
@@ -144,6 +151,7 @@ p_R(r) = \begin{cases}
   \end{cases}
 \end{aligned}
 \]</span></p>
+<p>We can encode these formulae, and generate probabilities for each row:</p>
 <pre class="r"><code>cdf_x &lt;- function(x) {
   x_max &lt;- 100
   return(2 / pi * asin(x / x_max))
@@ -152,21 +160,15 @@ pmf_r &lt;- function(r) {
   ifelse(r == 1, cdf_x(1.5), 
          ifelse(r == 100, cdf_x(100) - cdf_x(99.5), 
                 cdf_x(r + 0.5) - cdf_x(r - 0.5)))
-}
-est_probs &lt;- tibble(r = seq(1, 100)) %&gt;%
-  mutate(prob = map_dbl(r, pmf_r))
-est_probs %&gt;%
-  ggplot(aes(x = r, y = prob)) + 
-  geom_point(col = &quot;lightblue&quot;) +
-  theme_light() +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1), 
-                     breaks = seq(0, .06, .01),
-                     minor_breaks = seq(0, .06, .01)) +
-  labs(
-    title = &quot;Estimated probabilities at each row&quot;,
-    y = &quot;Probabilities&quot;,
-    x = &quot;Row&quot;
-  )</code></pre>
-<p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/pmf-1.png" width="672" /></p>
+}</code></pre>
+<p>In particular, we can see that the probability for the last row is
+<span class="math inline">\(p_R(100) = 6.37%\)</span>, which
+will where we will choose to sit!</p>
+</div>
+<div id="plotting-estimates-vs.simulations" class="section level4">
+<h4>Plotting estimates vs. simulations</h4>
+<p>We can now establish the probabilities of the t-shirt landing in each row.
+(We’ll find it compares pretty favorably to our simulation from earlier.)</p>
+<p><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/est_plt-1.png" width="672" /><img src="/post/2020-04-10-riddler-express-where-should-you-sit-for-t-shirt-cannon_files/figure-html/est_plt-2.png" width="672" /></p>
 </div>
 </div>
