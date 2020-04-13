@@ -1,0 +1,59 @@
+---
+title: 'Riddler Classic: Spam begets spam'
+author: ravic
+date: '2020-04-12'
+slug: riddler-classic-spam-begets-spam
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<!--more-->
+<div id="problem" class="section level4">
+<h4>Problem</h4>
+<blockquote>
+<p>Over the course of three days, suppose the probability of any spammer making a new comment on this week’s Riddler column over a very short time interval is proportional to the length of that time interval. (For those in the know, I’m saying that spammers follow a Poisson process.) On average, the column gets one brand-new comment of spam per day that is not a reply to any previous comments. Each spam comment or reply also gets its own spam reply at an average rate of one per day.<br />
+ 
+For example, after three days, I might have four comments that were not replies to any previous comments, and each of them might have a few replies (and their replies might have replies, which might have further replies, etc.).<br />
+ 
+After the three days are up, how many total spam posts (comments plus replies) can I expect to have?</p>
+</blockquote>
+</div>
+<div id="simulation" class="section level4">
+<h4>Simulation</h4>
+<pre class="r"><code>num_trials &lt;- 100000
+spam_comments &lt;- function(hrs, mult) {
+  # Given a number of hours, and a multiplier to decide whether new spam
+  # comments seed their own comment/reply spam stream.
+  arrival_time &lt;- rexp(n = 1, rate = 1/24)
+  if(arrival_time &gt; hrs) {
+    return(0)
+  } 
+  return(1 + mult * spam_comments(hrs - arrival_time, mult))
+}
+
+df &lt;- crossing(trial = 1:num_trials, mult = 1:2) %&gt;%
+  mutate(hrs = 24 * 3) %&gt;%
+  mutate(num_comments = purrr::map2_dbl(hrs, mult, spam_comments))</code></pre>
+<pre class="r"><code>options(digits = 3)
+df %&gt;%
+  group_by(mult) %&gt;%
+  summarise(
+    mean_num_comments = mean(num_comments),
+    sd_num_comments = sd(num_comments))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##    mult mean_num_comments sd_num_comments
+##   &lt;int&gt;             &lt;dbl&gt;           &lt;dbl&gt;
+## 1     1              3.00            1.74
+## 2     2             19.1            79.2</code></pre>
+</div>
+<div id="conclusion" class="section level4">
+<h4>Conclusion</h4>
+<p>We already knew that the mean number of comments without spawning new
+threads with a rate of 1 per day for 3 days was 3 comments, using a
+basic Poisson process (with a variance of 3 as well.)</p>
+<p>With our simulation, we can see a much higher number of comments (~19 over
+3 days time), and an extremely high variance.</p>
+</div>
