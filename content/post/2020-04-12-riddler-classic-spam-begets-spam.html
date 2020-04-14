@@ -46,8 +46,8 @@ df %&gt;%
 <pre><code>## # A tibble: 2 x 3
 ##    mult mean_num_comments sd_num_comments
 ##   &lt;int&gt;             &lt;dbl&gt;           &lt;dbl&gt;
-## 1     1              3.00            1.74
-## 2     2             19.1            79.2</code></pre>
+## 1     1              3.00            1.73
+## 2     2             19.7           132.</code></pre>
 </div>
 <div id="conclusion" class="section level4">
 <h4>Conclusion</h4>
@@ -56,4 +56,31 @@ threads with a rate of 1 per day for 3 days was 3 comments, using a
 basic Poisson process (with a variance of 3 as well.)</p>
 <p>With our simulation, we can see a much higher number of comments (~19 over
 3 days time), and an extremely high variance.</p>
+</div>
+<div id="update" class="section level4">
+<h4>Update</h4>
+<p>Revising with a couple of sources:</p>
+<ul>
+<li>Notes from MIT’s OpenCourseWare
+<a href="https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-262-discrete-stochastic-processes-spring-2011/course-notes/MIT6_262S11_chap02.pdf">CS 6.262</a></li>
+<li>David Robinson’s <a href="https://www.youtube.com/watch?v=QtThluGted0">screencast</a>
+on this Riddler</li>
+</ul>
+<p>The MIT chapter points to one reminder – if you have two Poisson processes at different rates <span class="math inline">\(\lambda_1\)</span> and <span class="math inline">\(\lambda_2\)</span>, it forms an aggregate Poisson process with rate <span class="math inline">\(\lambda = \lambda_1 + \lambda_2\)</span>.</p>
+<p>For the first waiting time <span class="math inline">\(X_1\)</span>, it follows a simple exponential distribution with <span class="math inline">\(\lambda = 1\)</span>. This correspondingly has a mean <span class="math inline">\(\lambda\)</span>. Fair enough.</p>
+<p>But now we have the original post and the new post, both of which gather replies. So at this point, we can consider this as two Poisson processes, both with <span class="math inline">\(\lambda_1 = \lambda_2 = 1\)</span>. The aggregate of these two is a Poisson process <span class="math inline">\(\lambda = 2\)</span>. The wait time for <span class="math inline">\(X_2\)</span> is then <span class="math inline">\(\frac{1}{2}\)</span>.</p>
+<p>With the next comment, we now are combining another Poisson process, so <span class="math inline">\(\lambda = 2 + 1 = 3\)</span>. So, now we have <span class="math inline">\(X_3 \sim \exp(3)\)</span> waiting time, with an expectation <span class="math inline">\(E[X_3] = \frac{1}{3}\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+S_n &amp; = X_1 + X_2 + X_3 + \dots + X_n \\
+E[S_n] &amp; = E[X_1] + E[X_2] + E[X_3] + \dots + E[X_n] \\
+&amp; = 1 + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} \\
+&amp; = \int_1^n \frac{1}{x} \; dx \\
+&amp; = \ln{x} \; \big|_1^n \\
+3 &amp; = \ln{n} \\
+n &amp; = e^3 \\
+\end{aligned}
+\]</span>
+There’s an off-by-one issue here, since you cannot fit all the comments exactly within
+the window, so, we’re looking at <span class="math inline">\(n - 1 = e^3 - 1 = 19.1\)</span>.</p>
 </div>

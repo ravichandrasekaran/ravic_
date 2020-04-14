@@ -64,3 +64,44 @@ basic Poisson process (with a variance of 3 as well.)
 
 With our simulation, we can see a much higher number of comments (~19 over 
 3 days time), and an extremely high variance.
+
+
+
+#### Update 
+
+Revising with a couple of sources:
+
+*  Notes from MIT's OpenCourseWare 
+   [CS 6.262](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-262-discrete-stochastic-processes-spring-2011/course-notes/MIT6_262S11_chap02.pdf)
+*  David Robinson's [screencast](https://www.youtube.com/watch?v=QtThluGted0) 
+   on this Riddler 
+
+The MIT chapter points to one reminder -- if you have two Poisson processes at different rates $\lambda_1$ and $\lambda_2$, it forms an aggregate Poisson process with rate $\lambda = \lambda_1 + \lambda_2$. 
+
+For the first waiting time $X_1$, it follows a simple exponential distribution with $\lambda = 1$. This correspondingly has a mean $\lambda$. Fair enough. 
+
+But now we have the original post and the new post, both of which gather replies. So at this point, we can consider this as two Poisson processes, both with $\lambda_1 = \lambda_2 = 1$. The aggregate of these two is a Poisson process $\lambda = 2$. The wait time for $X_2$ is then $\frac{1}{2}$.
+
+With the next comment, we now are combining another Poisson process, so $\lambda = 2 + 1 = 3$. So, now we have $X_3 \sim \exp(3)$ waiting time, with an expectation $E[X_3] = \frac{1}{3}$.
+
+$$
+\begin{aligned}
+S_n & = X_1 + X_2 + X_3 + \dots + X_n \\
+E[S_n] & = E[X_1] + E[X_2] + E[X_3] + \dots + E[X_n] \\
+& = 1 + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} \\
+& = \int_1^n \frac{1}{x} \; dx \\
+& = \ln{x} \; \big|_1^n \\
+3 & = \ln{n} \\
+n & = e^3 \\
+\end{aligned}
+$$
+There's an off-by-one issue here, since you cannot fit all the comments exactly within
+the window, so, we're looking at $n - 1 = e^3 - 1 = 19.1$.
+
+
+
+
+
+
+
+
