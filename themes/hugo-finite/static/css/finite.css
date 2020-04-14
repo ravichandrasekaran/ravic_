@@ -11,7 +11,12 @@
 body {
     background-color: #faf8f8;
     color: #101730;
-    font-family: 'Merriweather', serif;
+    font-family: "Source Sans Pro",Helvetica Neue,sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.2em;    
+    font-size: 100%;
 }
 
 /* Title and top bar navigation.  */
@@ -81,9 +86,31 @@ a:focus {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'WorkSans', sans;
-    text-transform: uppercase
+    font-family: 'Source Sans Pro', sans-serif;
+    /* text-transform: uppercase; */
+    line-height: 4;
 }
+
+h1 {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 1.0rem;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 70%;
+    font-weight: bold;
+}
+
 
 @media screen and (min-width: 40em) {
     h1 { font-size: 1.5rem; }
@@ -122,6 +149,7 @@ pre {
     margin: 0 0 16px 0;
     border-left: 1px dashed #2199e8;
     padding-left: 1em;
+    background-color: #ece8e8;
 }
 
 .hljs
@@ -229,8 +257,12 @@ ul.taxonomy-terms {
 
 blockquote {
     color: #8a8a8a;
-    line-height: 1.0;
-    font-size: 0.9em; 
+    line-height: 1.2;
+    font-size: 1.0em; 
+}
+
+.katex {
+  font-size: 1.0em !important;
 }
 
 .longquote {
