@@ -102,3 +102,11 @@ df <- tibble(t = seq(0, 700)) %>%
 
 ```
 
+
+
+
+http://www-math.mit.edu/~djk/18_01/chapter18/section02.html
+https://mathworld.wolfram.com/Cycloid.html
+https://mathworld.wolfram.com/Circle-CircleIntersection.html
+https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
+https://math.libretexts.org/Courses/University_of_California%2C_Davis/UCD_Mat_21C%3A_Multivariate_Calculus/10%3A_Parametric_Equations_and_Polar_Coordinates/10.1%3A_Parametrizations_of_Plane_Curves
