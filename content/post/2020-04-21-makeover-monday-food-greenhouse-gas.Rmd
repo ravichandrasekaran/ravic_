@@ -1,0 +1,75 @@
+---
+title: 'Makeover Monday: Food - Greenhouse gas'
+author: ravic
+date: '2020-04-21'
+slug: makeover-monday-food-greenhouse-gas
+categories: []
+tags:
+  - makeover-monday
+---
+
+
+<!--more-->
+
+* [Source article](https://ourworldindata.org/food-choice-vs-eating-local)
+* [Starter image](https://ourworldindata.org/food-choice-vs-eating-local)
+* [Source's source](https://science.sciencemag.org/content/360/6392/987)
+
+![Original environmental impact image](/post/2020-04-21-makeover-monday-food-greenhouse-gas_files/Environmental-impact-of-food-by-life-cycle-stage.png){width=600px height=300px}
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("janitor")
+library("glue")
+```
+```{r import_data, include=FALSE}
+df_raw <- readr::read_csv("https://query.data.world/s/cuvfttec7lpxwuhhfljspo34e6nrlq")
+```
+```{r clean_data, include=FALSE}
+df <- df_raw %>%
+  janitor::clean_names() %>%
+  select(everything(), -x9)
+# Units are in kg CO2 equivalents per kg of food product
+```
+```{r features, include=FALSE}
+df <- df %>%
+  mutate(
+    major_food_category = case_when(
+      str_detect(food_product, " Oil") ~ "Vegetable Oils",
+      str_detect(food_product, "Beef|Meat|Lamb") ~ "Meat",
+      str_detect(food_product, "Poultry|Pork") ~ "Meat",
+      str_detect(food_product, "Fish|Shrimp") ~ "Meat",
+      str_detect(food_product, "Milk|Cheese|Eggs") ~ "Dairy",
+      str_detect(food_product, "Fruit|Banana|Apple|Berries|Vegetables|Brassicas|Tomato|Onion") ~
+        "Fruits & Vegetables",
+      str_detect(food_product, "Coffee|Chocolate") ~ "Caffeine",
+      TRUE ~ "(Other)"),
+    minor_food_category = case_when(
+      str_detect(food_product, " Oil") ~ "Vegetable Oils",
+      str_detect(food_product, "Beef|Meat|Lamb") ~ "Red meat",
+      str_detect(food_product, "Poultry|Pork") ~ "White meat",
+      str_detect(food_product, "Fish|Shrimp") ~ "Seafood",
+      str_detect(food_product, "Fruit|Banana|Apple|Berries") ~ "Fruits",
+      str_detect(food_product, "Vegetables|Brassicas|Tomato|Onion") ~ "Vegetables",
+      str_detect(food_product, "Coffee") ~ "Coffee",
+      str_detect(food_product, "Chocolate") ~ "Chocolate",
+      TRUE ~ major_food_category)
+    )
+# df %>% select(food_product, major_food_category, minor_food_category) %>% view()
+# Animal-based?
+```
+
+
+### Notes
+
+1.  "Pound-for-pound". 
+2.  Beef is bad. Beef has more total greenhouse gas emissions.
+3.  A range of different approaches -- "Eat Local.", "Farm to Table", "Raw food",
+    "Vegan" - have different impacts
+4.  The original authors are pushing more for consumers to adopt plant-based meat,
+    and avoid discretionary things like sugar/stimulants/alcohol.
+5.  The revised article discussion focuses more on the fallacy of "Eat Local." 
+    But even more, that highlights that our mental model of food + greenhouse gases
+    is wrong. 
+
+
