@@ -1,0 +1,56 @@
+---
+title: 'Tidy Tuesday: GDPR Violations'
+author: ravic
+date: '2020-04-21'
+slug: tidy-tuesday-gdpr-violations
+categories: []
+tags:
+  - tidy-tuesday
+---
+
+
+<!--more-->
+
+(Overview from TidyTuesday)[https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-04-21/readme.md]
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("janitor")
+library("glue")
+```
+
+```{r import_data, include=FALSE}
+base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/"
+vdf <- readr::read_tsv(
+  glue(base_url, "2020/2020-04-21/gdpr_violations.tsv"),
+  na = c("Not available.", "Not known", "0", "Not available", "Not disclosed", "Unknown")) %>%
+  janitor::clean_names() %>%
+  mutate_at(vars(name, authority, controller, type), factor)
+tdf <- readr::read_tsv(glue(base_url, "2020/2020-04-21/gdpr_text.tsv")) %>%
+  janitor::clean_names()
+```
+
+```{r data_overview, include=FALSE}
+library("skimr")
+skimr::skim(vdf)
+vdf %>% view()
+```
+
+```{r clean_data, include=FALSE}
+# Need to clean up `controller`. Different types (individual vs. company), 
+# different variants on company name (e.g. Google vs. Google, Inc), and 
+# different regions (Vodafone España vs. Vodafone Romania)
+```
+
+---
+
+
+### Potential concepts
+
+1.  The `summary` information is rich. Potentially understand the violation 
+    without the text of the articles?
+2.  Associations between violations? 
+3.  Timing of fines, prosecutions? Fine amounts over time? Sending messages?
+
+
+
