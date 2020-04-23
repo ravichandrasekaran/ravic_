@@ -126,7 +126,7 @@ code
 {
     /* For non-JS users we repeat color here.  */
     color: #101730;
-    background-color: #ece8e8;
+    /* background-color: #ece8e8; */
     border: none;
     padding-left: 0.3em;
     padding-right: 0.3em;
@@ -149,7 +149,7 @@ pre {
     margin: 0 0 16px 0;
     border-left: 1px dashed #2199e8;
     padding-left: 1em;
-    background-color: #ece8e8;
+    /* background-color: #ece8e8; */
 }
 
 .hljs
@@ -280,7 +280,7 @@ blockquote {
   table thead,
   table tbody,
   table tfoot {
-    background-color: #fffef5;
+    background-color: #ffffff;
     font-size: 10pt;
     font-family: Inter;}
   table thead {
@@ -307,8 +307,19 @@ blockquote {
       text-transform: uppercase;
       text-align: left; 
     }
+    thead th {
+      background: #ece8e8;
+      vertical-align: bottom;
+    }  
   table tbody tr:nth-child(even) {
-    background-color: #fffef5; }
+    vertical-align: top;
+    background-color: #ffffff; }
+  table tbody tr:nth-child(odd) {
+    vertical-align: top;
+    background-color: #ffffff; }
+  table tbody tr {
+    border-bottom: 1px solid #e5dada;
+  }
   table tbody th,
   table tbody td {
     padding: 0.5rem 0.625rem 0.625rem; }

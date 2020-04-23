@@ -8,6 +8,123 @@ tags:
   - tidy-tuesday
 ---
 
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
 
 
-
+<!--more-->
+<div id="background" class="section level3">
+<h3>Background</h3>
+<p><a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-04-21/readme.md">Overview from TidyTuesday</a></p>
+<div id="examining-biggest-fines" class="section level4">
+<h4>Examining biggest fines</h4>
+<p>Notes:</p>
+<ol style="list-style-type: decimal">
+<li>Separate individuals and companies? Many small-value individual fines.</li>
+<li>Limited early enforcement. (The July 2018 fine in Portugal must have
+really pissed somebody off.)</li>
+<li>Limited late-stage enforcement against individuals, small-value fines.</li>
+<li>Test early rapid enforcement deterrent via inter-arrival waiting times.</li>
+</ol>
+<p><img src="/post/2020-04-21-tidy-tuesday-gdpr-violations_files/figure-html/timeline_plot-1.png" width="768" /></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right;">
+rank
+</th>
+<th style="text-align:left;">
+controller
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+fine (MM €)
+</th>
+<th style="text-align:left;">
+summary
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Google Inc.
+</td>
+<td style="text-align:left;width: 100px; ">
+2019-01-21
+</td>
+<td style="text-align:left;width: 100px; ">
+€50.0
+</td>
+<td style="text-align:left;">
+The French NGO “La Quadrature du Net” and the Austrian organization “None Of Your Business” complained about the creation of a Google account related to the configuration of the Android system in a mobile phone. A fine of 50 million euros was issued because the following principles were not observed: the principle of transparency (Art. 5 GDPR), the sufficiency of information (Art.13 / 14 GDPR), and the presence of legal basis (Art. 6 GDPR).
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+TIM - Telecom Provider
+</td>
+<td style="text-align:left;width: 100px; ">
+2020-02-01
+</td>
+<td style="text-align:left;width: 100px; ">
+€27.8
+</td>
+<td style="text-align:left;">
+A huge fine of €27,8 million was issued to the Italian telecom company TIM. The Italian Data Protection Authority (Garante) revealed that TIM was fined due to numerous unlawful data processing activities related to marketing and advertising, which included unsolicited promotional calls and prize competitions in which data subjects were entered without consent.One of the reasons for the large fine was the fact that the unlawful data processing activities involved several million individuals. One individual, for example, was called a total of 155 times in a month while TIM refused to add the affected individual on a no-call list even after several requests. The DPA determined that the company lacked control over the call centers and did not have adequate measures to add people to no-call lists.TIM also did not provide accurate and detailed enough privacy policies and data processing policies, and as such consumers were not efficiently informed about the data collected and processed. The company&amp;#8217;s management of data breaches was also not efficient according to Garante.Besides the fine, Garante also imposed 20 corrective measures according to Art. 58(2) GDPR which prohibits TIM from processing marketing-related data of those individuals who have refused to receive promotional calls, individuals who asked to be blacklisted and individuals who are not clients of TIM.The company was also forbidden from using customer data collected from the &amp;#8220;My Tim&amp;#8221;, &amp;#8220;Tim Personal&amp;#8221; and &amp;#8220;Tim Smart Kid&amp;#8221; apps.
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Austrian Post
+</td>
+<td style="text-align:left;width: 100px; ">
+2019-10-23
+</td>
+<td style="text-align:left;width: 100px; ">
+€18.0
+</td>
+<td style="text-align:left;">
+The Austrian Post had sold detailed personal profiles of approximately three million Austrians to various companies and political parties. The profiles contained names, addresses, political predilections, and even intimate details.
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Deutsche Wohnen SE
+</td>
+<td style="text-align:left;width: 100px; ">
+2019-10-30
+</td>
+<td style="text-align:left;width: 100px; ">
+€14.5
+</td>
+<td style="text-align:left;">
+The company collected data from multiple tenants without providing the option to remove that data once it was no longer required. This led to the company retaining personal data of tenants for years (salary statements, social security insurances, health insurances, tax insurances, bank statements). The Berlin Data Commissioner issued a fine of €14,500,000.
+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="further-research" class="section level3">
+<h3>Further research</h3>
+<ol style="list-style-type: decimal">
+<li>The <code>summary</code> information is rich. Potentially understand the violation
+without the text of the articles?</li>
+<li>Associations between violations?</li>
+</ol>
+</div>
