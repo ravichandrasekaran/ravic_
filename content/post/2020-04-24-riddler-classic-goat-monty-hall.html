@@ -32,7 +32,8 @@ tags:
 <h2>Simulation</h2>
 <p>The Monty Hall problem forces us to wrestle with our better instincts. So,
 let’s start with a simulation.</p>
-<pre class="r"><code>simulation_run &lt;- function(stand_pat=TRUE) {
+<pre class="r"><code>set.seed(2020)
+simulation_run &lt;- function(stand_pat=TRUE) {
   # Place goats
   num_goats &lt;- sample(0:3, 1)
   door_possibilities &lt;- c(rep(1, num_goats), rep(0, 3 - num_goats))
@@ -76,8 +77,8 @@ df %&gt;%
 <pre><code>## # A tibble: 2 x 5
 ##   stand_pat trials door_open winning pct_winning
 ## * &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;   &lt;int&gt;       &lt;dbl&gt;
-## 1 FALSE     100000     66433   33146       0.499
-## 2 TRUE      100000     66621   25015       0.375</code></pre>
+## 1 FALSE     100000     66710   33210       0.498
+## 2 TRUE      100000     66532   24939       0.375</code></pre>
 </div>
 <div id="formulation" class="section level2">
 <h2>Formulation</h2>

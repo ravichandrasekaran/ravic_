@@ -36,6 +36,7 @@ The Monty Hall problem forces us to wrestle with our better instincts. So,
 let's start with a simulation.
 
 ```{r simulation}
+set.seed(2020)
 simulation_run <- function(stand_pat=TRUE) {
   # Place goats
   num_goats <- sample(0:3, 1)
