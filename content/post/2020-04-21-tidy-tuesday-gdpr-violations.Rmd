@@ -1,0 +1,159 @@
+---
+title: 'Tidy Tuesday: GDPR Violations'
+author: ravic
+date: '2020-04-21'
+slug: tidy-tuesday-gdpr-violations
+categories: []
+tags:
+  - tidy-tuesday
+---
+
+
+<!--more-->
+
+### Background
+
+[Overview from TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-04-21/readme.md)
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("janitor")
+library("glue")
+library("scales")
+library("ggrepel")
+library("formattable")
+library("kableExtra")
+```
+```{r import_data, include=FALSE}
+base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/"
+vdf_raw <- readr::read_tsv(
+  glue(base_url, "2020/2020-04-21/gdpr_violations.tsv"),
+  na = c("Not available.", "Not known", "0", "Not available", "Not disclosed", "Unknown")) %>%
+  janitor::clean_names() 
+tdf <- readr::read_tsv(glue(base_url, "2020/2020-04-21/gdpr_text.tsv")) %>%
+  janitor::clean_names()
+```
+```{r clean_data, include=FALSE}
+library("lubridate")
+vdf <- vdf_raw %>%
+  mutate_at(vars(name, authority, controller, type), factor) %>%
+  mutate(date = na_if(mdy(date), ymd("1970-01-01")))
+  
+# Need to clean up `controller`. Different types (individual vs. company), 
+# different variants on company name (e.g. Google vs. Google, Inc), and 
+# different regions (Vodafone España vs. Vodafone Romania)
+```
+```{r data_overview, include=FALSE}
+library("skimr")
+skimr::skim(vdf)
+vdf %>% view()
+```
+
+
+```{r key_events, fig.width=8, include=FALSE}
+vdf %>%
+  filter(!is.na(date), !is.na(price)) %>%
+  ggplot(aes(x = date, y = price)) +
+  geom_point(color = "lightblue") + 
+  theme_light() +
+  scale_y_log10(labels = scales::dollar_format(prefix = "\u20ac")) +
+  labs(
+    x = "",
+    y = "",
+    title = "Amount of GDPR fine (Eur.) over time"
+  ) 
+```
+#### Examining biggest fines
+
+
+
+Notes:
+
+1.  Separate individuals and companies? Many small-value individual fines.
+2.  Limited early enforcement. (The July 2018 fine in Portugal must have 
+    really pissed somebody off.)
+3.  Limited late-stage enforcement against individuals, small-value fines.
+4.  Test early rapid enforcement deterrent via inter-arrival waiting times.
+
+```{r reverse_date_axis, include=FALSE}
+# https://stackoverflow.com/questions/43625341/reverse-datetime-posixct-data-axis-in-ggplot
+c_trans <- function(a, b, breaks = b$breaks, format = b$format) {
+  a <- scales::as.trans(a)
+  b <- scales::as.trans(b)
+
+  name <- paste(a$name, b$name, sep = "-")
+
+  trans <- function(x) a$trans(b$trans(x))
+  inv <- function(x) b$inverse(a$inverse(x))
+
+  scales::trans_new(name, trans, inverse = inv, breaks = breaks, format=format)
+
+}
+rev_date <- c_trans("reverse", "date")
+```
+
+```{r timeline_plot, fig.height=8, fig.width=8, echo = FALSE}
+vdf <- vdf %>%
+  mutate(rank_fine = rank(-price)) 
+
+vdf %>%
+  filter(!is.na(date), !is.na(price)) %>%
+  filter(price > 100000) %>%
+  ggplot(aes(y = date, x = price)) +
+  geom_jitter(color = "lightblue", show.legend = FALSE, height = 0, alpha = .7, width = .2) + 
+  theme_light() +
+  scale_x_continuous(
+    breaks = seq(0, 5e7, 1e7),
+    minor_breaks = seq(0, 5e7, 1e7),
+    position = "top", 
+    labels = scales::label_dollar(
+      scale = 1e-6, accuracy = .1, 
+      suffix = "",  prefix = "\u20ac")) +
+  scale_y_continuous(
+    trans = rev_date, labels = date_format("%b %Y"),
+    breaks = ymd(c("2018-07-01", "2019-01-01", "2019-07-01", "2020-01-01", "2020-07-01"))) + 
+  labs(
+    x = "",
+    y = "",
+    title = "Amount of GDPR fine since enforcement began (2018-05-25)",
+    subtitle = glue("Fines in millions of Euros (MM{euro})", euro="\u20ac"), 
+    size = "Fine"
+  ) +
+  theme(axis.line.y.left = element_blank(),
+        axis.line.y.right = element_blank(),
+        panel.border = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_text_repel(data = subset(vdf, price > 1e7), 
+                  aes(label = glue("[{n}]", n=as.character(rank_fine))), hjust=0, 
+                  segment.color = "grey", point.padding = 1,
+                  size=rel(3)) 
+  
+
+
+```
+
+
+
+
+```{r biggest_fines, echo = FALSE}
+vdf %>% 
+  arrange(desc(price)) %>%
+  filter(price > 1e7) %>%
+  arrange(desc(price)) %>%
+  mutate(rank = rank(-price)) %>%
+  select(rank, controller, date, fine=price, summary) %>%
+  mutate(fine = scales::dollar(fine, scale = 1/1e6, accuracy=.1, prefix="\u20ac")) %>%  
+  rename(`fine (MM €)` = fine) %>%
+  knitr::kable() %>% 
+  column_spec(column = 3, width = "100px") %>%
+  column_spec(column = 4, width = "100px", )
+```
+
+
+---
+
+### Further research
+
+1.  The `summary` information is rich. Potentially understand the violation 
+    without the text of the articles?
+2.  Associations between violations? 
