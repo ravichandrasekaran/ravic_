@@ -325,6 +325,10 @@ blockquote {
     padding: 0.5rem 0.625rem 0.625rem; }
     
 
+.caption {
+  font-style: italic;
+  font-size: 0.9rem;
+}
 /**************************************************
  *  Publications
  **************************************************/
