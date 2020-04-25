@@ -126,6 +126,8 @@ code
 {
     /* For non-JS users we repeat color here.  */
     color: #101730;
+    font-family: 'DejaVuSansMono', 'Courier New', 'Courier', monospace;
+    font-size: 0.85rem;
     /* background-color: #ece8e8; */
     border: none;
     padding-left: 0.3em;

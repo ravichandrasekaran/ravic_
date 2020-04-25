@@ -1,0 +1,24 @@
+---
+title: Enabling tweet embed support
+author: ravic
+date: '2020-04-25'
+slug: enabling-tweet-embed-support
+categories: []
+tags: []
+---
+
+Looking into tweet embed support via Markdown, up-to-date Hugo versions.
+
+<!--more-->
+
+#### Investigation notes
+
+1.  Hugo has been [full of shortcodes](https://gohugo.io/content-management/shortcodes/).
+2.  Using shortcodes in Rmarkdown was [never easy](https://bookdown.org/yihui/blogdown/content.html#shortcode). 
+3.  But since 0.55, using those shortcodes in Rmarkdown has been [fraught](https://github.com/rstudio/blogdown/issues/40).
+
+> {{ % as the outer-most shortcode delimiter means “pass the inner content to the content renderer” (e.g. Blackfriday); the old behavior can be had, see [#5763](https://github.com/gohugoio/hugo/issues/5763)
+    
+4.  [\@yihue](https://twitter.com/xieyihui) recommends a [workaround](https://stackoverflow.com/questions/55856904/cannot-use-markdown-shortcodes-in-blogdowns-rmd-files/55928449#55928449), but it is not obvious how to use it (at least to me).
+4.  Now up to [version 0.69.2](https://gohugo.io/functions/renderstring/). Might want to check on Netlify support.
+5.  Hugo release 0.62 brings [Markdown Render Hooks](https://gohugo.io/functions/renderstring/), which seems like it might supplant `markdownify`: 

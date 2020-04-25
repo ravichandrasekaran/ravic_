@@ -1,0 +1,29 @@
+---
+title: Enabling tweet embed support
+author: ravic
+date: '2020-04-25'
+slug: enabling-tweet-embed-support
+categories: []
+tags: []
+---
+
+
+
+<p>Looking into tweet embed support via Markdown, up-to-date Hugo versions.</p>
+<!--more-->
+<div id="investigation-notes" class="section level4">
+<h4>Investigation notes</h4>
+<ol style="list-style-type: decimal">
+<li>Hugo has been <a href="https://gohugo.io/content-management/shortcodes/">full of shortcodes</a>.</li>
+<li>Using shortcodes in Rmarkdown was <a href="https://bookdown.org/yihui/blogdown/content.html#shortcode">never easy</a>.</li>
+<li>But since 0.55, using those shortcodes in Rmarkdown has been <a href="https://github.com/rstudio/blogdown/issues/40">fraught</a>.</li>
+</ol>
+<blockquote>
+<p>{{ % as the outer-most shortcode delimiter means “pass the inner content to the content renderer” (e.g. Blackfriday); the old behavior can be had, see <a href="https://github.com/gohugoio/hugo/issues/5763">#5763</a></p>
+</blockquote>
+<ol start="4" style="list-style-type: decimal">
+<li><a href="https://twitter.com/xieyihui">@yihue</a> recommends a <a href="https://stackoverflow.com/questions/55856904/cannot-use-markdown-shortcodes-in-blogdowns-rmd-files/55928449#55928449">workaround</a>, but it is not obvious how to use it (at least to me).</li>
+<li>Now up to <a href="https://gohugo.io/functions/renderstring/">version 0.69.2</a>. Might want to check on Netlify support.</li>
+<li>Hugo release 0.62 brings <a href="https://gohugo.io/functions/renderstring/">Markdown Render Hooks</a>, which seems like it might supplant <code>markdownify</code>:</li>
+</ol>
+</div>
