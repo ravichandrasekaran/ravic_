@@ -11,14 +11,106 @@ Looking into tweet embed support via Markdown, up-to-date Hugo versions.
 
 <!--more-->
 
-#### Investigation notes
 
-1.  Hugo has been [full of shortcodes](https://gohugo.io/content-management/shortcodes/).
-2.  Using shortcodes in Rmarkdown was [never easy](https://bookdown.org/yihui/blogdown/content.html#shortcode). 
-3.  But since 0.55, using those shortcodes in Rmarkdown has been [fraught](https://github.com/rstudio/blogdown/issues/40).
+
+#### Background
+It seems I've found myself looking at Hugo shortcodes in `blogdown` again, 
+specifically enabling the tweet shortcode in my `.Rmd` files. 
+
+Notes below are mainly so that I don't repeat the investigation, and have to
+remind myself why it's not easy to do this any more and have it work.
+
+```{r old_working_sample, echo=TRUE, eval=FALSE}
+blogdown::shortcode('tweet', '852205086956818432')
+```
+
+I've tried to ignore the different handling and lifecycle of the `.Rmd` files
+vs. the `.Rmarkdown` files. But the fact that there are two different files, and
+that they have fundamentally different lifecycles is pretty central. You don't
+get everything you want, so you might need to understand the underlying mechanics. 
+And you might need to [make a choice](https://bookdown.org/yihui/blogdown/output-format.html).
+
+#### Situation
+1.  Hugo has useful [shortcodes](https://gohugo.io/content-management/shortcodes/). 
+    Some built-in ones, some custom user-defined ones.
+2.  Using shortcodes in `.Rmd` files was [never
+easy](https://bookdown.org/yihui/blogdown/content.html#shortcode), requiring the
+use of an additional function - `blogdown::shortcode()`. More detail from the
+[`blogdown`
+repo](https://github.com/rstudio/blogdown/blob/58cbb42f6f8ea82e5de3db5f7441f5b3d12b86c5/R/hugo.R#L376-L412):
+
+> These functions can be used in either `knitr` inline R expressions or code
+chunks. The returned character string is wrapped in `htmltools::HTML()`, so
+`rmarkdown` will protect it from the Pandoc conversion. You cannot simply write
+`{{{< shortcode >}}}` in R Markdown, because Pandoc is not aware of Hugo
+shortcodes, and may convert special characters so that Hugo can no longer
+recognize the shortcodes (e.g. `<` will be converted to `&lt;`).
+
+3.  But since Hugo verson 0.55, using those shortcodes in Rmarkdown has been [fraught](https://github.com/rstudio/blogdown/issues/40).
 
 > {{ % as the outer-most shortcode delimiter means “pass the inner content to the content renderer” (e.g. Blackfriday); the old behavior can be had, see [#5763](https://github.com/gohugoio/hugo/issues/5763)
+
+
+#### Avenues
     
-4.  [\@yihue](https://twitter.com/xieyihui) recommends a [workaround](https://stackoverflow.com/questions/55856904/cannot-use-markdown-shortcodes-in-blogdowns-rmd-files/55928449#55928449), but it is not obvious how to use it (at least to me).
-4.  Now up to [version 0.69.2](https://gohugo.io/functions/renderstring/). Might want to check on Netlify support.
-5.  Hugo release 0.62 brings [Markdown Render Hooks](https://gohugo.io/functions/renderstring/), which seems like it might supplant `markdownify`: 
+1.  [\@yihue](https://twitter.com/xieyihui) recommends two
+[workarounds](https://stackoverflow.com/questions/55856904/cannot-use-markdown-shortcodes-in-blogdowns-rmd-files/55928449#55928449):
+    + Downgrading and locking Hugo to v0.54 is possible, via
+      `blogdown::install_hugo('0.54.0', force = TRUE)` as \@yihue suggests, but the
+      Hugo Finite theme I'm using requires 0.57 and has visible bugs without it. :(.
+    + Forcing the use of `markdownify` -- is for the shortcode author, not the 
+      consumer.
+\
+\
+
+2.  Wait for Hugo author to revert?
+    + Now up to [version 0.69.2](https://gohugo.io/functions/renderstring/).
+      Don't think Hugo author is reverting :(
+\
+\
+3.  Creating forked shortcodes?
+    + The Hugo [docs](https://gohugo.io/content-management/shortcodes/) suggest 
+      that shortcode authors can use this directive to use old-style behavior: \
+      ``{{ $_hugo_config := `{ "version": 1 }` }}``
+\
+\
+      
+4.  Build specialized functions?
+    + Does the emoji example below point to just building it in R?
+\
+\
+5.  Hugo releases have some changes. These don't seem helpful, but might spark ideas later.
+    + `Blackfriday` is still available, but `goldmark` is now the default converter.
+    + Version 0.62 brings [Markdown Render Hooks](https://gohugo.io/functions/renderstring/), which seems like it might supplant `markdownify`
+
+      
+---
+
+#### Emojis in similar boat?
+1.  Do emojis have the same issue? Pandoc doesn't recognize
+them. 
+    + A solution is the `emo` package on Hadley's github,
+    `install_github("hadley/emo")`, which allows an inline emoji.
+\
+\
+2. Here's [\@apreshill's
+presentation](https://github.com/rbind/apreshill/blob/master/static/slides/blogdown-workshop-slides.Rmd),
+including a `config.toml` directive to render a :heart:. But that works in part
+because the files are `.md`, rather than `.Rmd`.
+    + I did add the `enableEmojis` directive to my `config.toml` file, just in 
+      case I decide to use a `.Rmarkdown` file in the future.
+\
+\
+3.  More from [\@yihue](https://twitter.com/xieyihui) below. 
+
+> The life cycles of .Rmd vs .Rmarkdown: \
+\
+.Rmd -> knitr -> .md (intermediate) -> pandoc -> .html  \
+.Rmarkdown -> knitr -> .markdown -> Hugo/Blackfriday -> .html  \
+\
+Emoji is a Markdown extension only in Blackfriday. Pandoc does not support it. 
+As a result, you must use .Rmarkdown if you must have emojis. \
+\
+https://github.com/rstudio/blogdown/issues/171
+
+

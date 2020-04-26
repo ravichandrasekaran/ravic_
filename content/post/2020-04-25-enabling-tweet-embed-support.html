@@ -11,19 +11,120 @@ tags: []
 
 <p>Looking into tweet embed support via Markdown, up-to-date Hugo versions.</p>
 <!--more-->
-<div id="investigation-notes" class="section level4">
-<h4>Investigation notes</h4>
+<div id="background" class="section level4">
+<h4>Background</h4>
+<p>It seems I’ve found myself looking at Hugo shortcodes in <code>blogdown</code> again,
+specifically enabling the tweet shortcode in my <code>.Rmd</code> files.</p>
+<p>Notes below are mainly so that I don’t repeat the investigation, and have to
+remind myself why it’s not easy to do this any more and have it work.</p>
+<pre class="r"><code>blogdown::shortcode(&#39;tweet&#39;, &#39;852205086956818432&#39;)</code></pre>
+<p>I’ve tried to ignore the different handling and lifecycle of the <code>.Rmd</code> files
+vs. the <code>.Rmarkdown</code> files. But the fact that there are two different files, and
+that they have fundamentally different lifecycles is pretty central. You don’t
+get everything you want, so you might need to understand the underlying mechanics.
+And you might need to <a href="https://bookdown.org/yihui/blogdown/output-format.html">make a choice</a>.</p>
+</div>
+<div id="situation" class="section level4">
+<h4>Situation</h4>
 <ol style="list-style-type: decimal">
-<li>Hugo has been <a href="https://gohugo.io/content-management/shortcodes/">full of shortcodes</a>.</li>
-<li>Using shortcodes in Rmarkdown was <a href="https://bookdown.org/yihui/blogdown/content.html#shortcode">never easy</a>.</li>
-<li>But since 0.55, using those shortcodes in Rmarkdown has been <a href="https://github.com/rstudio/blogdown/issues/40">fraught</a>.</li>
+<li>Hugo has useful <a href="https://gohugo.io/content-management/shortcodes/">shortcodes</a>.
+Some built-in ones, some custom user-defined ones.</li>
+<li>Using shortcodes in <code>.Rmd</code> files was <a href="https://bookdown.org/yihui/blogdown/content.html#shortcode">never
+easy</a>, requiring the
+use of an additional function - <code>blogdown::shortcode()</code>. More detail from the
+<a href="https://github.com/rstudio/blogdown/blob/58cbb42f6f8ea82e5de3db5f7441f5b3d12b86c5/R/hugo.R#L376-L412"><code>blogdown</code>
+repo</a>:</li>
+</ol>
+<blockquote>
+<p>These functions can be used in either <code>knitr</code> inline R expressions or code
+chunks. The returned character string is wrapped in <code>htmltools::HTML()</code>, so
+<code>rmarkdown</code> will protect it from the Pandoc conversion. You cannot simply write
+<code>{{{&lt; shortcode &gt;}}}</code> in R Markdown, because Pandoc is not aware of Hugo
+shortcodes, and may convert special characters so that Hugo can no longer
+recognize the shortcodes (e.g. <code>&lt;</code> will be converted to <code>&amp;lt;</code>).</p>
+</blockquote>
+<ol start="3" style="list-style-type: decimal">
+<li>But since Hugo verson 0.55, using those shortcodes in Rmarkdown has been <a href="https://github.com/rstudio/blogdown/issues/40">fraught</a>.</li>
 </ol>
 <blockquote>
 <p>{{ % as the outer-most shortcode delimiter means “pass the inner content to the content renderer” (e.g. Blackfriday); the old behavior can be had, see <a href="https://github.com/gohugoio/hugo/issues/5763">#5763</a></p>
 </blockquote>
-<ol start="4" style="list-style-type: decimal">
-<li><a href="https://twitter.com/xieyihui">@yihue</a> recommends a <a href="https://stackoverflow.com/questions/55856904/cannot-use-markdown-shortcodes-in-blogdowns-rmd-files/55928449#55928449">workaround</a>, but it is not obvious how to use it (at least to me).</li>
-<li>Now up to <a href="https://gohugo.io/functions/renderstring/">version 0.69.2</a>. Might want to check on Netlify support.</li>
-<li>Hugo release 0.62 brings <a href="https://gohugo.io/functions/renderstring/">Markdown Render Hooks</a>, which seems like it might supplant <code>markdownify</code>:</li>
+</div>
+<div id="avenues" class="section level4">
+<h4>Avenues</h4>
+<ol style="list-style-type: decimal">
+<li><a href="https://twitter.com/xieyihui">@yihue</a> recommends two
+<a href="https://stackoverflow.com/questions/55856904/cannot-use-markdown-shortcodes-in-blogdowns-rmd-files/55928449#55928449">workarounds</a>:
+<ul>
+<li>Downgrading and locking Hugo to v0.54 is possible, via
+<code>blogdown::install_hugo('0.54.0', force = TRUE)</code> as @yihue suggests, but the
+Hugo Finite theme I’m using requires 0.57 and has visible bugs without it. :(.</li>
+<li>Forcing the use of <code>markdownify</code> – is for the shortcode author, not the
+consumer.<br />
+<br />
+</li>
+</ul></li>
+<li>Wait for Hugo author to revert?
+<ul>
+<li>Now up to <a href="https://gohugo.io/functions/renderstring/">version 0.69.2</a>.
+Don’t think Hugo author is reverting :(<br />
+<br />
+</li>
+</ul></li>
+<li>Creating forked shortcodes?
+<ul>
+<li>The Hugo <a href="https://gohugo.io/content-management/shortcodes/">docs</a> suggest
+that shortcode authors can use this directive to use old-style behavior:<br />
+<code>{{ $_hugo_config := `{ &quot;version&quot;: 1 }` }}</code><br />
+<br />
+</li>
+</ul></li>
+<li>Build specialized functions?
+<ul>
+<li>Does the emoji example below point to just building it in R?<br />
+<br />
+</li>
+</ul></li>
+<li>Hugo releases have some changes. These don’t seem helpful, but might spark ideas later.
+<ul>
+<li><code>Blackfriday</code> is still available, but <code>goldmark</code> is now the default converter.</li>
+<li>Version 0.62 brings <a href="https://gohugo.io/functions/renderstring/">Markdown Render Hooks</a>, which seems like it might supplant <code>markdownify</code></li>
+</ul></li>
 </ol>
+<hr />
+</div>
+<div id="emojis-in-similar-boat" class="section level4">
+<h4>Emojis in similar boat?</h4>
+<ol style="list-style-type: decimal">
+<li>Do emojis have the same issue? Pandoc doesn’t recognize
+them.
+<ul>
+<li>A solution is the <code>emo</code> package on Hadley’s github,
+<code>install_github(&quot;hadley/emo&quot;)</code>, which allows an inline emoji.<br />
+<br />
+</li>
+</ul></li>
+<li>Here’s <a href="https://github.com/rbind/apreshill/blob/master/static/slides/blogdown-workshop-slides.Rmd">@apreshill’s
+presentation</a>,
+including a <code>config.toml</code> directive to render a :heart:. But that works in part
+because the files are <code>.md</code>, rather than <code>.Rmd</code>.
+<ul>
+<li>I did add the <code>enableEmojis</code> directive to my <code>config.toml</code> file, just in
+case I decide to use a <code>.Rmarkdown</code> file in the future.<br />
+<br />
+</li>
+</ul></li>
+<li>More from <a href="https://twitter.com/xieyihui">@yihue</a> below.</li>
+</ol>
+<blockquote>
+<p>The life cycles of .Rmd vs .Rmarkdown:<br />
+<br />
+.Rmd -&gt; knitr -&gt; .md (intermediate) -&gt; pandoc -&gt; .html<br />
+.Rmarkdown -&gt; knitr -&gt; .markdown -&gt; Hugo/Blackfriday -&gt; .html<br />
+<br />
+Emoji is a Markdown extension only in Blackfriday. Pandoc does not support it.
+As a result, you must use .Rmarkdown if you must have emojis.<br />
+<br />
+<a href="https://github.com/rstudio/blogdown/issues/171" class="uri">https://github.com/rstudio/blogdown/issues/171</a></p>
+</blockquote>
 </div>
