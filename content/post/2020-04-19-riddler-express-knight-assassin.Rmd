@@ -1,0 +1,31 @@
+---
+title: Riddler Express - Knight / assassin
+author: ravic
+date: '2020-04-19'
+slug: riddler-express-knight-assassin
+categories: []
+tags:
+  - riddler
+---
+
+
+1.  Drunken knight. How long does it take? How many foes accidentally killed? 
+    How many of his friends does he displace? What if there are *two* drunken 
+    knights? What if there are *four* drunken knights? How drunk is he -- does
+    he avoid ready victory (lookaheads)? Or stumble back and forth (retraces)?
+    Does he fall off the board?
+2.  D3 sim?
+
+<!--more-->
+
+> From Yan Zhang comes a royal murder mystery: \
+\ 
+Black Bishop: “Sir, forensic testing indicates the Queen’s assassin, the White Knight between us, has moved exactly eight times since the beginning of the game, which has been played by the legal rules.” 
+\
+Black King: “So?” \
+\ 
+Black Bishop: “Well, to convict this assassin, we need to construct a legal game history. But we just can’t figure out how he got there!”
+
+
+
+
