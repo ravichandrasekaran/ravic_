@@ -1,0 +1,89 @@
+---
+title: Riddler Express - Cheese Equity
+author: ravic
+date: '2020-04-24'
+slug: riddler-express-cheese-equity
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From the Riddler, a <a href="https://fivethirtyeight.com/features/can-you-beat-the-goat-monty-hall-problem/">cheese cutting effort.</a></p>
+<!--more-->
+<p>From the Riddler, a <a href="https://fivethirtyeight.com/features/can-you-beat-the-goat-monty-hall-problem/">cheese cutting effort.</a></p>
+<blockquote>
+<p>From Andrew Heairet comes a puzzle that is sure to whet your appetite:</p>
+</blockquote>
+<blockquote>
+<p>You and a friend are grilling two small square burger patties whose sides are 5 centimeters long. However, you only have one slice of cheese remaining, which is also square and whose sides are 7 centimeters long. You want to cut the slice so that all of the cheese is evenly split between the two patties, and no cheese is spilling over either patty and onto the grill.</p>
+</blockquote>
+<blockquote>
+<p>What is the smallest number of cuts you need to make? You can only make straight cuts, and you should assume that the cheese is stationary during the cutting process.</p>
+</blockquote>
+<div id="three-cuts" class="section level2">
+<h2>Three cuts!</h2>
+<p><strong>Yes, three cuts!</strong> Let’s break it down.</p>
+<div id="the-cheese" class="section level4">
+<h4>The cheese</h4>
+<p>Here’s our cheese, 7-cm × 7-cm, scored with a 1-cm grid as one often sees.</p>
+<div class="figure">
+<img src="/post/2020-04-24-riddler-express-cheese-equity_files/01-%20Plain%20cheese.svg" alt="Original cheese" width="300" />
+<p class="caption">Original cheese</p>
+</div>
+</div>
+<div id="the-burger-as-guide" class="section level4">
+<h4>The burger as guide</h4>
+<p>We’re going to overlay the square burger on top of the cheese, centered
+and rotated 45 degrees, which will guide our first two cuts.</p>
+<p>Even though it looks like the burger can be inscribed within the cheese,
+it’s just a tad bigger than the cheese, and the corners overshoot a bit.
+By how much? The side of the cheese is 7-cm. The diagonal of the 5-cm
+patty is <span class="math inline">\(5\sqrt{2}\)</span> or about 7.07-cm. Not over by much, but noticeable.</p>
+<div class="figure">
+<img src="/post/2020-04-24-riddler-express-cheese-equity_files/02-%20Burger%20on%20top.svg" alt="Burger on top" width="300" />
+<p class="caption">Burger on top</p>
+</div>
+</div>
+<div id="first-two-cuts" class="section level4">
+<h4>First two cuts</h4>
+<p>We’re going to to cut along the top and bottom of the rotated patty.</p>
+<div class="figure">
+<img src="/post/2020-04-24-riddler-express-cheese-equity_files/03-%20First%20cuts.svg" alt="First cuts" width="300" />
+<p class="caption">First cuts</p>
+</div>
+</div>
+<div id="third-cut" class="section level4">
+<h4>Third cut</h4>
+<p>Now that we have a 5-cm wide stripe across the diagonal of our cheese, we’re
+going to cut across the other diagonal.</p>
+<div class="figure">
+<img src="/post/2020-04-24-riddler-express-cheese-equity_files/04-%20Last%20cut.svg" alt="Last cut" width="300" />
+<p class="caption">Last cut</p>
+</div>
+</div>
+<div id="rearranging" class="section level4">
+<h4>Rearranging</h4>
+<p>We’re going to rearrange the four smaller triangles to make something
+that looks like a two larger, nearly 5-cm squares. These are all
+isoceles right triangles with side length of <span class="math inline">\(a = \frac{1}{2}(7\sqrt{2} - 5)\)</span> or about 2.45-cm.<br />
+So they’ll fit, but look ever so slightly off when we arrange them.</p>
+<div class="figure">
+<img src="/post/2020-04-24-riddler-express-cheese-equity_files/05-%20Rearanging.svg" alt="Rearranging" width="400" />
+<p class="caption">Rearranging</p>
+</div>
+</div>
+<div id="measuring" class="section level4">
+<h4>Measuring</h4>
+<p>Now, just to make sure they fit our 5-cm patties, we’ll take a look on our graph
+paper what our final product looks like after a bit of rotation. It’s a little
+easier to see that we have this small leftover strip around the triangles, which
+makes sense. Our cheese area was 7-cm × 7-cm or 49-cm, and our patty area is
+50-cm, so the cheese can’t quite cover the meat regardless of how hard we try!</p>
+<div class="figure">
+<img src="/post/2020-04-24-riddler-express-cheese-equity_files/06-%20Measuring.svg" alt="Measuring" width="800" />
+<p class="caption">Measuring</p>
+</div>
+</div>
+</div>
