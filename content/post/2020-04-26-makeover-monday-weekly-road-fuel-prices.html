@@ -1,0 +1,63 @@
+---
+title: Makeover Monday - Weekly road fuel prices
+author: ravic
+date: '2020-04-26'
+slug: makeover-monday-weekly-road-fuel-prices
+categories: 
+tags:
+  - makeover-monday
+---
+
+
+
+<p>Makeover Monday challenge looks at weekly retail fuel price index from UK’s
+Department for Business, Energy &amp; Industrial Strategy.</p>
+<!--more-->
+<ul>
+<li>SOURCE ARTICLE: <a href="https://www.racfoundation.org/data/uk-pump-prices-over-time">RAC Foundation</a></li>
+<li>DATA SOURCE: <a href="https://www.gov.uk/government/statistical-data-sets/oil-and-petroleum-products-weekly-statistics">Department for Business, Energy &amp; Industrial Strategy</a></li>
+</ul>
+<div class="figure">
+<img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/rac-foundation-10-year-rolling-price-per-litre.png" alt="RAC 10-year petrol prices" width="800" />
+<p class="caption">RAC 10-year petrol prices</p>
+</div>
+<hr />
+<div id="replicate-original" class="section level3">
+<h3>Replicate original</h3>
+<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/replicate_original-1.png" width="768" /></p>
+</div>
+<div id="questions" class="section level3">
+<h3>Questions</h3>
+<ol style="list-style-type: decimal">
+<li>The two indices basically track. Does one forecast the other? Can we think
+of this like FedEx shipping volumes dropping as a recessionary indicator?</li>
+<li>Does the 10-year rolling average hide insights?</li>
+<li>We’re obviously seeing a recent plunge – unparalleled during tracking?
+Suddenness of change? Changepoint analysis? The suddenness at the end isn’t
+like the US unemployment stats – it’s not enough to pop by itself.</li>
+<li>Do we understand the drop-off in previous cycles?</li>
+<li>In the United States, we have seasonality in our prices. Do those not
+materialize here?</li>
+</ol>
+</div>
+<div id="critique" class="section level3">
+<h3>Critique</h3>
+<ol style="list-style-type: decimal">
+<li>The choice here is two line series. They track very closely, so not sure the
+second series gives a lot of information. Color choices are opposite of the
+U.S. gas colors, but maybe that’s ok. (Makes the removed legend a challenge,
+though). Axes are pretty straightforward. The cushion underneath the lines
+feels good - close to the 30% heuristic.</li>
+<li>Would love a history here - not just what the chart values on hover are
+(which is nice), but an explanation of the changepoints.</li>
+<li>For our current uses, we’re probably more interested in changes than absolute
+indices.</li>
+</ol>
+</div>
+<div id="exploration" class="section level3">
+<h3>Exploration</h3>
+<div id="longer-timeline" class="section level4">
+<h4>Longer timeline</h4>
+<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/longer_timeline-1.png" width="768" /></p>
+</div>
+</div>

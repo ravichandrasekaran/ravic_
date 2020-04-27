@@ -1,0 +1,121 @@
+---
+title: Makeover Monday - Weekly road fuel prices
+author: ravic
+date: '2020-04-26'
+slug: makeover-monday-weekly-road-fuel-prices
+categories: 
+tags:
+  - makeover-monday
+---
+
+Makeover Monday challenge looks at weekly retail fuel price index from UK's
+Department for Business, Energy & Industrial Strategy.
+
+<!--more-->
+
+* SOURCE ARTICLE: [RAC Foundation](https://www.racfoundation.org/data/uk-pump-prices-over-time)
+* DATA SOURCE: [Department for Business, Energy & Industrial Strategy](https://www.gov.uk/government/statistical-data-sets/oil-and-petroleum-products-weekly-statistics)
+
+![RAC 10-year petrol prices](/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/rac-foundation-10-year-rolling-price-per-litre.png){width=800px}
+
+---
+
+```{r load_packages, include = FALSE}
+library("tidyverse")
+library("janitor")
+library("glue")
+library("lubridate")
+```
+```{r import_data, include = FALSE}
+library("httr")
+library("readxl")
+GET(
+  "https://query.data.world/s/srmhb5n5w5uhkdxzmkg6iuxhs356ir", 
+  write_disk(tf <- tempfile(fileext = ".xlsx")))
+df <- read_excel(tf) %>% 
+  janitor::clean_names() %>%
+  mutate(date = janitor::excel_numeric_to_date(as.numeric(date)))
+```
+
+
+### Replicate original
+
+```{r replicate_original, echo = FALSE, fig.width = 8}
+# TODO - Refine panel, labels in line (or in subtitle)
+df %>%
+  gather(key = "fuel_type", value = "price_per_litre", -date) %>%
+  mutate(fuel_type = fct_recode(fuel_type,
+                                Diesel = "diesel_usd", Petrol = "petrol_usd")) %>%
+  filter(complete.cases(.)) %>%
+  filter(date > ymd("2010-04-01")) %>%
+  ggplot(aes(date, price_per_litre)) +
+  geom_line(aes(colour = fuel_type)) +
+  theme_light() + 
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  scale_x_date(date_breaks = "1 year") +
+  labs(title = "Comparison of petrol vs. diesel fuel prices",
+       subtitle = "Average retail pump prices per litre (pence), measured weekly",
+       x = "", 
+       y = "",
+       colour = "Fuel type",
+       caption = "RAC Foundation (Source: BEIS)") +
+  scale_y_continuous(limits = c(80, 160), 
+                     labels = scales::comma_format(suffix = "p"))
+
+```
+
+### Questions
+
+1.  The two indices basically track. Does one forecast the other? Can we think
+    of this like FedEx shipping volumes dropping as a recessionary indicator? 
+2.  Does the 10-year rolling average hide insights? 
+3.  We're obviously seeing a recent plunge -- unparalleled during tracking?
+    Suddenness of change? Changepoint analysis? The suddenness at the end isn't
+    like the US unemployment stats -- it's not enough to pop by itself.
+4.  Do we understand the drop-off in previous cycles?
+5.  In the United States, we have seasonality in our prices. Do those not 
+    materialize here?
+    
+### Critique
+
+1.  The choice here is two line series. They track very closely, so not sure the
+    second series gives a lot of information. Color choices are opposite of the 
+    U.S. gas colors, but maybe that's ok. (Makes the removed legend a challenge,
+    though). Axes are pretty straightforward. The cushion underneath the lines 
+    feels good - close to the 30% heuristic.
+2.  Would love a history here - not just what the chart values on hover are 
+    (which is nice), but an explanation of the changepoints. 
+3.  For our current uses, we're probably more interested in changes than absolute
+    indices.
+
+
+### Exploration
+
+#### Longer timeline
+
+```{r longer_timeline, echo = FALSE, fig.width = 8}
+# TODO - Try plotly here, https://blogdown-demo.rbind.io/about/
+df %>%
+  gather(key = "fuel_type", value = "price_per_litre", -date) %>%
+  mutate(fuel_type = fct_recode(fuel_type,
+                                Diesel = "diesel_usd", Petrol = "petrol_usd")) %>%
+  filter(complete.cases(.)) %>%
+  ggplot(aes(date, price_per_litre)) +
+  geom_line(aes(colour = fuel_type)) +
+  theme_light() + 
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  scale_x_date(date_breaks = "1 year") +
+  labs(title = "Comparison of petrol vs. diesel fuel prices",
+       subtitle = "Average retail pump prices per liter (pence), measured weekly",
+       x = "", 
+       y = "",
+       colour = "Fuel type",
+       caption = "RAC Foundation (Source: BEIS)") +  
+  scale_y_continuous(limits = c(40, 160), 
+                     labels = scales::comma_format(suffix = "p"))
+
+
+```
+
