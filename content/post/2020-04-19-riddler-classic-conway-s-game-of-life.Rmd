@@ -1,0 +1,53 @@
+---
+title: Riddler Classic - Conway's Game of Life
+author: ravic
+date: '2020-04-19'
+slug: riddler-classic-conway-s-game-of-life
+categories: []
+tags:
+  - riddler
+---
+
+
+<!--more-->
+
+> Riddler Nation was deeply saddened to hear of the loss of John Conway last week. It is only fitting that this week’s Classic is a spin on Conway’s Game of Life.
+
+> In the most common version of the game, there is an infinite grid of square cells, which are initially either alive or dead. Each square has eight neighbors — the eight squares that surround it. And after every step in time, or “tick,” all the cells are simultaneously updated according to the following rules:
+
+> A living cell with two or three living neighbors remains living.  
+A living cell with any other number of living neighbors dies (due to under- or overpopulation).  
+A dead cell with exactly three living neighbors comes alive (due to reproduction).  
+These relatively simple rules lead to some startlingly complex, emergent behaviors. For example, some formations of living cells are known as “oscillators,” which change form from one tick to the next, ultimately returning back to their original formation.
+
+> Now suppose we were to replace the infinite grid with a finite grid that has periodic boundary conditions, so that cells in the first row are neighbors with cells in the last row, and cells in the first column are neighbors with cells in the last column. If there are three rows and N columns, what is the smallest value of N that can support an oscillator?
+
+---
+
+## Notes
+
+1.  At 4 columns, we can find an oscillator with vertical rows forming waves.
+2.  With fewer columns, it doesn't feel like we can find an oscillator. 
+    Prove via sim?
+3.  At 3 columns, lots of dissimilar shapes are actually similar. Horizontal
+    and vertical flips are basically the same shape, as are row or column 
+    swaps. With three dots, you can arrange a "line" (vertical or horizontal,
+    in any row or column), and the shape and outcomes are all the same ("cross",
+    then "winter"). A "diagonal" is a stable configuration. A "hinge" (which 
+    includes a lot of things that don't look like that) forms a 4-dot "tetris" 
+    shape, which is stable.
+4.  Are all elementary operations ok? Rotations, flips, swaps? Transposes? Can 
+    we reduce the space we need to check from $2^9 = 512$ for brute force 
+    $3 \times 3$ matrix? How many dots, and how many in each row?
+
+
+
+```{r}
+
+l <- rep(0, 9)
+l[sample(1:9, 4)] <- 1
+matrix(l, nrow=3, ncol=3, byrow=TRUE)
+
+
+```
+
