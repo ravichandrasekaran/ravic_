@@ -14,6 +14,7 @@ tags:
 * [Source article](https://ourworldindata.org/food-choice-vs-eating-local)
 * [Starter image](https://ourworldindata.org/food-choice-vs-eating-local)
 * [Source's source](https://science.sciencemag.org/content/360/6392/987)
+* https://www.reuters.com/video/watch/dems-want-to-take-away-your-hamburgers-g-id520628816
 
 ![Original environmental impact image](/post/2020-04-21-makeover-monday-food-greenhouse-gas_files/Environmental-impact-of-food-by-life-cycle-stage.png){width=600px height=300px}
 
