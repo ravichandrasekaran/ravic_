@@ -1,0 +1,146 @@
+---
+title: Riddler Classic - GOAT Monty Hall
+author: ravic
+date: '2020-04-24'
+slug: riddler-classic-goat-monty-hall
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From the Riddler, <a href="https://fivethirtyeight.com/features/can-you-beat-the-goat-monty-hall-problem/">“Now suppose Monty changes the rules.”</a></p>
+<!--more-->
+<div id="problem" class="section level2">
+<h2>Problem</h2>
+<p>From the Riddler, <a href="https://fivethirtyeight.com/features/can-you-beat-the-goat-monty-hall-problem/">“Now suppose Monty changes the rules.”</a></p>
+<blockquote>
+<p>The Monty Hall problem is a classic case of conditional probability. In the original problem, there are three doors, two of which have goats behind them, while the third has a prize. You pick one of the doors, and then Monty (who knows in advance which door has the prize) will always open another door, revealing a goat behind it. It’s then up to you to choose whether to stay with your initial guess or to switch to the remaining door. Your best bet is to switch doors, in which case you will win the prize two-thirds of the time.</p>
+</blockquote>
+<blockquote>
+<p>Now suppose Monty changes the rules. First, he will randomly pick a number of goats to put behind the doors: zero, one, two or three, each with a 25 percent chance. After the number of goats is chosen, they are assigned to the doors at random, and each door has at most one goat. Any doors that don’t have a goat behind them have an identical prize behind them.</p>
+</blockquote>
+<blockquote>
+<p>At this point, you choose a door. If Monty is able to open another door, revealing a goat, he will do so. But if no other doors have goats behind them, he will tell you that is the case.</p>
+</blockquote>
+<blockquote>
+<p>It just so happens that when you play, Monty is able to open another door, revealing a goat behind it. Should you stay with your original selection or switch? And what are your chances of winning the prize?</p>
+</blockquote>
+</div>
+<div id="simulation" class="section level2">
+<h2>Simulation</h2>
+<p>The Monty Hall problem forces us to wrestle with our better instincts. So,
+let’s start with a simulation.</p>
+<pre class="r"><code>set.seed(2020)
+simulation_run &lt;- function(stand_pat=TRUE) {
+  # Place goats
+  num_goats &lt;- sample(0:3, 1)
+  door_possibilities &lt;- c(rep(1, num_goats), rep(0, 3 - num_goats))
+  door_values &lt;- sample(door_possibilities, 3, replace = FALSE)
+
+    # Choose door
+  idx_door_choice &lt;- sample(1:3, 1)
+  if (sum(door_values[-idx_door_choice]) == 0) {
+    # Monty can&#39;t open another door!
+    return(NA)
+  }
+  
+  if (!stand_pat) {
+    # One of the other doors had a goat that can be revealed
+    # We will remove a goat-door, and our original choice.
+    # Then we will revise our choice!
+    
+    doors = 1:3
+    potential_goat_doors &lt;- doors[doors != idx_door_choice &amp; door_values[doors] == 1]
+    goat_door &lt;- potential_goat_doors[sample.int(length(potential_goat_doors), 1)]
+    idx_door_choice &lt;- doors[doors  != idx_door_choice &amp; doors != goat_door]
+  }
+  
+  # Did we win?
+  is_winner &lt;- (door_values[idx_door_choice] == 0)
+  return(is_winner)
+}
+
+df &lt;- crossing(
+    trials = seq(1:100000),
+    stand_pat = c(TRUE, FALSE)) %&gt;%
+  mutate(outcome = purrr::map_lgl(stand_pat, simulation_run))
+
+df %&gt;%
+  group_by(stand_pat) %&gt;%
+  summarise(
+    trials = n(), 
+    door_open = sum(!is.na(outcome)),
+    winning = sum(outcome, na.rm = TRUE)) %&gt;%
+  mutate(pct_winning = winning / door_open)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   stand_pat trials door_open winning pct_winning
+## * &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;   &lt;int&gt;       &lt;dbl&gt;
+## 1 FALSE     100000     66710   33210       0.498
+## 2 TRUE      100000     66532   24939       0.375</code></pre>
+</div>
+<div id="formulation" class="section level2">
+<h2>Formulation</h2>
+<p>What’s the probability that Monty can even open a door?</p>
+<ol style="list-style-type: decimal">
+<li>Monty can’t open a door to show a goat if there are no goats.</li>
+<li>Monty can’t open a door if there’s only one goat, and you chose that door.</li>
+</ol>
+<p><span class="math display">\[
+\begin{aligned}
+P(D) &amp; = \sum_{k=0}^3 p_G(k) \cdot P(D \mid G = k) \\
+&amp; = \frac{1}{4} \sum_{k=0}^3 P(D \mid G = k) \\
+&amp; = \frac{1}{4} \left[ 0 + \frac{2}{3} + 1 + 1 \right] \\
+&amp; = \frac{2}{3} \\
+\\
+P(G = k \mid D) &amp; = \frac{P(D \mid G = k) \cdot P(G = k)}{P(D)} \\
+&amp; = \frac{1}{4} \cdot \frac{3}{2} \cdot P(D \mid G = k) \\
+&amp; = \frac{3}{8} \cdot P(D \mid G = k) \\
+\end{aligned}
+\]</span>
+We can expand these out to get the conditional probabilities we’ll need shortly:</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(G = 0 \mid D) &amp; = 0 \\
+P(G = 1 \mid D) &amp; = \frac{3}{8} \cdot \frac{2}{3}  &amp; = \frac{1}{4} \\
+P(G = 2 \mid D) &amp; = \frac{3}{8} \cdot 1  &amp; = \frac{3}{8} \\
+P(G = 3 \mid D) &amp; = \frac{3}{8} \cdot 1  &amp; = \frac{3}{8} \\
+\end{aligned}
+\]</span></p>
+<p>Win probabilities for each of these scenarios is pretty easy to establish,
+especially if we take the original Monty Hall problem as a given.</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(W \mid D, G = 0)  &amp; = 0 \\
+P(W \mid D, G = 1)  &amp; = 1 \\
+P(W \mid D, G = 2)  &amp; = \begin{cases}
+  \frac{1}{3} &amp;&amp; \text{stand pat} \\
+  \frac{2}{3} &amp;&amp; \text{changing door} \\
+  \end{cases} \\
+P(W \mid D, G = 3)  &amp; = 0 \\
+\end{aligned}
+\]</span></p>
+<div id="whats-the-probability-that-you-will-win-standing-pat-assuming-monty-has-opened-a-door" class="section level5">
+<h5>What’s the probability that you will win <strong>standing pat</strong>, assuming Monty has opened a door?</h5>
+<p><span class="math display">\[
+\begin{aligned}
+P(W | D) &amp; = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
+&amp; = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{1}{3}} + \frac{3}{8} \cdot 0 \\
+&amp; = \frac{1}{4} + \frac{1}{8}  \\
+&amp; = \frac{3}{8} \\
+\end{aligned}
+\]</span></p>
+</div>
+<div id="whats-the-probability-that-you-will-win-changing-doors-assuming-monty-has-opened-a-door" class="section level5">
+<h5>What’s the probability that you will win <strong>changing doors</strong>, assuming Monty has opened a door?</h5>
+<p><span class="math display">\[
+\begin{aligned}
+P(W | D) &amp; = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
+&amp; = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{2}{3}} + \frac{3}{8} \cdot 0 \\
+&amp; = \frac{1}{4} + \frac{1}{4}  \\
+&amp; = \frac{1}{2} \\
+\end{aligned}
+\]</span></p>
+</div>
+</div>
