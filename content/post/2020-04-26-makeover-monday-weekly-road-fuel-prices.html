@@ -13,6 +13,8 @@ tags:
 <p>Makeover Monday challenge looks at weekly retail fuel price index from UK’s
 Department for Business, Energy &amp; Industrial Strategy.</p>
 <!--more-->
+<div id="original" class="section level3">
+<h3>Original</h3>
 <ul>
 <li>SOURCE ARTICLE: <a href="https://www.racfoundation.org/data/uk-pump-prices-over-time">RAC Foundation</a></li>
 <li>DATA SOURCE: <a href="https://www.gov.uk/government/statistical-data-sets/oil-and-petroleum-products-weekly-statistics">Department for Business, Energy &amp; Industrial Strategy</a></li>
@@ -21,24 +23,6 @@ Department for Business, Energy &amp; Industrial Strategy.</p>
 <img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/rac-foundation-10-year-rolling-price-per-litre.png" alt="RAC 10-year petrol prices" width="800" />
 <p class="caption">RAC 10-year petrol prices</p>
 </div>
-<hr />
-<div id="replicate-original" class="section level3">
-<h3>Replicate original</h3>
-<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/replicate_original-1.png" width="768" /></p>
-</div>
-<div id="questions" class="section level3">
-<h3>Questions</h3>
-<ol style="list-style-type: decimal">
-<li>The two indices basically track. Does one forecast the other? Can we think
-of this like FedEx shipping volumes dropping as a recessionary indicator?</li>
-<li>Does the 10-year rolling average hide insights?</li>
-<li>We’re obviously seeing a recent plunge – unparalleled during tracking?
-Suddenness of change? Changepoint analysis? The suddenness at the end isn’t
-like the US unemployment stats – it’s not enough to pop by itself.</li>
-<li>Do we understand the drop-off in previous cycles?</li>
-<li>In the United States, we have seasonality in our prices. Do those not
-materialize here?</li>
-</ol>
 </div>
 <div id="critique" class="section level3">
 <h3>Critique</h3>
@@ -53,11 +37,60 @@ feels good - close to the 30% heuristic.</li>
 <li>For our current uses, we’re probably more interested in changes than absolute
 indices.</li>
 </ol>
+<hr />
+</div>
+<div id="replicate-original" class="section level3">
+<h3>Replicate original</h3>
+<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/replicate_original-1.png" width="768" /></p>
+</div>
+<div id="questions" class="section level3">
+<h3>Questions</h3>
+<ol style="list-style-type: decimal">
+<li>The two indices basically track. Does one forecast the other? Can we think
+of this like FedEx shipping volumes dropping as a recessionary indicator?
+Might expect more volatility in diesel (smaller supply, specialized
+refinement)?</li>
+<li>Does the 10-year rolling average hide insights? Do we need to see (multiple)
+shorter windows? Longer windows?</li>
+<li>We’re obviously seeing a recent plunge – unparalleled during tracking?
+Suddenness of change? Changepoint analysis? The suddenness at the end isn’t
+like the US unemployment stats – it’s not enough to pop by itself.</li>
+<li>Do we understand the drop-off in previous cycles? Do demand shocks (like
+current Coronavirus shock and 2008 financial collapse) behave differently?</li>
+<li>In the United States, we have seasonality in our prices. Do those not
+materialize here?</li>
+<li>Doesn’t foot with our mental model of petroleum - shouldn’t the negative
+prices of West Texas Intermediate (WTI) mean something for the price at the
+pump?</li>
+</ol>
 </div>
 <div id="exploration" class="section level3">
 <h3>Exploration</h3>
 <div id="longer-timeline" class="section level4">
 <h4>Longer timeline</h4>
-<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/longer_timeline-1.png" width="768" /></p>
+<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/longer_timeline-1.png" width="672" /></p>
+</div>
+<div id="smoothed" class="section level4">
+<h4>Smoothed</h4>
+<pre><code>## Warning: Removed 7 rows containing missing values (geom_path).</code></pre>
+<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/smoothed-1.png" width="672" /></p>
+</div>
+<div id="percent-changes" class="section level4">
+<h4>Percent changes</h4>
+<p>Here, we’re taking a lot of liberty by lagging a rolling average against a
+rolling average. That’s probably not great, so we need to figure out how to
+smooth the values appropriately.</p>
+<p>Nonetheless, we can start to see the really strong slope changes - not just
+currently, but the multi-stage dropoff leading into the 2008 recession. Diesel
+seems a bit more muted in declines.</p>
+<p>We should probably look at sequential declines, not single week drop-off,
+though. The recent decline is at least 15%, and that’s not reflected well.</p>
+<p><img src="/post/2020-04-26-makeover-monday-weekly-road-fuel-prices_files/figure-html/lag_slope-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="appendix" class="section level4">
+<h4>Appendix</h4>
+<p>Attempted to use <code>changepoint</code> library, but this really isn’t anywhere near
+stable enough.</p>
 </div>
 </div>
