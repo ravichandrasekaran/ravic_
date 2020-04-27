@@ -1,0 +1,112 @@
+---
+title: 'Riddler Express: Social distancing'
+author: ravic
+date: '2020-04-09'
+slug: riddler-express-social-distancing
+categories: []
+tags: []
+---
+
+From the Riddler, social distancing.
+
+<!--more-->
+
+
+From the Riddler, social distancing.
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("ggforce")
+```
+
+```{r}
+v = 1/100
+sociopath.location <- function(t) {
+  # Sociopath travels v units for every unit of time, starting at (0, 0).
+  return(tibble(x_s=v * t, y_s=0))
+}
+
+sociopath.location(2)
+
+theta = 30 / 360 * (2 * pi)
+conscientious.location <- function(t) {
+  # Conscientious travels along a linear path at v units 
+  # for every unit of time, starting at (12, 0)
+  d = v * t
+  y = d * cos(theta)
+  x = 12 - d * sin(theta)
+  if (y <= 6) {
+    return(tibble(x_c =x, y_c = y, d_c =d))
+  }
+  y_max_height = 6
+  x_max_height = 12 - 6 * tan(theta)
+  d_max_height = 6 / cos(theta)
+  t_max_height = d_max_height / v
+  delta_ceil = (t - t_max_height) * v
+  x_rev = x_max_height - delta_ceil
+  return(tibble(x_c=x_rev, y_c=6, d_c = 0))
+}
+
+df_c <- tibble(t = seq(0, 1200)) %>%
+  mutate(c_loc = purrr::map(t, conscientious.location)) %>%
+  unnest(cols=c_loc) %>%
+  mutate(name = "Conscientious") 
+df_s <- tibble(t = seq(0, 1200)) %>%
+  mutate(s_loc = purrr::map(t, sociopath.location)) %>%
+  unnest(cols=s_loc) %>%
+  mutate(name = "Sociopath")
+df <- bind_cols(c(df_c, df_s))  %>%
+  mutate(unsafe = ((x_c - x_s)^2 + y_c^2 < 36)) %>%
+  mutate(dist = (sqrt((x_c - x_s)^2 + y_c^2) - 6))
+df %>% view()
+
+df %>%
+  ggplot(aes(x=t, y=dist)) +
+  geom_point()
+
+sum(df$unsafe)
+circle_df <- df %>%
+  summarise(max_x_s = max(x_s)) %>%
+  mutate(x0 = max_x_s,
+         y0 = 0,
+         r = 6)
+
+
+  
+circle_df
+
+
+max(df$x_s)
+df %>%
+  ggplot() +
+  geom_point(aes(x=x_c, y=y_c), col="lightblue") +
+  geom_point(aes(x=x_s, y=y_s), col="black") +
+  geom_circle(aes(x0=x0, y0=y0, r=r), data=circle_df, col="red", inherit.aes=FALSE, n=180) +
+  scale_x_continuous(limits = c(0, 12), breaks=seq(0, 12, 2)) +
+  scale_y_continuous(breaks=seq(0, 12, 2), limits=c(0, 12))
+  
+
+
+
+  mutate(s_loc = purrr::map(t, sociopath.location)) %>%
+  unnest(cols=c(c_loc, s_loc)) %>%
+  mutate(unsafe = ((x_c - x_s)^2 + y_c^2 <= 36))
+
+
+df <- tibble(t = seq(0, 700)) %>%
+  mutate(c_loc = purrr::map(t, conscientious.location)) %>%
+  mutate(s_loc = purrr::map(t, sociopath.location)) %>%
+  unnest(cols=c(c_loc, s_loc)) %>%
+  mutate(unsafe = ((x_c - x_s)^2 + y_c^2 <= 36))
+
+
+```
+
+
+
+
+http://www-math.mit.edu/~djk/18_01/chapter18/section02.html
+https://mathworld.wolfram.com/Cycloid.html
+https://mathworld.wolfram.com/Circle-CircleIntersection.html
+https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
+https://math.libretexts.org/Courses/University_of_California%2C_Davis/UCD_Mat_21C%3A_Multivariate_Calculus/10%3A_Parametric_Equations_and_Polar_Coordinates/10.1%3A_Parametrizations_of_Plane_Curves
