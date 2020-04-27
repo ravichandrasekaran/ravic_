@@ -28,10 +28,84 @@ tags:
 <p>It just so happens that when you play, Monty is able to open another door, revealing a goat behind it. Should you stay with your original selection or switch? And what are your chances of winning the prize?</p>
 </blockquote>
 </div>
+<div id="answer" class="section level2">
+<h2>Answer</h2>
+<p>We’re about to find that if Monty’s opened a door, standing pat has a <span class="math inline">\(\mathbf{\frac{3}{8}}\)</span>
+probability of winning vs. changing doors, which has a <span class="math inline">\(\mathbf{\frac{1}{2}}\)</span> chance of
+winning. We’re going with the <strong>change doors</strong> approach.</p>
+</div>
+<div id="formulation" class="section level2">
+<h2>Formulation</h2>
+<p>What’s the probability that Monty can even open a door?</p>
+<ol style="list-style-type: decimal">
+<li>Monty can’t open a door to show a goat if there are no goats.</li>
+<li>Monty can’t open a door if there’s only one goat, and you chose that door.</li>
+</ol>
+<p><span class="math display">\[
+\begin{aligned}
+P(D) &amp; = \sum_{k=0}^3 p_G(k) \cdot P(D \mid G = k) \\
+&amp; = \frac{1}{4} \sum_{k=0}^3 P(D \mid G = k) \\
+&amp; = \frac{1}{4} \left[ 0 + \frac{2}{3} + 1 + 1 \right] \\
+&amp; = \frac{2}{3} \\
+\end{aligned}
+\]</span>
+The more interesting question is, “Given that Monty opened the door, what are
+the probabilities that there are 1, 2, or 3 goats?” (Just like the original
+Monty Hall problem, opening the door to show a goat provides a lot of
+information.)</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(G = k \mid D) &amp; = \frac{P(D \mid G = k) \cdot P(G = k)}{P(D)} \\
+&amp; = \frac{1}{4} \cdot \frac{3}{2} \cdot P(D \mid G = k) \\
+&amp; = \frac{3}{8} \cdot P(D \mid G = k) \\
+\\
+P(G = 0 \mid D) &amp; = 0 \\
+P(G = 1 \mid D) &amp; = \frac{3}{8} \cdot \frac{2}{3} = \frac{1}{4} \\
+P(G = 2 \mid D) &amp; = \frac{3}{8} \cdot 1  = \frac{3}{8} \\
+P(G = 3 \mid D) &amp; = \frac{3}{8} \cdot 1  = \frac{3}{8} \\
+\end{aligned}
+\]</span></p>
+<p>Win probabilities for each of these scenarios is pretty easy to establish:</p>
+<ul>
+<li>If there were only one goat, and Monty showed it to you, then you’ve already won.</li>
+<li>If there were three goats, you’ve already lost. :(</li>
+<li>And if there were two goats, we’d consult the original Monty Hall problem. :)</li>
+</ul>
+<p>Which we can lay out as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(W \mid D, G = 0)  &amp; = 0 \\
+P(W \mid D, G = 1)  &amp; = 1 \\
+P(W \mid D, G = 2)  &amp; = \begin{cases}
+  \frac{1}{3} &amp;&amp; \text{stand pat} \\
+  \frac{2}{3} &amp;&amp; \text{changing door} \\
+  \end{cases} \\
+P(W \mid D, G = 3)  &amp; = 0 \\
+\end{aligned}
+\]</span></p>
+<p>What’s the probability that you will win <strong>standing pat</strong>, assuming Monty has opened a door?</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(W | D) &amp; = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
+&amp; = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{1}{3}} + \frac{3}{8} \cdot 0 \\
+&amp; = \frac{1}{4} + \frac{1}{8}  \\
+&amp; = \mathbf{\frac{3}{8}} \\
+\end{aligned}
+\]</span></p>
+<p>What’s the probability that you will win <strong>changing doors</strong>, assuming Monty has opened a door?</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(W | D) &amp; = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
+&amp; = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{2}{3}} + \frac{3}{8} \cdot 0 \\
+&amp; = \frac{1}{4} + \frac{1}{4}  \\
+&amp; = \mathbf{\frac{1}{2}} \\
+\end{aligned}
+\]</span></p>
+<hr />
+</div>
 <div id="simulation" class="section level2">
 <h2>Simulation</h2>
-<p>The Monty Hall problem forces us to wrestle with our better instincts. So,
-let’s start with a simulation.</p>
+<p>Simulation is a good idea with a Monty Hall problem.</p>
 <pre class="r"><code>set.seed(2020)
 simulation_run &lt;- function(stand_pat=TRUE) {
   # Place goats
@@ -79,68 +153,4 @@ df %&gt;%
 ## * &lt;lgl&gt;      &lt;int&gt;     &lt;int&gt;   &lt;int&gt;       &lt;dbl&gt;
 ## 1 FALSE     100000     66710   33210       0.498
 ## 2 TRUE      100000     66532   24939       0.375</code></pre>
-</div>
-<div id="formulation" class="section level2">
-<h2>Formulation</h2>
-<p>What’s the probability that Monty can even open a door?</p>
-<ol style="list-style-type: decimal">
-<li>Monty can’t open a door to show a goat if there are no goats.</li>
-<li>Monty can’t open a door if there’s only one goat, and you chose that door.</li>
-</ol>
-<p><span class="math display">\[
-\begin{aligned}
-P(D) &amp; = \sum_{k=0}^3 p_G(k) \cdot P(D \mid G = k) \\
-&amp; = \frac{1}{4} \sum_{k=0}^3 P(D \mid G = k) \\
-&amp; = \frac{1}{4} \left[ 0 + \frac{2}{3} + 1 + 1 \right] \\
-&amp; = \frac{2}{3} \\
-\\
-P(G = k \mid D) &amp; = \frac{P(D \mid G = k) \cdot P(G = k)}{P(D)} \\
-&amp; = \frac{1}{4} \cdot \frac{3}{2} \cdot P(D \mid G = k) \\
-&amp; = \frac{3}{8} \cdot P(D \mid G = k) \\
-\end{aligned}
-\]</span>
-We can expand these out to get the conditional probabilities we’ll need shortly:</p>
-<p><span class="math display">\[
-\begin{aligned}
-P(G = 0 \mid D) &amp; = 0 \\
-P(G = 1 \mid D) &amp; = \frac{3}{8} \cdot \frac{2}{3}  &amp; = \frac{1}{4} \\
-P(G = 2 \mid D) &amp; = \frac{3}{8} \cdot 1  &amp; = \frac{3}{8} \\
-P(G = 3 \mid D) &amp; = \frac{3}{8} \cdot 1  &amp; = \frac{3}{8} \\
-\end{aligned}
-\]</span></p>
-<p>Win probabilities for each of these scenarios is pretty easy to establish,
-especially if we take the original Monty Hall problem as a given.</p>
-<p><span class="math display">\[
-\begin{aligned}
-P(W \mid D, G = 0)  &amp; = 0 \\
-P(W \mid D, G = 1)  &amp; = 1 \\
-P(W \mid D, G = 2)  &amp; = \begin{cases}
-  \frac{1}{3} &amp;&amp; \text{stand pat} \\
-  \frac{2}{3} &amp;&amp; \text{changing door} \\
-  \end{cases} \\
-P(W \mid D, G = 3)  &amp; = 0 \\
-\end{aligned}
-\]</span></p>
-<div id="whats-the-probability-that-you-will-win-standing-pat-assuming-monty-has-opened-a-door" class="section level5">
-<h5>What’s the probability that you will win <strong>standing pat</strong>, assuming Monty has opened a door?</h5>
-<p><span class="math display">\[
-\begin{aligned}
-P(W | D) &amp; = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
-&amp; = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{1}{3}} + \frac{3}{8} \cdot 0 \\
-&amp; = \frac{1}{4} + \frac{1}{8}  \\
-&amp; = \frac{3}{8} \\
-\end{aligned}
-\]</span></p>
-</div>
-<div id="whats-the-probability-that-you-will-win-changing-doors-assuming-monty-has-opened-a-door" class="section level5">
-<h5>What’s the probability that you will win <strong>changing doors</strong>, assuming Monty has opened a door?</h5>
-<p><span class="math display">\[
-\begin{aligned}
-P(W | D) &amp; = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
-&amp; = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{2}{3}} + \frac{3}{8} \cdot 0 \\
-&amp; = \frac{1}{4} + \frac{1}{4}  \\
-&amp; = \frac{1}{2} \\
-\end{aligned}
-\]</span></p>
-</div>
 </div>

@@ -30,10 +30,95 @@ From the Riddler, ["Now suppose Monty changes the rules."](https://fivethirtyeig
 
 > It just so happens that when you play, Monty is able to open another door, revealing a goat behind it. Should you stay with your original selection or switch? And what are your chances of winning the prize?
 
+## Answer
+We're about to find that if Monty's opened a door, standing pat has a $\mathbf{\frac{3}{8}}$
+probability of winning vs. changing doors, which has a $\mathbf{\frac{1}{2}}$ chance of 
+winning. We're going with the **change doors** approach.
+
+
+## Formulation
+
+What's the probability that Monty can even open a door?
+
+1.  Monty can't open a door to show a goat if there are no goats.
+2.  Monty can't open a door if there's only one goat, and you chose that door.
+
+$$
+\begin{aligned}
+P(D) & = \sum_{k=0}^3 p_G(k) \cdot P(D \mid G = k) \\
+& = \frac{1}{4} \sum_{k=0}^3 P(D \mid G = k) \\
+& = \frac{1}{4} \left[ 0 + \frac{2}{3} + 1 + 1 \right] \\
+& = \frac{2}{3} \\
+\end{aligned}
+$$
+The more interesting question is, "Given that Monty opened the door, what are 
+the probabilities that there are 1, 2, or 3 goats?" (Just like the original 
+Monty Hall problem, opening the door to show a goat provides a lot of 
+information.)
+
+$$
+\begin{aligned}
+P(G = k \mid D) & = \frac{P(D \mid G = k) \cdot P(G = k)}{P(D)} \\
+& = \frac{1}{4} \cdot \frac{3}{2} \cdot P(D \mid G = k) \\
+& = \frac{3}{8} \cdot P(D \mid G = k) \\
+\\
+P(G = 0 \mid D) & = 0 \\
+P(G = 1 \mid D) & = \frac{3}{8} \cdot \frac{2}{3} = \frac{1}{4} \\
+P(G = 2 \mid D) & = \frac{3}{8} \cdot 1  = \frac{3}{8} \\
+P(G = 3 \mid D) & = \frac{3}{8} \cdot 1  = \frac{3}{8} \\
+\end{aligned}
+$$
+
+Win probabilities for each of these scenarios is pretty easy to establish:
+
+* If there were only one goat, and Monty showed it to you, then you've already won. 
+* If there were three goats, you've already lost. :(
+* And if there were two goats, we'd consult the original Monty Hall problem. :)  
+
+Which we can lay out as:  
+
+$$
+\begin{aligned}
+P(W \mid D, G = 0)  & = 0 \\
+P(W \mid D, G = 1)  & = 1 \\
+P(W \mid D, G = 2)  & = \begin{cases}
+  \frac{1}{3} && \text{stand pat} \\
+  \frac{2}{3} && \text{changing door} \\
+  \end{cases} \\
+P(W \mid D, G = 3)  & = 0 \\
+\end{aligned}
+$$
+
+
+
+What's the probability that you will win **standing pat**, assuming Monty has opened a door?
+
+$$
+\begin{aligned}
+P(W | D) & = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
+& = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{1}{3}} + \frac{3}{8} \cdot 0 \\
+& = \frac{1}{4} + \frac{1}{8}  \\
+& = \mathbf{\frac{3}{8}} \\
+\end{aligned}
+$$
+
+What's the probability that you will win **changing doors**, assuming Monty has opened a door?
+
+$$
+\begin{aligned}
+P(W | D) & = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
+& = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{2}{3}} + \frac{3}{8} \cdot 0 \\
+& = \frac{1}{4} + \frac{1}{4}  \\
+& = \mathbf{\frac{1}{2}} \\
+\end{aligned}
+$$
+
+
+---
+
 ## Simulation
 
-The Monty Hall problem forces us to wrestle with our better instincts. So,
-let's start with a simulation.
+Simulation is a good idea with a Monty Hall problem.
 
 ```{r simulation}
 set.seed(2020)
@@ -79,74 +164,3 @@ df %>%
     winning = sum(outcome, na.rm = TRUE)) %>%
   mutate(pct_winning = winning / door_open)
 ```
-
-## Formulation
-
-What's the probability that Monty can even open a door?
-
-1.  Monty can't open a door to show a goat if there are no goats.
-2.  Monty can't open a door if there's only one goat, and you chose that door.
-
-$$
-\begin{aligned}
-P(D) & = \sum_{k=0}^3 p_G(k) \cdot P(D \mid G = k) \\
-& = \frac{1}{4} \sum_{k=0}^3 P(D \mid G = k) \\
-& = \frac{1}{4} \left[ 0 + \frac{2}{3} + 1 + 1 \right] \\
-& = \frac{2}{3} \\
-\\
-P(G = k \mid D) & = \frac{P(D \mid G = k) \cdot P(G = k)}{P(D)} \\
-& = \frac{1}{4} \cdot \frac{3}{2} \cdot P(D \mid G = k) \\
-& = \frac{3}{8} \cdot P(D \mid G = k) \\
-\end{aligned}
-$$
-We can expand these out to get the conditional probabilities we'll need shortly:
-
-$$
-\begin{aligned}
-P(G = 0 \mid D) & = 0 \\
-P(G = 1 \mid D) & = \frac{3}{8} \cdot \frac{2}{3}  & = \frac{1}{4} \\
-P(G = 2 \mid D) & = \frac{3}{8} \cdot 1  & = \frac{3}{8} \\
-P(G = 3 \mid D) & = \frac{3}{8} \cdot 1  & = \frac{3}{8} \\
-\end{aligned}
-$$
-
-Win probabilities for each of these scenarios is pretty easy to establish,
-especially if we take the original Monty Hall problem as a given.
-
-$$
-\begin{aligned}
-P(W \mid D, G = 0)  & = 0 \\
-P(W \mid D, G = 1)  & = 1 \\
-P(W \mid D, G = 2)  & = \begin{cases}
-  \frac{1}{3} && \text{stand pat} \\
-  \frac{2}{3} && \text{changing door} \\
-  \end{cases} \\
-P(W \mid D, G = 3)  & = 0 \\
-\end{aligned}
-$$
-
-
-
-##### What's the probability that you will win **standing pat**, assuming Monty has opened a door?
-
-$$
-\begin{aligned}
-P(W | D) & = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
-& = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{1}{3}} + \frac{3}{8} \cdot 0 \\
-& = \frac{1}{4} + \frac{1}{8}  \\
-& = \frac{3}{8} \\
-\end{aligned}
-$$
-
-##### What's the probability that you will win **changing doors**, assuming Monty has opened a door?
-
-$$
-\begin{aligned}
-P(W | D) & = \sum_{k=1}^3 P(G = k \mid D) \cdot P(W \mid D,\,G = k)  \\
-& = \frac{1}{4} \cdot 1 + \frac{3}{8} \cdot \mathbf{\frac{2}{3}} + \frac{3}{8} \cdot 0 \\
-& = \frac{1}{4} + \frac{1}{4}  \\
-& = \frac{1}{2} \\
-\end{aligned}
-$$
-
-
