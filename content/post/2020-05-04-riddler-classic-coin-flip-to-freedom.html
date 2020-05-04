@@ -1,0 +1,142 @@
+---
+title: Riddler Classic - Coin Flip to Freedom
+author: ravic
+date: '2020-05-04'
+slug: riddler-classic-coin-flip-to-freedom
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<!--more-->
+<div id="problem" class="section level2">
+<h2>Problem</h2>
+<p>From the <a href="https://fivethirtyeight.com/features/can-you-flip-your-way-to-freedom/">Riddler</a>,
+can you flip your way to freedom?</p>
+<blockquote>
+<p>From Bart Wright comes a rhetorical question from a famed soliloquy, “To flip, or not to flip?”:</p>
+</blockquote>
+<blockquote>
+<p>You are locked in the dungeon of a faraway castle with three fellow prisoners (i.e., there are four prisoners in total), each in a separate cell with no means of communication. But it just so happens that all of you are logicians (of course).</p>
+</blockquote>
+<blockquote>
+<p>To entertain themselves, the guards have decided to give you all a single chance for immediate release. Each prisoner will be given a fair coin, which can either be fairly flipped one time or returned to the guards without being flipped. If all flipped coins come up heads, you will all be set free! But if any of the flipped coins comes up tails, or if no one chooses to flip a coin, you will all be doomed to spend the rest of your lives in the castle’s dungeon.</p>
+</blockquote>
+<blockquote>
+<p>The only tools you and your fellow prisoners have to aid you are random number generators, which will give each prisoner a random number, uniformly and independently chosen between zero and one.</p>
+</blockquote>
+<blockquote>
+<p>What are your chances of being released?</p>
+</blockquote>
+<blockquote>
+<p>Extra credit: Instead of four prisoners, suppose there are N prisoners. Now what are your chances of being released?</p>
+</blockquote>
+</div>
+<div id="formulation" class="section level2">
+<h2>Formulation</h2>
+<p>We’re going to assume each prisoner is quietly analyzing the cutoff value <span class="math inline">\(c\)</span>
+that would maximize all their chances of escape. Intuitively, we’d expect a
+somewhat low value for <span class="math inline">\(c\)</span> – escape feels more likely if fewer prisoners are
+flipping coins.</p>
+<p><span class="math display">\[
+\begin{aligned}
+P_F &amp; = \sum_{k=1}^4 \binom{4}{k} c^k(1-c)^{4-k} \cdot \left(\frac{1}{2}\right)^k \\
+&amp; = \sum_{k=1}^4 \binom{4}{k} \left(\frac{c}{2}\right)^k(1-c)^{4-k}  \\
+&amp; = \sum_{k=\mathbf{0}}^4 \binom{4}{k} \left(\frac{c}{2}\right)^k(1-c)^{4-k} - (1 -c)^4 \\
+&amp; = [\frac{c}{2} + (1-c)]^4 - (1 - c)^4 \\
+&amp; = [1 - \frac{c}{2}]^4 - (1 -c)^4 \\
+&amp; = \left(\frac{1}{2}\right)^4(2-c)^4 - (1-c)^4
+\end{aligned}
+\]</span></p>
+<p>Since we’re using the binomial expansion, we can generalize this to any number
+of prisoners, <span class="math inline">\(n\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+P_W &amp; = \left(\frac{1}{2}\right)^n(2-c)^n - (1-c)^n
+\end{aligned}
+\]</span></p>
+<p>What is the optimal value of the cutoff <span class="math inline">\(c\)</span>? Let’s take the derivative of <span class="math inline">\(P_W\)</span>
+with respect to <span class="math inline">\(c\)</span>, and see what cutoff will maximize our chances.</p>
+<p><span class="math display">\[ 
+\begin{aligned}
+P_W &amp; = \left(\frac{1}{2}\right)^n(2-c)^n - (1-c)^n \\
+\frac{dP}{dc} &amp; =  \left(\frac{1}{2}\right)^n \cdot n (2-c)^{n-1}(-1) - n(1-c)^{n-1}(-1) \\
+0 &amp; = \left(\frac{1}{2}\right)^n \cdot (2-c)^{n-1} - (1-c)^{n-1} \\
+(1 - c)^{n-1} &amp;= \left(\frac{1}{2}\right)^n \cdot (2-c)^{n-1} \\
+(1 - c)^{n-1} &amp;= \left(\frac{1}{2}\right)^{n-1} \cdot \left(\frac{1}{2}\right) \cdot (2-c)^{n-1} \\
+1 - c &amp; = \frac{1}{2} \cdot \frac{1}{2}^{1/(n-1)} \cdot (2 - c) \\
+\end{aligned}
+\]</span></p>
+<p>Let’s define a variable <span class="math inline">\(r\)</span> for that unwieldy root, and use that to express the
+cutoff that we’re looking for:</p>
+<p><span class="math display">\[
+\begin{aligned}
+r &amp; = 2^{1/(1-n)} \\
+2 - 2c &amp; = 2r - cr \\
+2 - 2r &amp; = 2c - cr \\
+c &amp; = \frac{2 - 2r}{2- r} \\
+\end{aligned}
+\]</span></p>
+<pre class="r"><code># library(&quot;tidyverse&quot;)
+unwieldy_root &lt;- function(n) { 2 ^ (1 / (1 - n)) }
+best_cutoff &lt;- function(n) { 
+  r = unwieldy_root(n)
+  (2 - 2 * r) / (2 - r)
+}
+win_prob &lt;- function(n) {
+  c &lt;- best_cutoff(n)
+  (1 - c/2)^n - (1 - c)^n
+}
+
+df &lt;- tibble(n = seq(2, 10000)) %&gt;%
+  mutate(
+    c = best_cutoff(n),
+    p = win_prob(n)) </code></pre>
+<pre class="r"><code>df %&gt;%
+  ggplot(aes(x = n, y = c)) +
+  geom_point(color=&quot;lightblue&quot;) +
+  theme_light() +
+  labs(title = &quot;Optimal cutoff for varying number of prisoners&quot;,
+       x = &quot;&quot;,
+       y = &quot;&quot;) +
+  scale_x_continuous(breaks = seq(0, 100, 10), 
+                     minor_breaks = NULL) +
+  coord_cartesian(xlim = c(0, 100))</code></pre>
+<p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/plot_solutions-1.png" width="672" /></p>
+<pre class="r"><code>df %&gt;% 
+  ggplot(aes(x = n, y = p)) +
+  geom_point(color=&quot;lightblue&quot;) +
+  theme_light() +
+  labs(title = &quot;Probability of freedom for varying number of prisoners&quot;,
+       x = &quot;&quot;,
+       y = &quot;&quot;) +
+  scale_x_continuous(breaks = seq(0, 100, 10), 
+                     minor_breaks = NULL) +
+  coord_cartesian(xlim = c(0, 100))</code></pre>
+<p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>df %&gt;%
+  ggplot(aes(x = n, y = c)) +
+  geom_point(color=&quot;lightblue&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  theme_light() +
+  labs(title = &quot;Power law relationship of best cutoff with number of prisoners&quot;,
+       x = &quot;&quot;,
+       y = &quot;&quot;)</code></pre>
+<p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/log_relationship-1.png" width="672" /></p>
+<pre class="r"><code>df %&gt;%
+  ggplot(aes(x = n, y = p)) +
+  geom_point(color=&quot;lightblue&quot;) +
+  scale_x_log10() +
+  scale_y_log10(limits = c(.1, .5)) +
+  theme_light()</code></pre>
+<p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/win_prob_limit-1.png" width="672" /></p>
+</div>
+<div id="limit" class="section level2">
+<h2>Limit</h2>
+<p><a href="https://math.stackexchange.com/questions/882741/limit-of-1-x-nn-when-n-tends-to-infinity" class="uri">https://math.stackexchange.com/questions/882741/limit-of-1-x-nn-when-n-tends-to-infinity</a>
+<a href="https://socratic.org/questions/what-is-the-derivative-of-2-x" class="uri">https://socratic.org/questions/what-is-the-derivative-of-2-x</a>
+<a href="https://www.wyzant.com/resources/lessons/math/calculus/limits/lhopital" class="uri">https://www.wyzant.com/resources/lessons/math/calculus/limits/lhopital</a></p>
+</div>
