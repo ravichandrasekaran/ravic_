@@ -45,24 +45,23 @@ flipping coins.</p>
 P_F &amp; = \sum_{k=1}^4 \binom{4}{k} c^k(1-c)^{4-k} \cdot \left(\frac{1}{2}\right)^k \\
 &amp; = \sum_{k=1}^4 \binom{4}{k} \left(\frac{c}{2}\right)^k(1-c)^{4-k}  \\
 &amp; = \sum_{k=\mathbf{0}}^4 \binom{4}{k} \left(\frac{c}{2}\right)^k(1-c)^{4-k} - (1 -c)^4 \\
-&amp; = [\frac{c}{2} + (1-c)]^4 - (1 - c)^4 \\
-&amp; = [1 - \frac{c}{2}]^4 - (1 -c)^4 \\
-&amp; = \left(\frac{1}{2}\right)^4(2-c)^4 - (1-c)^4
+&amp; = \left(\frac{c}{2} + (1-c)\right)^4 - (1 - c)^4 \\
+&amp; = \left(1 - \frac{c}{2}\right)^4 - (1 -c)^4 \\
 \end{aligned}
 \]</span></p>
 <p>Since we’re using the binomial expansion, we can generalize this to any number
 of prisoners, <span class="math inline">\(n\)</span>.</p>
 <p><span class="math display">\[
 \begin{aligned}
-P_W &amp; = \left(\frac{1}{2}\right)^n(2-c)^n - (1-c)^n
+P_F &amp; = \left(1-\frac{c}{2}\right)^n - (1-c)^n
 \end{aligned}
 \]</span></p>
-<p>What is the optimal value of the cutoff <span class="math inline">\(c\)</span>? Let’s take the derivative of <span class="math inline">\(P_W\)</span>
+<p>What is the optimal value of the cutoff <span class="math inline">\(c\)</span>? Let’s take the derivative of <span class="math inline">\(P_F\)</span>
 with respect to <span class="math inline">\(c\)</span>, and see what cutoff will maximize our chances.</p>
 <p><span class="math display">\[ 
 \begin{aligned}
-P_W &amp; = \left(\frac{1}{2}\right)^n(2-c)^n - (1-c)^n \\
-\frac{dP}{dc} &amp; =  \left(\frac{1}{2}\right)^n \cdot n (2-c)^{n-1}(-1) - n(1-c)^{n-1}(-1) \\
+P_F &amp; = \left(1-\frac{c}{2}\right)^n - (1-c)^n \\
+\frac{dP_F}{dc} &amp; =  n \left(1-\frac{c}{2}\right)^{n-1}\left(-\frac{1}{2}\right) - n(1-c)^{n-1}(-1) \\
 0 &amp; = \left(\frac{1}{2}\right)^n \cdot (2-c)^{n-1} - (1-c)^{n-1} \\
 (1 - c)^{n-1} &amp;= \left(\frac{1}{2}\right)^n \cdot (2-c)^{n-1} \\
 (1 - c)^{n-1} &amp;= \left(\frac{1}{2}\right)^{n-1} \cdot \left(\frac{1}{2}\right) \cdot (2-c)^{n-1} \\
@@ -77,6 +76,19 @@ r &amp; = 2^{1/(1-n)} \\
 2 - 2c &amp; = 2r - cr \\
 2 - 2r &amp; = 2c - cr \\
 c &amp; = \frac{2 - 2r}{2- r} \\
+\end{aligned}
+\]</span></p>
+</div>
+<div id="plotting-results" class="section level2">
+<h2>Plotting results</h2>
+<p>As we increase the number of prisoners, the cutoff value <span class="math inline">\(c\)</span> that maximizes
+our probability of freedom predictably drives down quickly.</p>
+<p>What isn’t quite as obvious is that the probability would converge to a value
+close to <strong>25%</strong>. Maybe we could do a binomial expansion and see something
+geometric within it?</p>
+<p><span class="math display">\[
+\begin{aligned}
+P_F &amp; = \left(1-\frac{c}{2}\right)^n - (1-c)^n
 \end{aligned}
 \]</span></p>
 <pre class="r"><code># library(&quot;tidyverse&quot;)
@@ -114,7 +126,11 @@ df &lt;- tibble(n = seq(2, 10000)) %&gt;%
        y = &quot;&quot;) +
   scale_x_continuous(breaks = seq(0, 100, 10), 
                      minor_breaks = NULL) +
-  coord_cartesian(xlim = c(0, 100))</code></pre>
+  scale_y_continuous(labels = scales::percent_format(accuracy=1),
+                     breaks = seq(0.25, 0.33, .01),
+                     minor_breaks = NULL) +
+  coord_cartesian(xlim = c(0, 100)) +
+  geom_hline(lty=2, yintercept = 0.25)</code></pre>
 <p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <pre class="r"><code>df %&gt;%
   ggplot(aes(x = n, y = c)) +
@@ -126,13 +142,6 @@ df &lt;- tibble(n = seq(2, 10000)) %&gt;%
        x = &quot;&quot;,
        y = &quot;&quot;)</code></pre>
 <p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/log_relationship-1.png" width="672" /></p>
-<pre class="r"><code>df %&gt;%
-  ggplot(aes(x = n, y = p)) +
-  geom_point(color=&quot;lightblue&quot;) +
-  scale_x_log10() +
-  scale_y_log10(limits = c(.1, .5)) +
-  theme_light()</code></pre>
-<p><img src="/post/2020-05-04-riddler-classic-coin-flip-to-freedom_files/figure-html/win_prob_limit-1.png" width="672" /></p>
 </div>
 <div id="limit" class="section level2">
 <h2>Limit</h2>
