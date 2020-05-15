@@ -62,7 +62,10 @@ disadvantage_of_advantage %>%
 
 ```
 
+## Analytic approach
 
+Order statistics. $X_{max}$ distribution given $X_1, X_2$. $Y_{min}$ distribution 
+given $Y_1 = X_{max}_1$
 
 
 
