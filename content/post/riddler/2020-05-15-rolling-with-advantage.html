@@ -16,9 +16,6 @@ tags:
 <h2>Problem</h2>
 <p>From the Riddler, an extension to <a href="https://fivethirtyeight.com/features/can-you-find-the-best-dungeons-dragons-strategy/">Dungeons &amp; Dragons</a></p>
 <blockquote>
-<p>Since it was impossible to complete the game of sudoku, you might instead enjoy passing the time with a game of Dungeons &amp; Dragons, courtesy of Emma Knight:</p>
-</blockquote>
-<blockquote>
 <p>The fifth edition of Dungeons &amp; Dragons introduced a system of “advantage and disadvantage.” When you roll a die “with advantage,” you roll the die twice and keep the higher result. Rolling “with disadvantage” is similar, except you keep the lower result instead. The rules further specify that when a player rolls with both advantage and disadvantage, they cancel out, and the player rolls a single die. Yawn!</p>
 </blockquote>
 <blockquote>
@@ -27,6 +24,93 @@ tags:
 <blockquote>
 <p>Extra Credit: Instead of maximizing your expected roll, suppose you need to roll N or better with your 20-sided die. For each value of N, is it better to use advantage of disadvantage, disadvantage of advantage or rolling a single die?</p>
 </blockquote>
+</div>
+<div id="analytic-approach" class="section level2">
+<h2>Analytic approach</h2>
+<p><strong>Lots of order statistics. Order statistics on top of other order statistics.</strong></p>
+<p>Let’s start with disadvantage of advantage.</p>
+<p><span class="math display">\[
+\begin{aligned}
+p_X(k) &amp; = \frac{1}{20} \\
+F_X(k) &amp; = \frac{k}{20} \\
+\\
+A &amp; = \max(X_1, X_2) = X_{max} \\
+F_A(k) &amp;= \left[F_X(k)\right]^2 \\
+&amp; = \left(\frac{k}{20}\right)^2 \\
+\\
+D &amp; = \min(A_1, A_2) = A_{min} \\
+1 - F_D(k) &amp;= \left[1 - F_A(k)\right]^2 \\
+F_D(k) &amp;= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+\end{aligned}
+\]</span></p>
+<p>Getting close. From here, we can get the probability mass function (pmf) for
+<span class="math inline">\(D\)</span> for our random variable for disadvantage-of-advantage. And with that, we can
+express the expectation <span class="math inline">\(E[D]\)</span> .</p>
+<p><span class="math display">\[
+\begin{aligned}
+p_D(k) &amp; = F_D(k) - F_D(k-1) \\
+E[D] &amp; = \sum_k k \cdot p_D(k) \\
+\end{aligned}
+\]</span></p>
+<p>Some notes:</p>
+<ol style="list-style-type: decimal">
+<li>Our expectation for disadvantage-of-advantage <span class="math inline">\(E[D]\)</span> works out to
+<strong>11.17</strong>. So, we get a little help above a straight
+roll with an expectation of 10.5. That matches some intutition – the advantage
+steps insulates us against the worst outcomes.</li>
+<li>Looks a lot like <span class="math inline">\(E[D] = E[X] + \frac{2}{3}\)</span>. We’ll need to come back to that.</li>
+<li>We could do the same order statistics for advantage-of-disadvantage. But that’s
+a drag. Instead, we’ll just realize that it’s the same probability mass function,
+just flipped over the line at <span class="math inline">\(x = 10.5\)</span>.
+As <a href="https://genius.com/1227305">Missy Elliott would advise</a>, we need to put our
+thing down, flip it and reverse it.</li>
+<li>We can plot the probability mass function, too. It’s pretty hard to get either
+extreme – the disadvantage step makes it hard to get 20, and the advantage
+makes it hard to get a 1.</li>
+</ol>
+<p><img src="/post/riddler/2020-05-15-rolling-with-advantage_files/figure-html/plot_dis_of_adv-1.png" width="672" /></p>
+<p>We can get a bit closer to a closed-form solution for the expectation, using
+<a href="https://en.wikipedia.org/wiki/Faulhaber%27s_formula">Faulhaber’s formula</a></p>
+<p>$$
+\begin{aligned}
+E[D] &amp; = _k k p_D(k) \
+&amp; = _k [1 - F_D(k)] \
+\
+&amp; = _k ^2 \
+&amp; = _k \
+&amp; = _k 1 - <em>k k^2 + <em>k k^4 \
+\
+</em>{k=1}^n k^2 &amp; = \
+</em>{k=1}^n k^4 &amp; =  \</p>
+<p>\end{aligned}
+$$</p>
+<hr />
+<div id="extra-credit" class="section level3">
+<h3>Extra credit</h3>
+<pre><code>## # A tibble: 20 x 3
+##        k beats_straight beats_dis_of_adv
+##    &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt;
+##  1     1          1              1      
+##  2     2          0.95           0.995  
+##  3     3          0.9            0.980  
+##  4     4          0.85           0.956  
+##  5     5          0.8            0.922  
+##  6     6          0.75           0.879  
+##  7     7          0.7            0.828  
+##  8     8          0.65           0.770  
+##  9     9          0.6            0.706  
+## 10    10          0.55           0.636  
+## 11    11          0.5            0.562  
+## 12    12          0.450          0.487  
+## 13    13          0.4            0.410  
+## 14    14          0.35           0.334  
+## 15    15          0.3            0.260  
+## 16    16          0.25           0.191  
+## 17    17          0.200          0.130  
+## 18    18          0.15           0.0770 
+## 19    19          0.100          0.0361 
+## 20    20          0.05           0.00951</code></pre>
+</div>
 </div>
 <div id="simulation" class="section level2">
 <h2>Simulation</h2>
@@ -59,16 +143,52 @@ disadvantage_of_advantage %&gt;%
 <pre><code>## # A tibble: 1 x 1
 ##   winner
 ##    &lt;dbl&gt;
-## 1   9.88</code></pre>
+## 1   9.83</code></pre>
 <pre class="r"><code>disadvantage_of_advantage %&gt;%
   summarise(winner = mean(winner))</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   winner
 ##    &lt;dbl&gt;
 ## 1   11.2</code></pre>
-</div>
-<div id="analytic-approach" class="section level2">
-<h2>Analytic approach</h2>
-<p>Order statistics. <span class="math inline">\(X_{max}\)</span> distribution given <span class="math inline">\(X_1, X_2\)</span>. <span class="math inline">\(Y_{min}\)</span> distribution
-given <span class="math inline">\(Y_1 = X_{max}_1\)</span></p>
+<p>Now for advantage of disadvantage:</p>
+<hr />
+<p><span class="math display">\[
+\begin{aligned}
+p_X(k) &amp; = \frac{1}{20} \\
+F_X(k) &amp; = \frac{k}{20} \\
+\\
+D^{\prime} &amp; = \min(X_1, X_2) = X_{min} \\
+1 - F_D^{\prime}(k) &amp;= \left[1 - F_X(k)\right]^2 \\
+F_D^{\prime}(k) &amp; = 1 - \left(1 - \frac{k}{20}\right)^2 \\
+\\
+A^{\prime} &amp; = \min(D_1, D_2) = A_{max} \\
+F_{A^{\prime}}(k) &amp;= \left[F_{D^{\prime}}(k)\right]^2 \\
+F_{A^{\prime}}(k) &amp;=  \left[1 - \left(1 - \frac{k}{20}\right)^2\right]^2 \\
+\end{aligned}
+\]</span></p>
+<p>And, again, we’re close to the interesting stuff</p>
+<p><span class="math display">\[
+\begin{aligned}
+p_{A^{\prime}}(k) &amp; = F_{A^{\prime}}(k) - F_{A^{\prime}}(k-1) \\
+P(k \ge N) &amp; = 1 - F_{A^{\prime}}(N - 1) \\
+\end{aligned}
+\]</span></p>
+<p><img src="/post/riddler/2020-05-15-rolling-with-advantage_files/figure-html/adv_of_dis-1.png" width="672" /></p>
+<pre><code>## [1] 9.833338</code></pre>
+<p><span class="math display">\[
+\begin{aligned}
+\sum_{k=1}^n k^2 &amp; = \frac{n(n + 1)(2n + 1)}{6}\\
+\sum_{k=1}^n k^4 &amp; = \frac{n(n+1)(2n+1)(3n^2+3n-1)}{30} \\
+\\
+F_D(k) &amp;= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+E[D] &amp; = \sum 1 - F_D(k) \\
+&amp; = \sum \left(1 - \left(\frac{k}{n}\right)^2\right)^2 \\
+&amp; = \sum \left[1 - 2\left(\frac{k^2}{n^2}\right) + \frac{k^4}{n^4}\right] \\
+&amp; = \sum 1 - \frac{2}{n^2}\sum k^2 + \frac{1}{n^4} \sum k^4 \\
+&amp; = \frac{n(n+1)}{2} - \frac{2}{n^2}\left[\frac{n(n + 1)(2n + 1)}{6}\right] + \frac{1}{n^4}\left[\frac{n(n+1)(2n+1)(3n^2+3n-1)}{30}\right] \\
+&amp; = \frac{n(n+1)}{2} - \frac{2(n+1)}{3} + \frac{(n+1)}{5} \\
+&amp; = \frac{n + 1}{2} \cdot [(n - \frac{2(2n^2 + n)}{6n^2} + \dots] \\
+&amp; = \frac{n + 1}{2} \cdot [(n - \frac{2}{3} - \frac{1}{3n} + \dots] \\
+\end{aligned}
+\]</span></p>
 </div>

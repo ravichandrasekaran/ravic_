@@ -12,11 +12,15 @@ From the Riddler, an extension to [Dungeons & Dragons](https://fivethirtyeight.c
 
 <!--more-->
 
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("patchwork")
+library("glue")
+```
+
 ## Problem
 
 From the Riddler, an extension to [Dungeons & Dragons](https://fivethirtyeight.com/features/can-you-find-the-best-dungeons-dragons-strategy/)
-
-> Since it was impossible to complete the game of sudoku, you might instead enjoy passing the time with a game of Dungeons & Dragons, courtesy of Emma Knight:
 
 > The fifth edition of Dungeons & Dragons introduced a system of “advantage and disadvantage.” When you roll a die “with advantage,” you roll the die twice and keep the higher result. Rolling “with disadvantage” is similar, except you keep the lower result instead. The rules further specify that when a player rolls with both advantage and disadvantage, they cancel out, and the player rolls a single die. Yawn!
 
@@ -24,11 +28,137 @@ From the Riddler, an extension to [Dungeons & Dragons](https://fivethirtyeight.c
 
 > Extra Credit: Instead of maximizing your expected roll, suppose you need to roll N or better with your 20-sided die. For each value of N, is it better to use advantage of disadvantage, disadvantage of advantage or rolling a single die?
 
+
+## Analytic approach
+
+**Lots of order statistics. Order statistics on top of other order statistics.**
+
+Let's start with disadvantage of advantage. 
+
+$$
+\begin{aligned}
+p_X(k) & = \frac{1}{20} \\
+F_X(k) & = \frac{k}{20} \\
+\\
+A & = \max(X_1, X_2) = X_{max} \\
+F_A(k) &= \left[F_X(k)\right]^2 \\
+& = \left(\frac{k}{20}\right)^2 \\
+\\
+D & = \min(A_1, A_2) = A_{min} \\
+1 - F_D(k) &= \left[1 - F_A(k)\right]^2 \\
+F_D(k) &= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+\end{aligned}
+$$
+
+Getting close. From here, we can get the probability mass function (pmf) for 
+$D$ for our random variable for disadvantage-of-advantage. And with that, we can
+express the expectation $E[D]$ . 
+
+
+$$
+\begin{aligned}
+p_D(k) & = F_D(k) - F_D(k-1) \\
+E[D] & = \sum_k k \cdot p_D(k) \\
+\end{aligned}
+$$
+
+```{r dis_of_adv, echo=FALSE}
+faces <- 20
+F_dis_of_adv <- function(k, faces) {
+  1 - (1 - (k / faces)^2)^2
+}
+pmf_dis_of_adv <- function(k, faces) {
+  F_dis_of_adv(k, faces) - F_dis_of_adv(k-1, faces) 
+}
+dis_of_adv_beats <- function(N, faces) {
+  1 - F_dis_of_adv(N - 1, faces)
+}
+df <- tibble(k = seq_len(20)) %>%
+  mutate(prob = pmf_dis_of_adv(k, faces),
+         beats = dis_of_adv_beats(k, faces))
+exp_dis_of_adv <- sum(seq_len(faces) * pmf_dis_of_adv(seq_len(faces), faces))
+```
+
+Some notes:
+
+1. Our expectation for disadvantage-of-advantage $E[D]$ works out to 
+**`r {round(exp_dis_of_adv, 2)}`**. So, we get a little help above a straight
+roll with an expectation of 10.5.  That matches some intutition -- the advantage
+steps insulates us against the worst outcomes.
+2. Looks a lot like $E[D] = E[X] + \frac{2}{3}$. We'll need to come back to that.
+3. We could do the same order statistics for advantage-of-disadvantage. But that's
+a drag. Instead, we'll just realize that it's the same probability mass function,
+just flipped over the line at $x = 10.5$.
+As [Missy Elliott would advise](https://genius.com/1227305), we need to put our
+thing down, flip it and reverse it.
+4. We can plot the probability mass function, too. It's pretty hard to get either 
+extreme -- the disadvantage step makes it hard to get 20, and the advantage 
+makes it hard to get a 1. 
+
+```{r plot_dis_of_adv, echo = FALSE}
+df %>% 
+  ggplot(aes(k, prob)) +
+  geom_point(color="orange") +
+  geom_segment(aes(xend=k, y=0, yend=prob), col="orange") +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent_format(accuracy=1), 
+                     breaks=seq(0, .08, .01), expand=c(0, 0)) +
+  scale_x_continuous(breaks = seq(1, 20), expand = c(0.02, 0.02)) +
+  labs(title = "Probability mass function of disadvantage-of-advantage", 
+       x = "", y = "") +
+  coord_cartesian(xlim=c(1, 20), ylim=c(0, .08)) +
+  geom_hline(yintercept = .05, lty = 2, col="grey60") +
+  theme(panel.grid= element_blank())
+  # geom_point(y = .05, col = "lightblue", alpha=.4) +
+  # geom_segment(aes(xend=k, y=0, yend=.05), col="lightblue", alpha=.4) +
+  # geom_vline(xintercept = exp_dis_of_adv, lty=2, col="grey60") +
+  # annotate("text", x = exp_dis_of_adv + .2, y = .085, 
+  #          label=glue("Expected value:\n {round(exp_dis_of_adv, 2)}"),
+  #          size=3, hjust=0, col="grey60") +
+
+
+  
+# df %>% 
+#   ggplot(aes(k, beats)) +
+#   geom_point(color="orange") +
+#   theme_light() +
+#   scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
+#   labs(x = "", y = "", title = "Probability of N or better")
+```
+
+
+We can get a bit closer to a closed-form solution for the expectation, using
+[Faulhaber's formula](https://en.wikipedia.org/wiki/Faulhaber%27s_formula)
+
+$$ 
+\begin{aligned}
+E[D] & = \sum_k k \cdot p_D(k) \\
+& = \sum_k [1 - F_D(k)] \\
+\\
+& = \sum_k \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+& = \sum_k \left[1 - 2\left(\frac{k^2}{20^2}\right) + \frac{k^4}{20^4}\right] \\
+& = \sum_k 1 - \frac{2}{20^2}\sum_k k^2 + \frac{1}{20^4}\sum_k k^4 \\
+\\
+\sum_{k=1}^n k^2 & = \frac{n(n + 1)(2n + 1)}{6}\\
+\sum_{k=1}^n k^4 & = \frac{n(n+1)(2n+1)(3n^2+3n-1)}{30} \\
+
+\end{aligned}
+$$
+
+---
+
+### Extra credit
+
+```{r extra_credit, echo = FALSE}
+sdf <- tibble(k = seq_len(20)) %>%
+  mutate(beats_straight = 1 - (k-1) / 20,
+         beats_dis_of_adv = dis_of_adv_beats(k, faces)) 
+sdf
+
+```
+
 ## Simulation
 
-```{r load_packages, include=FALSE}
-library("tidyverse")
-```
 ```{r simulation}
 df <- tibble(roll = sample.int(n=20, size=10000, replace=TRUE)) %>%
   mutate(trial = floor((row_number() - 1)/ 4 + 1)) %>%
@@ -62,10 +192,81 @@ disadvantage_of_advantage %>%
 
 ```
 
-## Analytic approach
+Now for advantage of disadvantage:
 
-Order statistics. $X_{max}$ distribution given $X_1, X_2$. $Y_{min}$ distribution 
-given $Y_1 = X_{max}_1$
+---
 
 
+$$
+\begin{aligned}
+p_X(k) & = \frac{1}{20} \\
+F_X(k) & = \frac{k}{20} \\
+\\
+D^{\prime} & = \min(X_1, X_2) = X_{min} \\
+1 - F_D^{\prime}(k) &= \left[1 - F_X(k)\right]^2 \\
+F_D^{\prime}(k) & = 1 - \left(1 - \frac{k}{20}\right)^2 \\
+\\
+A^{\prime} & = \min(D_1, D_2) = A_{max} \\
+F_{A^{\prime}}(k) &= \left[F_{D^{\prime}}(k)\right]^2 \\
+F_{A^{\prime}}(k) &=  \left[1 - \left(1 - \frac{k}{20}\right)^2\right]^2 \\
+\end{aligned}
+$$
+
+
+And, again, we're close to the interesting stuff
+
+$$
+\begin{aligned}
+p_{A^{\prime}}(k) & = F_{A^{\prime}}(k) - F_{A^{\prime}}(k-1) \\
+P(k \ge N) & = 1 - F_{A^{\prime}}(N - 1) \\
+\end{aligned}
+$$
+
+```{r adv_of_dis, echo=FALSE}
+F_adv_of_dis <- function(k) {
+  (1 - (1 - (k / 20))^2) ^2
+}
+pmf_adv_of_dis <- function(k) {
+  F_adv_of_dis(k) - F_adv_of_dis(k-1) 
+}
+adv_of_dis_beats <- function(N) {
+  1 - F_adv_of_dis(N - 1)
+}
+exp_adv_of_dis <- sum(seq_len(20) * pmf_adv_of_dis(seq_len(20)))
+qdf <- tibble(k = seq_len(20)) %>%
+  mutate(prob = pmf_adv_of_dis(k),
+         beats = adv_of_dis_beats(k))
+qdf %>% 
+  ggplot(aes(k, prob)) +
+  geom_point(color="orange") +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
+  labs(x = "", y = "", title = "Probability of k") +
+  geom_vline(xintercept = exp_adv_of_dis) 
+exp_adv_of_dis
+# |
+# qdf %>% 
+#  ggplot(aes(k, beats)) +
+#  geom_point(color="orange") +
+#  theme_light() +
+#  scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
+#  labs(x = "", y = "", title = "Probability of N or better")
+```
+
+$$
+\begin{aligned}
+\sum_{k=1}^n k^2 & = \frac{n(n + 1)(2n + 1)}{6}\\
+\sum_{k=1}^n k^4 & = \frac{n(n+1)(2n+1)(3n^2+3n-1)}{30} \\
+\\
+F_D(k) &= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+E[D] & = \sum 1 - F_D(k) \\
+& = \sum \left(1 - \left(\frac{k}{n}\right)^2\right)^2 \\
+& = \sum \left[1 - 2\left(\frac{k^2}{n^2}\right) + \frac{k^4}{n^4}\right] \\
+& = \sum 1 - \frac{2}{n^2}\sum k^2 + \frac{1}{n^4} \sum k^4 \\
+& = \frac{n(n+1)}{2} - \frac{2}{n^2}\left[\frac{n(n + 1)(2n + 1)}{6}\right] + \frac{1}{n^4}\left[\frac{n(n+1)(2n+1)(3n^2+3n-1)}{30}\right] \\
+& = \frac{n(n+1)}{2} - \frac{2(n+1)}{3} + \frac{(n+1)}{5} \\
+& = \frac{n + 1}{2} \cdot [(n - \frac{2(2n^2 + n)}{6n^2} + \dots] \\
+& = \frac{n + 1}{2} \cdot [(n - \frac{2}{3} - \frac{1}{3n} + \dots] \\
+\end{aligned}
+$$
 
