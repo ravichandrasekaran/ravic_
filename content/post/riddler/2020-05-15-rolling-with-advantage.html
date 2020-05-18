@@ -47,15 +47,15 @@ F_X(k) &amp; = \frac{k}{20} \\
 \\
 A &amp; = \max(X_1, X_2) = X_{max} \\
 F_A(k) &amp;= \left[F_X(k)\right]^2 \\
-&amp; = \left(\frac{k}{20}\right)^2 \\
+&amp; = \frac{k^2}{20^2} \\
 \\
 D &amp; = \min(A_1, A_2) = A_{min} \\
 1 - F_D(k) &amp;= \left[1 - F_A(k)\right]^2 \\
-F_D(k) &amp;= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+F_D(k) &amp;= 1 - \left[1 - \frac{k^2}{20^2}\right]^2 \\
 \end{aligned}
 \]</span></p>
-<p>Getting close. From here, we can get the probability mass function (pmf) for
-<span class="math inline">\(D\)</span> for our random variable for disadvantage-of-advantage. And with that, we can
+<p>Getting close. From here, we can get the probability mass function <span class="math inline">\(p_D(k)\)</span> for
+<span class="math inline">\(D\)</span>, our random variable for disadvantage-of-advantage. And with that, we can
 express the expectation <span class="math inline">\(E[D]\)</span> .</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -101,13 +101,19 @@ E[D] &amp; = \sum k \cdot p_D(k) \\
 \sum k^2 &amp; = \frac{1}{3}m^3 + \frac{1}{2}m^2 + \frac{1}{6}m \\
 \sum k^4 &amp; = \frac{1}{5}m^5 + \frac{1}{2}m^4 + \frac{1}{3}m^3 - \frac{1}{30}m \\
 \\
-E[D] &amp; = \frac{8}{15}m + \frac{1}{2} - \frac{1}{30n^3} \\
+E[D] &amp; = \frac{8}{15}m + \frac{1}{2} - \frac{1}{30m^3} \\
 &amp; \approx \frac{8}{15}m + \frac{1}{2}
 \end{aligned}
 \]</span></p>
-<p>So, with more faces, we have a linear expression for disadvantage-of-advantage,
-and for a straight role. With each additional face, the edge that we get from
-using disadvantage-of-advantage grows linearly.</p>
+<p>And now we can express the differences between the two expectations as a function
+of the number of sides on the dice:
+<span class="math display">\[
+\begin{aligned}
+E[D] - E[X] &amp; \approx [\frac{8}{15}m + \frac{1}{2}] - [\frac{m + 1}{2}] \\
+&amp; \approx \frac{1}{30}m \\
+\end{aligned}
+\]</span></p>
+<p>And there’s our <span class="math inline">\(\frac{2}{3}\)</span>, hiding in plain sight.</p>
 <hr />
 </div>
 <div id="extra-credit" class="section level3">
@@ -125,7 +131,7 @@ F_D(k) &amp;= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
 <p>And then we can build a table, which matches our intuition from before – that
 disadvantage-of-advantage has a hard time reaching the extremes.</p>
 <pre><code>## # A tibble: 20 x 4
-##        k beats_straight beats_dis_of_adv approach  
+##        N beats_straight beats_dis_of_adv approach  
 ##    &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt;     
 ##  1     1          1              1       dis-of-adv
 ##  2     2          0.95           0.995   dis-of-adv
@@ -147,5 +153,36 @@ disadvantage-of-advantage has a hard time reaching the extremes.</p>
 ## 18    18          0.15           0.0770  straight  
 ## 19    19          0.100          0.0361  straight  
 ## 20    20          0.05           0.00951 straight</code></pre>
+<hr />
+</div>
+<div id="second-or-third-best" class="section level3">
+<h3>Second or third best?</h3>
+<p>What is disadvantage-of-advantage doing? We know it insulates us against the
+worst, and that it avoids the best too. Here’s some simulation results – mostly
+second place, often third place, and even first place (with a tie) on occasion.</p>
+<pre class="r"><code>df &lt;- tibble(roll = sample.int(n=20, size=10000, replace=TRUE)) %&gt;%
+  mutate(trial = floor((row_number() - 1)/ 4 + 1)) %&gt;%
+  mutate(pair = floor((row_number() - 1) / 2 + 1))
+
+disadvantage_of_advantage &lt;- df %&gt;%
+  group_by(trial, pair) %&gt;%
+  summarise(winner = max(roll)) %&gt;%
+  group_by(trial) %&gt;%
+  summarise(winner = min(winner)) 
+
+df %&gt;% 
+  group_by(trial) %&gt;%
+  mutate(rank = rank(-1 * roll, ties.method=&quot;min&quot;)) %&gt;%
+  ungroup() %&gt;%
+  inner_join(disadvantage_of_advantage, 
+             by = c(roll = &quot;winner&quot;, trial = &quot;trial&quot;)) %&gt;%
+  count(rank) %&gt;%
+  mutate(pct = n/sum(n))</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##    rank     n   pct
+## * &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1     1   305 0.103
+## 2     2  1854 0.628
+## 3     3   791 0.268</code></pre>
 </div>
 </div>

@@ -50,16 +50,16 @@ F_X(k) & = \frac{k}{20} \\
 \\
 A & = \max(X_1, X_2) = X_{max} \\
 F_A(k) &= \left[F_X(k)\right]^2 \\
-& = \left(\frac{k}{20}\right)^2 \\
+& = \frac{k^2}{20^2} \\
 \\
 D & = \min(A_1, A_2) = A_{min} \\
 1 - F_D(k) &= \left[1 - F_A(k)\right]^2 \\
-F_D(k) &= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+F_D(k) &= 1 - \left[1 - \frac{k^2}{20^2}\right]^2 \\
 \end{aligned}
 $$
 
-Getting close. From here, we can get the probability mass function (pmf) for 
-$D$ for our random variable for disadvantage-of-advantage. And with that, we can
+Getting close. From here, we can get the probability mass function $p_D(k)$ for 
+$D$, our random variable for disadvantage-of-advantage. And with that, we can
 express the expectation $E[D]$ . 
 
 
@@ -147,16 +147,21 @@ E[D] & = \sum k \cdot p_D(k) \\
 \sum k^2 & = \frac{1}{3}m^3 + \frac{1}{2}m^2 + \frac{1}{6}m \\
 \sum k^4 & = \frac{1}{5}m^5 + \frac{1}{2}m^4 + \frac{1}{3}m^3 - \frac{1}{30}m \\
 \\
-E[D] & = \frac{8}{15}m + \frac{1}{2} - \frac{1}{30n^3} \\
+E[D] & = \frac{8}{15}m + \frac{1}{2} - \frac{1}{30m^3} \\
 & \approx \frac{8}{15}m + \frac{1}{2}
 \end{aligned}
 $$
 
-So, with more faces, we have a linear expression for disadvantage-of-advantage,
-and for a straight role. With each additional face, the edge that we get from 
-using disadvantage-of-advantage grows linearly.
+And now we can express the differences between the two expectations as a function
+of the number of sides on the dice:
+$$
+\begin{aligned}
+E[D] - E[X] & \approx [\frac{8}{15}m + \frac{1}{2}] - [\frac{m + 1}{2}] \\
+& \approx \frac{1}{30}m \\
+\end{aligned}
+$$
 
-
+And there's our $\frac{2}{3}$, hiding in plain sight.
 
 
 
@@ -177,12 +182,42 @@ $$
 
 And then we can build a table, which matches our intuition from before -- that
 disadvantage-of-advantage has a hard time reaching the extremes.
+
 ```{r extra_credit, echo = FALSE}
-sdf <- tibble(k = seq_len(20)) %>%
-  mutate(beats_straight = 1 - (k-1) / 20,
-         beats_dis_of_adv = dis_of_adv_beats(k, faces)) %>%
+sdf <- tibble(N = seq_len(20)) %>%
+  mutate(beats_straight = 1 - (N-1) / 20,
+         beats_dis_of_adv = dis_of_adv_beats(N, faces)) %>%
   mutate(approach = ifelse(beats_dis_of_adv >= beats_straight, "dis-of-adv", "straight"))
 sdf
 
 ```
 
+
+---
+
+### Second or third best?
+What is disadvantage-of-advantage doing? We know it insulates us against the 
+worst, and that it avoids the best too. Here's some simulation results -- mostly
+second place, often third place, and even first place (with a tie) on occasion.
+
+```{r simulation}
+df <- tibble(roll = sample.int(n=20, size=10000, replace=TRUE)) %>%
+  mutate(trial = floor((row_number() - 1)/ 4 + 1)) %>%
+  mutate(pair = floor((row_number() - 1) / 2 + 1))
+
+disadvantage_of_advantage <- df %>%
+  group_by(trial, pair) %>%
+  summarise(winner = max(roll)) %>%
+  group_by(trial) %>%
+  summarise(winner = min(winner)) 
+
+df %>% 
+  group_by(trial) %>%
+  mutate(rank = rank(-1 * roll, ties.method="min")) %>%
+  ungroup() %>%
+  inner_join(disadvantage_of_advantage, 
+             by = c(roll = "winner", trial = "trial")) %>%
+  count(rank) %>%
+  mutate(pct = n/sum(n))
+  
+```
