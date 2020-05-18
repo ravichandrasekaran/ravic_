@@ -25,9 +25,20 @@ tags:
 <p>Extra Credit: Instead of maximizing your expected roll, suppose you need to roll N or better with your 20-sided die. For each value of N, is it better to use advantage of disadvantage, disadvantage of advantage or rolling a single die?</p>
 </blockquote>
 </div>
+<div id="answers" class="section level2">
+<h2>Answers</h2>
+<ol style="list-style-type: decimal">
+<li>Disadvantage-of-advantage gives the highest expected outcome: <strong>11.17</strong> vs.
+10.5 for a straight roll, and 9.83 for advantage-of-disadvantage.</li>
+<li>If you need to roll N or better, you will want to use disadvantage-of-advantage
+for <span class="math inline">\(1 \le N \le 13\)</span>, then resort to a straight roll for <span class="math inline">\(14 \le N \le 20\)</span>.</li>
+</ol>
+</div>
 <div id="analytic-approach" class="section level2">
 <h2>Analytic approach</h2>
-<p><strong>Lots of order statistics. Order statistics on top of other order statistics.</strong></p>
+<p>Lots of order statistics. Order statistics on top of other order statistics.</p>
+<div id="formulation" class="section level3">
+<h3>Formulation</h3>
 <p>Let’s start with disadvantage of advantage.</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -52,143 +63,89 @@ p_D(k) &amp; = F_D(k) - F_D(k-1) \\
 E[D] &amp; = \sum_k k \cdot p_D(k) \\
 \end{aligned}
 \]</span></p>
-<p>Some notes:</p>
-<ol style="list-style-type: decimal">
-<li>Our expectation for disadvantage-of-advantage <span class="math inline">\(E[D]\)</span> works out to
-<strong>11.17</strong>. So, we get a little help above a straight
-roll with an expectation of 10.5. That matches some intutition – the advantage
-steps insulates us against the worst outcomes.</li>
-<li>Looks a lot like <span class="math inline">\(E[D] = E[X] + \frac{2}{3}\)</span>. We’ll need to come back to that.</li>
-<li>We could do the same order statistics for advantage-of-disadvantage. But that’s
-a drag. Instead, we’ll just realize that it’s the same probability mass function,
-just flipped over the line at <span class="math inline">\(x = 10.5\)</span>.
-As <a href="https://genius.com/1227305">Missy Elliott would advise</a>, we need to put our
-thing down, flip it and reverse it.</li>
-<li>We can plot the probability mass function, too. It’s pretty hard to get either
-extreme – the disadvantage step makes it hard to get 20, and the advantage
-makes it hard to get a 1.</li>
-</ol>
+</div>
+<div id="results" class="section level3">
+<h3>Results</h3>
+<p>Our expectation for disadvantage-of-advantage <span class="math inline">\(E[D]\)</span> works out to
+<strong>11.17</strong>. So, we get a little help above a
+straight roll with an expectation of 10.5. That matches some intutition
+– the advantage steps insulates us against the worst outcomes.</p>
+<p>We can plot the probability mass function, too. It’s pretty hard to get
+either extreme – the disadvantage step makes it hard to get 20, and the
+advantage makes it hard to get a 1.</p>
 <p><img src="/post/riddler/2020-05-15-rolling-with-advantage_files/figure-html/plot_dis_of_adv-1.png" width="672" /></p>
-<p>We can get a bit closer to a closed-form solution for the expectation, using
-<a href="https://en.wikipedia.org/wiki/Faulhaber%27s_formula">Faulhaber’s formula</a></p>
-<p>$$
+</div>
+<div id="what-about-advantage-of-disadvantage" class="section level3">
+<h3>What about advantage-of-disadvantage?</h3>
+<p>We could do the same order statistics for advantage-of-disadvantage. But
+that would be a drag. Instead, we’ll just realize that it’s the same
+probability mass function, just flipped over the line at <span class="math inline">\(x = 10.5\)</span>. As
+<a href="https://genius.com/1227305">Missy Elliott would advise</a>, we need to “put
+our thing down, flip it and reverse it.”</p>
+<p>Our expectation for advantage-of-disadvantage works out to <span class="math inline">\(E[A^{\prime}] = \textbf{9.83}\)</span>.
+And because the the advantage-of-disadvantage is consistently worse than a
+straight roll, we won’t even bother considering it for the rest.</p>
+</div>
+<div id="what-happens-with-more-faces" class="section level3">
+<h3>What happens with more faces?</h3>
+<p>Looks a lot like <span class="math inline">\(E[D] = E[X] + \frac{2}{3}\)</span>. That can’t be a coincidence.</p>
+<p>We can leverage a second expression for expectation of a discrete distribution,
+and <a href="https://mathworld.wolfram.com/PowerSum.html">Faulhaber’s Formula</a> to get
+an expression for <span class="math inline">\(E[D]\)</span>. Let <span class="math inline">\(m\)</span> be the number of faces on the die, then:</p>
+<p><span class="math display">\[
 \begin{aligned}
-E[D] &amp; = _k k p_D(k) \
-&amp; = _k [1 - F_D(k)] \
-\
-&amp; = _k ^2 \
-&amp; = _k \
-&amp; = _k 1 - <em>k k^2 + <em>k k^4 \
-\
-</em>{k=1}^n k^2 &amp; = \
-</em>{k=1}^n k^4 &amp; =  \</p>
-<p>\end{aligned}
-$$</p>
+E[D] &amp; = \sum k \cdot p_D(k) \\
+&amp; = \sum_{k=0}^m [1 - F_D(k)] \\
+&amp; = \sum_{k=0}^m \left[1 - \frac{k^2}{m^2}\right]^2 \\
+\\
+\sum k^2 &amp; = \frac{1}{3}m^3 + \frac{1}{2}m^2 + \frac{1}{6}m \\
+\sum k^4 &amp; = \frac{1}{5}m^5 + \frac{1}{2}m^4 + \frac{1}{3}m^3 - \frac{1}{30}m \\
+\\
+E[D] &amp; = \frac{8}{15}m + \frac{1}{2} - \frac{1}{30n^3} \\
+&amp; \approx \frac{8}{15}m + \frac{1}{2}
+\end{aligned}
+\]</span></p>
+<p>So, with more faces, we have a linear expression for disadvantage-of-advantage,
+and for a straight role. With each additional face, the edge that we get from
+using disadvantage-of-advantage grows linearly.</p>
 <hr />
+</div>
 <div id="extra-credit" class="section level3">
 <h3>Extra credit</h3>
-<pre><code>## # A tibble: 20 x 3
-##        k beats_straight beats_dis_of_adv
-##    &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt;
-##  1     1          1              1      
-##  2     2          0.95           0.995  
-##  3     3          0.9            0.980  
-##  4     4          0.85           0.956  
-##  5     5          0.8            0.922  
-##  6     6          0.75           0.879  
-##  7     7          0.7            0.828  
-##  8     8          0.65           0.770  
-##  9     9          0.6            0.706  
-## 10    10          0.55           0.636  
-## 11    11          0.5            0.562  
-## 12    12          0.450          0.487  
-## 13    13          0.4            0.410  
-## 14    14          0.35           0.334  
-## 15    15          0.3            0.260  
-## 16    16          0.25           0.191  
-## 17    17          0.200          0.130  
-## 18    18          0.15           0.0770 
-## 19    19          0.100          0.0361 
-## 20    20          0.05           0.00951</code></pre>
-</div>
-</div>
-<div id="simulation" class="section level2">
-<h2>Simulation</h2>
-<pre class="r"><code>df &lt;- tibble(roll = sample.int(n=20, size=10000, replace=TRUE)) %&gt;%
-  mutate(trial = floor((row_number() - 1)/ 4 + 1)) %&gt;%
-  mutate(pair = floor((row_number() - 1) / 2 + 1))
-
-disadvantage_of_advantage &lt;- df %&gt;%
-  group_by(trial, pair) %&gt;%
-  summarise(winner = max(roll)) %&gt;%
-  group_by(trial) %&gt;%
-  summarise(winner = min(winner)) 
-
-adv_of_dis &lt;- df %&gt;%
-  group_by(trial, pair) %&gt;%
-  summarise(winner = min(roll)) %&gt;%
-  group_by(trial) %&gt;%
-  summarise(winner = max(winner)) 
-
-disadvantage_of_advantage %&gt;%
-  ggplot(aes(x = winner)) +
-  geom_bar()</code></pre>
-<p><img src="/post/riddler/2020-05-15-rolling-with-advantage_files/figure-html/simulation-1.png" width="672" /></p>
-<pre class="r"><code>adv_of_dis %&gt;%
-  ggplot(aes(x = winner)) +
-  geom_bar()</code></pre>
-<p><img src="/post/riddler/2020-05-15-rolling-with-advantage_files/figure-html/simulation-2.png" width="672" /></p>
-<pre class="r"><code>adv_of_dis %&gt;%
-  summarise(winner = mean(winner))</code></pre>
-<pre><code>## # A tibble: 1 x 1
-##   winner
-##    &lt;dbl&gt;
-## 1   9.83</code></pre>
-<pre class="r"><code>disadvantage_of_advantage %&gt;%
-  summarise(winner = mean(winner))</code></pre>
-<pre><code>## # A tibble: 1 x 1
-##   winner
-##    &lt;dbl&gt;
-## 1   11.2</code></pre>
-<p>Now for advantage of disadvantage:</p>
-<hr />
-<p><span class="math display">\[
+<p>We already have most of the pieces in place for the extra credit. We can think
+of the probability of getting <span class="math inline">\(N\)</span> or better as:
+<span class="math display">\[
 \begin{aligned}
-p_X(k) &amp; = \frac{1}{20} \\
+P(\text{outcome} \ge N) &amp; = 1 - F(N - 1) \\
+\\
 F_X(k) &amp; = \frac{k}{20} \\
-\\
-D^{\prime} &amp; = \min(X_1, X_2) = X_{min} \\
-1 - F_D^{\prime}(k) &amp;= \left[1 - F_X(k)\right]^2 \\
-F_D^{\prime}(k) &amp; = 1 - \left(1 - \frac{k}{20}\right)^2 \\
-\\
-A^{\prime} &amp; = \min(D_1, D_2) = A_{max} \\
-F_{A^{\prime}}(k) &amp;= \left[F_{D^{\prime}}(k)\right]^2 \\
-F_{A^{\prime}}(k) &amp;=  \left[1 - \left(1 - \frac{k}{20}\right)^2\right]^2 \\
-\end{aligned}
-\]</span></p>
-<p>And, again, we’re close to the interesting stuff</p>
-<p><span class="math display">\[
-\begin{aligned}
-p_{A^{\prime}}(k) &amp; = F_{A^{\prime}}(k) - F_{A^{\prime}}(k-1) \\
-P(k \ge N) &amp; = 1 - F_{A^{\prime}}(N - 1) \\
-\end{aligned}
-\]</span></p>
-<p><img src="/post/riddler/2020-05-15-rolling-with-advantage_files/figure-html/adv_of_dis-1.png" width="672" /></p>
-<pre><code>## [1] 9.833338</code></pre>
-<p><span class="math display">\[
-\begin{aligned}
-\sum_{k=1}^n k^2 &amp; = \frac{n(n + 1)(2n + 1)}{6}\\
-\sum_{k=1}^n k^4 &amp; = \frac{n(n+1)(2n+1)(3n^2+3n-1)}{30} \\
-\\
 F_D(k) &amp;= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
-E[D] &amp; = \sum 1 - F_D(k) \\
-&amp; = \sum \left(1 - \left(\frac{k}{n}\right)^2\right)^2 \\
-&amp; = \sum \left[1 - 2\left(\frac{k^2}{n^2}\right) + \frac{k^4}{n^4}\right] \\
-&amp; = \sum 1 - \frac{2}{n^2}\sum k^2 + \frac{1}{n^4} \sum k^4 \\
-&amp; = \frac{n(n+1)}{2} - \frac{2}{n^2}\left[\frac{n(n + 1)(2n + 1)}{6}\right] + \frac{1}{n^4}\left[\frac{n(n+1)(2n+1)(3n^2+3n-1)}{30}\right] \\
-&amp; = \frac{n(n+1)}{2} - \frac{2(n+1)}{3} + \frac{(n+1)}{5} \\
-&amp; = \frac{n + 1}{2} \cdot [(n - \frac{2(2n^2 + n)}{6n^2} + \dots] \\
-&amp; = \frac{n + 1}{2} \cdot [(n - \frac{2}{3} - \frac{1}{3n} + \dots] \\
 \end{aligned}
 \]</span></p>
+<p>And then we can build a table, which matches our intuition from before – that
+disadvantage-of-advantage has a hard time reaching the extremes.</p>
+<pre><code>## # A tibble: 20 x 4
+##        k beats_straight beats_dis_of_adv approach  
+##    &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt;     
+##  1     1          1              1       dis-of-adv
+##  2     2          0.95           0.995   dis-of-adv
+##  3     3          0.9            0.980   dis-of-adv
+##  4     4          0.85           0.956   dis-of-adv
+##  5     5          0.8            0.922   dis-of-adv
+##  6     6          0.75           0.879   dis-of-adv
+##  7     7          0.7            0.828   dis-of-adv
+##  8     8          0.65           0.770   dis-of-adv
+##  9     9          0.6            0.706   dis-of-adv
+## 10    10          0.55           0.636   dis-of-adv
+## 11    11          0.5            0.562   dis-of-adv
+## 12    12          0.450          0.487   dis-of-adv
+## 13    13          0.4            0.410   dis-of-adv
+## 14    14          0.35           0.334   straight  
+## 15    15          0.3            0.260   straight  
+## 16    16          0.25           0.191   straight  
+## 17    17          0.200          0.130   straight  
+## 18    18          0.15           0.0770  straight  
+## 19    19          0.100          0.0361  straight  
+## 20    20          0.05           0.00951 straight</code></pre>
+</div>
 </div>

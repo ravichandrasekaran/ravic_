@@ -29,9 +29,17 @@ From the Riddler, an extension to [Dungeons & Dragons](https://fivethirtyeight.c
 > Extra Credit: Instead of maximizing your expected roll, suppose you need to roll N or better with your 20-sided die. For each value of N, is it better to use advantage of disadvantage, disadvantage of advantage or rolling a single die?
 
 
-## Analytic approach
+## Answers
+1.  Disadvantage-of-advantage gives the highest expected outcome: **11.17** vs. 
+    10.5 for a straight roll, and 9.83 for advantage-of-disadvantage.
+2.  If you need to roll N or better, you will want to use disadvantage-of-advantage
+    for $1 \le N \le 13$, then resort to a straight roll for $14 \le N \le 20$.
 
-**Lots of order statistics. Order statistics on top of other order statistics.**
+## Analytic approach
+Lots of order statistics. Order statistics on top of other order statistics.
+
+### Formulation
+
 
 Let's start with disadvantage of advantage. 
 
@@ -76,24 +84,22 @@ dis_of_adv_beats <- function(N, faces) {
 df <- tibble(k = seq_len(20)) %>%
   mutate(prob = pmf_dis_of_adv(k, faces),
          beats = dis_of_adv_beats(k, faces))
-exp_dis_of_adv <- sum(seq_len(faces) * pmf_dis_of_adv(seq_len(faces), faces))
+exp_adv_dis_fn <- function(faces) {
+  sum(1:faces * pmf_dis_of_adv(1:faces, faces))
+}
+exp_dis_of_adv <- exp_adv_dis_fn(20)
 ```
 
-Some notes:
+### Results
 
-1. Our expectation for disadvantage-of-advantage $E[D]$ works out to 
-**`r {round(exp_dis_of_adv, 2)}`**. So, we get a little help above a straight
-roll with an expectation of 10.5.  That matches some intutition -- the advantage
-steps insulates us against the worst outcomes.
-2. Looks a lot like $E[D] = E[X] + \frac{2}{3}$. We'll need to come back to that.
-3. We could do the same order statistics for advantage-of-disadvantage. But that's
-a drag. Instead, we'll just realize that it's the same probability mass function,
-just flipped over the line at $x = 10.5$.
-As [Missy Elliott would advise](https://genius.com/1227305), we need to put our
-thing down, flip it and reverse it.
-4. We can plot the probability mass function, too. It's pretty hard to get either 
-extreme -- the disadvantage step makes it hard to get 20, and the advantage 
-makes it hard to get a 1. 
+Our expectation for disadvantage-of-advantage $E[D]$ works out to 
+**`r {round(exp_dis_of_adv, 2)}`**. So, we get a little help above a 
+straight roll with an expectation of 10.5.  That matches some intutition 
+-- the advantage steps insulates us against the worst outcomes.  
+
+We can plot the probability mass function, too. It's pretty hard to get 
+either extreme -- the disadvantage step makes it hard to get 20, and the 
+advantage makes it hard to get a 1. 
 
 ```{r plot_dis_of_adv, echo = FALSE}
 df %>% 
@@ -109,164 +115,74 @@ df %>%
   coord_cartesian(xlim=c(1, 20), ylim=c(0, .08)) +
   geom_hline(yintercept = .05, lty = 2, col="grey60") +
   theme(panel.grid= element_blank())
-  # geom_point(y = .05, col = "lightblue", alpha=.4) +
-  # geom_segment(aes(xend=k, y=0, yend=.05), col="lightblue", alpha=.4) +
-  # geom_vline(xintercept = exp_dis_of_adv, lty=2, col="grey60") +
-  # annotate("text", x = exp_dis_of_adv + .2, y = .085, 
-  #          label=glue("Expected value:\n {round(exp_dis_of_adv, 2)}"),
-  #          size=3, hjust=0, col="grey60") +
-
-
-  
-# df %>% 
-#   ggplot(aes(k, beats)) +
-#   geom_point(color="orange") +
-#   theme_light() +
-#   scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
-#   labs(x = "", y = "", title = "Probability of N or better")
 ```
 
 
-We can get a bit closer to a closed-form solution for the expectation, using
-[Faulhaber's formula](https://en.wikipedia.org/wiki/Faulhaber%27s_formula)
+### What about advantage-of-disadvantage?
 
-$$ 
+We could do the same order statistics for advantage-of-disadvantage. But 
+that would be a drag. Instead, we'll just realize that it's the same 
+probability mass function, just flipped over the line at $x = 10.5$. As 
+[Missy Elliott would advise](https://genius.com/1227305), we need to "put 
+our thing down, flip it and reverse it."  
+
+Our expectation for advantage-of-disadvantage works out to $E[A^{\prime}] = \textbf{9.83}$.
+And because the the advantage-of-disadvantage is consistently worse than a 
+straight roll, we won't even bother considering it for the rest.
+
+### What happens with more faces?
+
+Looks a lot like $E[D] = E[X] + \frac{2}{3}$. That can't be a coincidence. 
+
+We can leverage a second expression for expectation of a discrete distribution, 
+and [Faulhaber's Formula](https://mathworld.wolfram.com/PowerSum.html) to get
+an expression for $E[D]$. Let $m$ be the number of faces on the die, then:
+
+$$
 \begin{aligned}
-E[D] & = \sum_k k \cdot p_D(k) \\
-& = \sum_k [1 - F_D(k)] \\
+E[D] & = \sum k \cdot p_D(k) \\
+& = \sum_{k=0}^m [1 - F_D(k)] \\
+& = \sum_{k=0}^m \left[1 - \frac{k^2}{m^2}\right]^2 \\
 \\
-& = \sum_k \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
-& = \sum_k \left[1 - 2\left(\frac{k^2}{20^2}\right) + \frac{k^4}{20^4}\right] \\
-& = \sum_k 1 - \frac{2}{20^2}\sum_k k^2 + \frac{1}{20^4}\sum_k k^4 \\
+\sum k^2 & = \frac{1}{3}m^3 + \frac{1}{2}m^2 + \frac{1}{6}m \\
+\sum k^4 & = \frac{1}{5}m^5 + \frac{1}{2}m^4 + \frac{1}{3}m^3 - \frac{1}{30}m \\
 \\
-\sum_{k=1}^n k^2 & = \frac{n(n + 1)(2n + 1)}{6}\\
-\sum_{k=1}^n k^4 & = \frac{n(n+1)(2n+1)(3n^2+3n-1)}{30} \\
-
+E[D] & = \frac{8}{15}m + \frac{1}{2} - \frac{1}{30n^3} \\
+& \approx \frac{8}{15}m + \frac{1}{2}
 \end{aligned}
 $$
+
+So, with more faces, we have a linear expression for disadvantage-of-advantage,
+and for a straight role. With each additional face, the edge that we get from 
+using disadvantage-of-advantage grows linearly.
+
+
+
+
 
 ---
 
 ### Extra credit
 
+We already have most of the pieces in place for the extra credit. We can think
+of the probability of getting $N$ or better as:
+$$
+\begin{aligned}
+P(\text{outcome} \ge N) & = 1 - F(N - 1) \\
+\\
+F_X(k) & = \frac{k}{20} \\
+F_D(k) &= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
+\end{aligned}
+$$
+
+And then we can build a table, which matches our intuition from before -- that
+disadvantage-of-advantage has a hard time reaching the extremes.
 ```{r extra_credit, echo = FALSE}
 sdf <- tibble(k = seq_len(20)) %>%
   mutate(beats_straight = 1 - (k-1) / 20,
-         beats_dis_of_adv = dis_of_adv_beats(k, faces)) 
+         beats_dis_of_adv = dis_of_adv_beats(k, faces)) %>%
+  mutate(approach = ifelse(beats_dis_of_adv >= beats_straight, "dis-of-adv", "straight"))
 sdf
 
 ```
-
-## Simulation
-
-```{r simulation}
-df <- tibble(roll = sample.int(n=20, size=10000, replace=TRUE)) %>%
-  mutate(trial = floor((row_number() - 1)/ 4 + 1)) %>%
-  mutate(pair = floor((row_number() - 1) / 2 + 1))
-
-disadvantage_of_advantage <- df %>%
-  group_by(trial, pair) %>%
-  summarise(winner = max(roll)) %>%
-  group_by(trial) %>%
-  summarise(winner = min(winner)) 
-
-adv_of_dis <- df %>%
-  group_by(trial, pair) %>%
-  summarise(winner = min(roll)) %>%
-  group_by(trial) %>%
-  summarise(winner = max(winner)) 
-
-disadvantage_of_advantage %>%
-  ggplot(aes(x = winner)) +
-  geom_bar()
-
-adv_of_dis %>%
-  ggplot(aes(x = winner)) +
-  geom_bar()
-
-adv_of_dis %>%
-  summarise(winner = mean(winner))
-
-disadvantage_of_advantage %>%
-  summarise(winner = mean(winner))
-
-```
-
-Now for advantage of disadvantage:
-
----
-
-
-$$
-\begin{aligned}
-p_X(k) & = \frac{1}{20} \\
-F_X(k) & = \frac{k}{20} \\
-\\
-D^{\prime} & = \min(X_1, X_2) = X_{min} \\
-1 - F_D^{\prime}(k) &= \left[1 - F_X(k)\right]^2 \\
-F_D^{\prime}(k) & = 1 - \left(1 - \frac{k}{20}\right)^2 \\
-\\
-A^{\prime} & = \min(D_1, D_2) = A_{max} \\
-F_{A^{\prime}}(k) &= \left[F_{D^{\prime}}(k)\right]^2 \\
-F_{A^{\prime}}(k) &=  \left[1 - \left(1 - \frac{k}{20}\right)^2\right]^2 \\
-\end{aligned}
-$$
-
-
-And, again, we're close to the interesting stuff
-
-$$
-\begin{aligned}
-p_{A^{\prime}}(k) & = F_{A^{\prime}}(k) - F_{A^{\prime}}(k-1) \\
-P(k \ge N) & = 1 - F_{A^{\prime}}(N - 1) \\
-\end{aligned}
-$$
-
-```{r adv_of_dis, echo=FALSE}
-F_adv_of_dis <- function(k) {
-  (1 - (1 - (k / 20))^2) ^2
-}
-pmf_adv_of_dis <- function(k) {
-  F_adv_of_dis(k) - F_adv_of_dis(k-1) 
-}
-adv_of_dis_beats <- function(N) {
-  1 - F_adv_of_dis(N - 1)
-}
-exp_adv_of_dis <- sum(seq_len(20) * pmf_adv_of_dis(seq_len(20)))
-qdf <- tibble(k = seq_len(20)) %>%
-  mutate(prob = pmf_adv_of_dis(k),
-         beats = adv_of_dis_beats(k))
-qdf %>% 
-  ggplot(aes(k, prob)) +
-  geom_point(color="orange") +
-  theme_light() +
-  scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
-  labs(x = "", y = "", title = "Probability of k") +
-  geom_vline(xintercept = exp_adv_of_dis) 
-exp_adv_of_dis
-# |
-# qdf %>% 
-#  ggplot(aes(k, beats)) +
-#  geom_point(color="orange") +
-#  theme_light() +
-#  scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
-#  labs(x = "", y = "", title = "Probability of N or better")
-```
-
-$$
-\begin{aligned}
-\sum_{k=1}^n k^2 & = \frac{n(n + 1)(2n + 1)}{6}\\
-\sum_{k=1}^n k^4 & = \frac{n(n+1)(2n+1)(3n^2+3n-1)}{30} \\
-\\
-F_D(k) &= 1 - \left[1 - \left(\frac{k}{20}\right)^2\right]^2 \\
-E[D] & = \sum 1 - F_D(k) \\
-& = \sum \left(1 - \left(\frac{k}{n}\right)^2\right)^2 \\
-& = \sum \left[1 - 2\left(\frac{k^2}{n^2}\right) + \frac{k^4}{n^4}\right] \\
-& = \sum 1 - \frac{2}{n^2}\sum k^2 + \frac{1}{n^4} \sum k^4 \\
-& = \frac{n(n+1)}{2} - \frac{2}{n^2}\left[\frac{n(n + 1)(2n + 1)}{6}\right] + \frac{1}{n^4}\left[\frac{n(n+1)(2n+1)(3n^2+3n-1)}{30}\right] \\
-& = \frac{n(n+1)}{2} - \frac{2(n+1)}{3} + \frac{(n+1)}{5} \\
-& = \frac{n + 1}{2} \cdot [(n - \frac{2(2n^2 + n)}{6n^2} + \dots] \\
-& = \frac{n + 1}{2} \cdot [(n - \frac{2}{3} - \frac{1}{3n} + \dots] \\
-\end{aligned}
-$$
 
