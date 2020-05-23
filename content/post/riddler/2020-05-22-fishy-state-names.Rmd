@@ -1,0 +1,92 @@
+---
+title: Fishy state names
+author: ravic
+date: '2020-05-22'
+slug: fishy-state-names
+categories: []
+tags:
+  - riddler
+---
+
+From Riddler, a fishy puzzle about state names.
+
+<!--more-->
+
+```{r load_packages, include=FALSE}
+library("tidyverse")
+library("glue")
+```
+```{r setup_python_venv, include=FALSE}
+library("here")
+library("reticulate")
+use_virtualenv(here("public", "venv"))
+```
+```{r import_lists, include=FALSE}
+library("here")
+words <- readr::read_csv(here(
+  "public", "data", "riddler", 
+  "2020-05-22-fishy-state-names_files", "word.list.txt"),
+  col_names="word")
+```
+
+```{python calcs}
+import pandas as pd
+import numpy as np
+import string
+
+def vectorize_docs(docs):
+    """Compose a vector of letter presence for a given doc."""
+
+    doc_array = np.array(
+        [
+            [int(letter in doc) for letter in string.ascii_lowercase] 
+            for doc in list(docs)
+        ], dtype=bool)
+    return pd.DataFrame(
+        data=doc_array, 
+        index=list(docs), 
+        columns=list(string.ascii_lowercase)
+    )
+    
+def identify_mackerels(states, words):
+    """Identify words whose letters are not in the state name, but which have
+    letters in other states."""
+    
+    state_pdf = vectorize_docs(states)
+    word_pdf = vectorize_docs(words)
+    composable = word_pdf.dot(state_pdf.T)
+    return composable
+
+```
+
+```{r leverage_python}
+pdf <- py$identify_mackerels(tolower(state.name), as.vector(words$word))
+mackerels <- pdf %>%
+  mutate(num_states = rowSums(.)) %>%
+  filter(num_states == 49) %>%
+  select(everything(), -num_states) %>%
+  rownames_to_column(var = "keyword") %>%
+  gather(key = "state", value = "composable", -keyword) %>%
+  filter(!composable)
+```
+
+```{r state_summary}
+mackerels %>%
+  count(state, sort = TRUE) 
+```
+
+```{r longest_mackerel}
+mackerels %>%
+  mutate(str_len = str_length(keyword)) %>%
+  arrange(desc(str_len)) %>% 
+  head(10)
+
+mackerels %>%
+  mutate(str_len = str_length(keyword)) %>%
+  group_by(state) %>%
+  arrange(desc(str_len)) %>%
+  slice(1) %>%
+  arrange(desc(str_len))
+
+```
+

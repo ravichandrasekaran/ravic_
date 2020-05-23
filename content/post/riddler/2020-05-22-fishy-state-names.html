@@ -1,0 +1,119 @@
+---
+title: Fishy state names
+author: ravic
+date: '2020-05-22'
+slug: fishy-state-names
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From Riddler, a fishy puzzle about state names.</p>
+<!--more-->
+<pre class="python"><code>import pandas as pd
+import numpy as np
+import string
+
+def vectorize_docs(docs):
+    &quot;&quot;&quot;Compose a vector of letter presence for a given doc.&quot;&quot;&quot;
+
+    doc_array = np.array(
+        [
+            [int(letter in doc) for letter in string.ascii_lowercase] 
+            for doc in list(docs)
+        ], dtype=bool)
+    return pd.DataFrame(
+        data=doc_array, 
+        index=list(docs), 
+        columns=list(string.ascii_lowercase)
+    )
+    
+def identify_mackerels(states, words):
+    &quot;&quot;&quot;Identify words whose letters are not in the state name, but which have
+    letters in other states.&quot;&quot;&quot;
+    
+    state_pdf = vectorize_docs(states)
+    word_pdf = vectorize_docs(words)
+    composable = word_pdf.dot(state_pdf.T)
+    return composable</code></pre>
+<pre class="r"><code>pdf &lt;- py$identify_mackerels(tolower(state.name), as.vector(words$word))
+mackerels &lt;- pdf %&gt;%
+  mutate(num_states = rowSums(.)) %&gt;%
+  filter(num_states == 49) %&gt;%
+  select(everything(), -num_states) %&gt;%
+  rownames_to_column(var = &quot;keyword&quot;) %&gt;%
+  gather(key = &quot;state&quot;, value = &quot;composable&quot;, -keyword) %&gt;%
+  filter(!composable)</code></pre>
+<pre class="r"><code>mackerels %&gt;%
+  count(state, sort = TRUE) </code></pre>
+<pre><code>##           state     n
+## 1          ohio 11342
+## 2       alabama  8274
+## 3          utah  6619
+## 4   mississippi  4863
+## 5        hawaii  1763
+## 6      kentucky  1580
+## 7       wyoming  1364
+## 8     tennessee  1339
+## 9        alaska  1261
+## 10       nevada  1229
+## 11       kansas   884
+## 12       oregon   682
+## 13      montana   648
+## 14        texas   639
+## 15      indiana   482
+## 16     colorado   481
+## 17     delaware   399
+## 18     oklahoma   369
+## 19   new jersey   337
+## 20         iowa   201
+## 21     virginia   107
+## 22     new york   105
+## 23     illinois    79
+## 24     missouri    73
+## 25     maryland    67
+## 26    wisconsin    60
+## 27 north dakota    54
+## 28   new mexico    30
+## 29      vermont    27
+## 30        maine    14
+## 31  connecticut     9
+## 32     michigan     4</code></pre>
+<pre class="r"><code>mackerels %&gt;%
+  mutate(str_len = str_length(keyword)) %&gt;%
+  arrange(desc(str_len)) %&gt;% 
+  head(10)</code></pre>
+<pre><code>##                    keyword       state composable str_len
+## 1  counterproductivenesses     alabama      FALSE      23
+## 2  hydrochlorofluorocarbon mississippi      FALSE      23
+## 3    counterproductiveness     alabama      FALSE      21
+## 4    unconscientiousnesses     alabama      FALSE      21
+## 5     counterconditionings     alabama      FALSE      20
+## 6     deoxycorticosterones     alabama      FALSE      20
+## 7     hyperconsciousnesses     alabama      FALSE      20
+## 8     hypersensitivenesses     alabama      FALSE      20
+## 9     interconnectednesses     alabama      FALSE      20
+## 10    nondestructivenesses     alabama      FALSE      20</code></pre>
+<pre class="r"><code>mackerels %&gt;%
+  mutate(str_len = str_length(keyword)) %&gt;%
+  group_by(state) %&gt;%
+  arrange(desc(str_len)) %&gt;%
+  slice(1) %&gt;%
+  arrange(desc(str_len))</code></pre>
+<pre><code>## # A tibble: 32 x 4
+## # Groups:   state [32]
+##    keyword                 state       composable str_len
+##    &lt;chr&gt;                   &lt;chr&gt;       &lt;lgl&gt;        &lt;int&gt;
+##  1 counterproductivenesses alabama     FALSE           23
+##  2 hydrochlorofluorocarbon mississippi FALSE           23
+##  3 overscrupulousnesses    hawaii      FALSE           20
+##  4 microelectrophoretic    kansas      FALSE           20
+##  5 transcendentalnesses    ohio        FALSE           20
+##  6 expressionlessnesses    utah        FALSE           20
+##  7 psychophysiologists     nevada      FALSE           19
+##  8 intersubjectivities     oklahoma    FALSE           19
+##  9 spectrophotometers      indiana     FALSE           18
+## 10 biobibliographical      tennessee   FALSE           18
+## # … with 22 more rows</code></pre>
