@@ -12,6 +12,23 @@ From Riddler, a fishy puzzle about state names.
 
 <!--more-->
 
+### Inspiration
+1.  Paula Scher https://www.printmag.com/featured/paula-scher-maps/
+
+### TODO
+
+1.  Try using Javascript DataTables (https://rstudio.github.io/DT/). Examples
+    [here](https://blogdown-demo.rbind.io/about/)
+2.  Try using plotly for the dynamic state table.
+3.  Can we model the number of potential anti-words? Based on simple letter
+    probabilities? Or some sort of covariance structure?
+4.  Can we use find better words using word frequency? 
+    ([Gutenberg data?](https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists))
+5.  Is mapping this on a physical map a good rendering? Just nouns? Just good 
+    nouns?
+6.  Both Python and R implementations? Code appendix?
+7.  Put Alaska and Hawaii on the map
+
 ```{r load_packages, include=FALSE}
 library("tidyverse")
 library("glue")
@@ -20,6 +37,7 @@ library("glue")
 library("here")
 library("reticulate")
 use_virtualenv(here("public", "venv"))
+py_config()
 ```
 ```{r import_lists, include=FALSE}
 library("here")
@@ -28,36 +46,43 @@ words <- readr::read_csv(here(
   "2020-05-22-fishy-state-names_files", "word.list.txt"),
   col_names="word")
 ```
+```{python q}
+def x_plus_one(x):
+    return x+1
+```
 
 ```{python calcs}
 import pandas as pd
-import numpy as np
+import scipy as sp
+from scipy.sparse import csr_matrix
 import string
 
-def vectorize_docs(docs):
-    """Compose a vector of letter presence for a given doc."""
-
-    doc_array = np.array(
-        [
-            [int(letter in doc) for letter in string.ascii_lowercase] 
-            for doc in list(docs)
-        ], dtype=bool)
-    return pd.DataFrame(
-        data=doc_array, 
-        index=list(docs), 
-        columns=list(string.ascii_lowercase)
-    )
-    
+  
 def identify_mackerels(states, words):
-    """Identify words whose letters are not in the state name, but which have
-    letters in other states."""
-    
-    state_pdf = vectorize_docs(states)
-    word_pdf = vectorize_docs(words)
-    composable = word_pdf.dot(state_pdf.T)
-    return composable
+
+    state_matrix = sp.sparse.csr_matrix([
+        [
+            letter in state 
+            for letter in string.ascii_lowercase
+        ] 
+        for state in states
+    ], dtype=bool)
+    word_matrix = sp.sparse.csr_matrix([
+        [
+            letter in word
+            for letter in string.ascii_lowercase
+        ] 
+        for word in words
+    ], dtype=bool)
+    prod = word_matrix * state_matrix.T
+    pdf = pd.DataFrame(
+      data=prod.A, 
+      index=words, 
+      columns=states)
+    return pdf
 
 ```
+
 
 ```{r leverage_python}
 pdf <- py$identify_mackerels(tolower(state.name), as.vector(words$word))
@@ -70,10 +95,22 @@ mackerels <- pdf %>%
   filter(!composable)
 ```
 
-```{r state_summary}
+```{r plot_state_summary, echo = FALSE}
 mackerels %>%
-  count(state, sort = TRUE) 
+  count(state, sort = TRUE) %>%
+  mutate(state = str_to_title(state)) %>%
+  mutate(state = fct_reorder(state, n)) %>%
+  ggplot(aes(state, n)) +
+  geom_col(fill = "orange") +
+  labs(
+    title = "Number of 'mackerels' by state",
+    subtitle = "Log scale",
+    x = "", y = "") +
+  coord_flip() +
+  scale_y_log10() +
+  theme_light()
 ```
+
 
 ```{r longest_mackerel}
 mackerels %>%
@@ -81,12 +118,78 @@ mackerels %>%
   arrange(desc(str_len)) %>% 
   head(10)
 
-mackerels %>%
+first_mackerel <- mackerels %>%
   mutate(str_len = str_length(keyword)) %>%
   group_by(state) %>%
   arrange(desc(str_len)) %>%
-  slice(1) %>%
+  slice(1) 
+
+first_mackerel %>%
   arrange(desc(str_len))
 
 ```
+
+```{r map_first_mackerel}
+library("maps")
+us_states <- map_data("state")
+
+labeled_centroids <- us_states %>%
+  group_by(region) %>%
+  summarise(
+    long = mean(long),
+    lat = mean(lat)
+  ) %>%
+  inner_join(first_mackerel, by=c("region"="state"))
+
+us_states %>%
+  ggplot(aes(long, lat, group=region)) +
+  geom_polygon(aes(group=group), fill = "white")
+
+us_states %>%
+  ggplot(aes(long, lat, group=region)) +
+  geom_polygon(aes(group=group), fill = "white", color="grey50") +
+  geom_text(data = labeled_centroids, aes(long, lat, label=keyword), size=2) +
+  coord_map(projection = "albers", lat0=39, lat1=45) +
+  # coord_map() +
+  guides(fill=FALSE) +
+  theme_void() 
+
+us_states %>%
+  left_join(mackerels %>% count(state), by=c("region" = "state")) %>%
+  mutate(n = replace(n, is.na(n), 0)) %>%
+  ggplot(aes(long, lat, group=region)) +
+  geom_polygon(aes(group=group, fill=n), color="grey80") +
+  coord_map(projection = "albers", lat0=30, lat1=55) +
+  scale_fill_viridis_c(
+    trans="log1p", 
+    breaks=c(0, 10, 100, 1000, 10000), 
+    name="Mackerels") +
+  theme(legend.position = "right") 
+
+mackerels %>%
+  count(state, sort = TRUE)
+
+# first_mackerel 
+```
+
+```{r better_map_projection, eval=FALSE}
+library(albersusa)
+# https://github.com/hrbrmstr/albersusa
+states_sf <- usa_sf("laea")
+
+ggplot() +
+  geom_sf(data = us_sf, size=0.125) +
+  coord_sf(crs = us_longlat_proj) +
+  theme_void()
+```
+
+
+
+
+
+
+
+
+
+
 
