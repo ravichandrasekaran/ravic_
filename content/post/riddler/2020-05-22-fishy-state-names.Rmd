@@ -12,6 +12,7 @@ From Riddler, a fishy puzzle about state names.
 
 <!--more-->
 
+
 ```{r load_packages, include=FALSE}
 library("tidyverse")
 library("glue")
@@ -180,6 +181,8 @@ mackerel_state_summary %>%
 ---
 
 ## Code
+*Note: Lots of code on this one, available on [Github](https://github.com/ravichandrasekaran/ravic_/blob/master/content/post/riddler/2020-05-22-fishy-state-names.Rmd)*
+
 The approach is very similar to a lot of text analytics. 
 
 * We start by
