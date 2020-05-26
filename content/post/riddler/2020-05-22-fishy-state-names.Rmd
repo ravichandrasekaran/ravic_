@@ -12,12 +12,12 @@ From Riddler, a fishy puzzle about state names.
 
 <!--more-->
 
-```{r load_packages, include=FALSE, cache=TRUE}
+```{r load_packages, include=FALSE}
 library("tidyverse")
 library("glue")
 # https://stackoverflow.com/questions/31935516/installing-r-packages-error-in-readrdsfile-error-reading-from-connection
 ```
-```{r setup_python_venv, include=FALSE, cache=TRUE}
+```{r setup_python_venv, include=FALSE}
 library("here")
 library("reticulate")
 use_virtualenv(here("public", "venv"))
@@ -99,35 +99,6 @@ mackerel_state_summary <- mackerels %>%
 ```
 
 
-```{r no_mackerels, include=FALSE}
-no_mackerels <- mackerel_state_summary %>%
-  filter(n == 0)
-no_mackerels %>%
-  pull(state) %>%
-  as.vector(.)
-
-```
-
-
-```{r plot_state_summary, include=FALSE}
-mackerel_state_summary %>%
-  filter(n > 0) %>%
-  mutate(state = fct_reorder(state, n)) %>%
-  ggplot(aes(state, n)) +
-  geom_col(fill = "orange") +
-  labs(
-    title = "Number of 'mackerels' by state",
-    subtitle = "Mackerel-having states",
-    x = "", y = "Num mackerels") +
-  scale_y_log10() +
-  theme_light() +
-  coord_flip()
-
-  # https://github.com/tidyverse/ggplot2/issues/881  
-  # annotation_logticks(sides="l") 
-```
-
-
 
 
 ## Mapping mackerels
@@ -194,6 +165,16 @@ us_hex %>%
 ```
 
 
+#### Ohio for the win!
+Ohio leads all other states with 11342 "mackerels".
+
+```{r mackerel_state_summary_top, echo=FALSE}
+mackerel_state_summary %>%
+  arrange(desc(n)) %>%
+  select(state, state_abbr, mackerels=n) %>%
+  head(10)
+```
+
 
 
 ---
@@ -218,6 +199,35 @@ calculations a bit.
 ```
 
 ## Less promising viz
+
+```{r no_mackerels, include=FALSE}
+no_mackerels <- mackerel_state_summary %>%
+  filter(n == 0)
+no_mackerels %>%
+  pull(state) %>%
+  as.vector(.)
+
+```
+
+```{r plot_state_summary, include=FALSE}
+mackerel_state_summary %>%
+  filter(n > 0) %>%
+  mutate(state = fct_reorder(state, n)) %>%
+  ggplot(aes(state, n)) +
+  geom_col(fill = "orange") +
+  labs(
+    title = "Number of 'mackerels' by state",
+    subtitle = "Mackerel-having states",
+    x = "", y = "Num mackerels") +
+  scale_y_log10() +
+  theme_light() +
+  coord_flip()
+
+  # https://github.com/tidyverse/ggplot2/issues/881  
+  # annotation_logticks(sides="l") 
+```
+
+
 
 ### Attempt to use `statebins` package
 It worked fine, but the hexbin approach looked better. Might have been able to
