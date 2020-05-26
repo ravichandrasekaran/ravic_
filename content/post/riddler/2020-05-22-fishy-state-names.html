@@ -12,35 +12,54 @@ tags:
 
 <p>From Riddler, a fishy puzzle about state names.</p>
 <!--more-->
-<div id="inspiration" class="section level3">
-<h3>Inspiration</h3>
+<div id="mapping-mackerels" class="section level2">
+<h2>Mapping mackerels</h2>
+<p>Notes:
+Used all of these resources, especially <a href="http://twitter.com/hrbrmstr">Bob
+Rudis</a>’s guide. Invaluable stuff.</p>
 <ol style="list-style-type: decimal">
-<li>Paula Scher <a href="https://www.printmag.com/featured/paula-scher-maps/" class="uri">https://www.printmag.com/featured/paula-scher-maps/</a></li>
+<li><a href="https://rud.is/b/2015/05/14/geojson-hexagonal-statebins-in-r/" class="uri">https://rud.is/b/2015/05/14/geojson-hexagonal-statebins-in-r/</a></li>
+<li><a href="https://geocompr.robinlovelace.net/adv-map.html" class="uri">https://geocompr.robinlovelace.net/adv-map.html</a></li>
+<li><a href="https://www.r-graph-gallery.com/328-hexbin-map-of-the-usa.html" class="uri">https://www.r-graph-gallery.com/328-hexbin-map-of-the-usa.html</a></li>
+<li><a href="https://source.opennews.org/articles/choosing-right-map-projection/" class="uri">https://source.opennews.org/articles/choosing-right-map-projection/</a></li>
 </ol>
+<p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/using_hexbins-1.png" width="672" /></p>
+<hr />
 </div>
-<div id="todo" class="section level3">
-<h3>TODO</h3>
-<ol style="list-style-type: decimal">
-<li>Try using Javascript DataTables (<a href="https://rstudio.github.io/DT/" class="uri">https://rstudio.github.io/DT/</a>). Examples
-<a href="https://blogdown-demo.rbind.io/about/">here</a></li>
-<li>Try using plotly for the dynamic state table.</li>
-<li>Can we model the number of potential anti-words? Based on simple letter
-probabilities? Or some sort of covariance structure?</li>
-<li>Can we use find better words using word frequency?
-(<a href="https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists">Gutenberg data?</a>)</li>
-<li>Is mapping this on a physical map a good rendering? Just nouns? Just good
-nouns?</li>
-<li>Both Python and R implementations? Code appendix?</li>
-<li>Put Alaska and Hawaii on the map</li>
-</ol>
-<pre class="python"><code>import pandas as pd
+<div id="code" class="section level2">
+<h2>Code</h2>
+<p>The approach is very similar to a lot of text analytics.</p>
+<ul>
+<li>We start by
+representing the words and states as vectors, in this case with 26 boolean
+elements to indicate the presence or absence of each letter. (We don’t care
+about number of occurrences.</li>
+<li>Then, we can use a simple matrix multiplication to see if any of the letters
+are shared.</li>
+<li>The choice of a sparse matrix format and using booleans help speed up the
+calculations a bit.</li>
+</ul>
+<pre class="r"><code>import pandas as pd
 import scipy as sp
 from scipy.sparse import csr_matrix
 import string
 
   
-def identify_mackerels(states, words):
-
+def any_shared_letters(states, words):
+    &quot;&quot;&quot;
+    For a list of states and words, find whether the state uses any letter
+    in the word.
+       
+    1.  Construct a matrix from the list of tokens. For each token, construct 
+        a vector of booleans to indicate whether each letter is in the token.
+        Then stitch together these vectors row-wise into a sparse matrix.
+    2.  Multiply the word matrix by the transpose of the state matrix. The
+        result will have a row for each word, and a column for each state.
+        For each cell, we will have an indicator of whether the word shares
+        any letter with the state.
+    
+    &quot;&quot;&quot;
+    
     state_matrix = sp.sparse.csr_matrix([
         [
             letter in state 
@@ -61,30 +80,50 @@ def identify_mackerels(states, words):
       index=words, 
       columns=states)
     return pdf</code></pre>
-<pre class="r"><code>pdf &lt;- py$identify_mackerels(tolower(state.name), as.vector(words$word))
+<pre class="r"><code># Run Python routine via reticulate
+pdf &lt;- py$any_shared_letters(tolower(state.name), as.vector(words$word))
+
 mackerels &lt;- pdf %&gt;%
-  mutate(num_states = rowSums(.)) %&gt;%
+  rownames_to_column(var = &quot;keyword&quot;) %&gt;%
+  mutate(num_states = rowSums(subset(., select=-keyword))) %&gt;%
   filter(num_states == 49) %&gt;%
   select(everything(), -num_states) %&gt;%
-  rownames_to_column(var = &quot;keyword&quot;) %&gt;%
-  gather(key = &quot;state&quot;, value = &quot;composable&quot;, -keyword) %&gt;%
-  filter(!composable)</code></pre>
-<p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/plot_state_summary-1.png" width="672" /></p>
-<pre class="r"><code>mackerels %&gt;%
-  mutate(str_len = str_length(keyword)) %&gt;%
-  arrange(desc(str_len)) %&gt;% 
-  head(10)</code></pre>
-<pre><code>##                    keyword       state composable str_len
-## 1  counterproductivenesses     alabama      FALSE      23
-## 2  hydrochlorofluorocarbon mississippi      FALSE      23
-## 3    counterproductiveness     alabama      FALSE      21
-## 4    unconscientiousnesses     alabama      FALSE      21
-## 5     counterconditionings     alabama      FALSE      20
-## 6     deoxycorticosterones     alabama      FALSE      20
-## 7     hyperconsciousnesses     alabama      FALSE      20
-## 8     hypersensitivenesses     alabama      FALSE      20
-## 9     interconnectednesses     alabama      FALSE      20
-## 10    nondestructivenesses     alabama      FALSE      20</code></pre>
+  gather(key = &quot;state&quot;, value = &quot;any_shared_letters&quot;, -keyword) %&gt;%
+  filter(!any_shared_letters)
+
+states_df &lt;- tibble(state = state.name)
+mackerel_state_summary &lt;- mackerels %&gt;% 
+  mutate(state = str_to_title(state)) %&gt;%
+  count(state, sort = TRUE) %&gt;%
+  right_join(states_df, by=&quot;state&quot;) %&gt;%
+  mutate(n = replace(n, is.na(n), 0)) %&gt;%
+  mutate(state_abbr = state.abb[which(state.name == state)])  </code></pre>
+</div>
+<div id="less-promising-viz" class="section level2">
+<h2>Less promising viz</h2>
+<div id="attempt-to-use-statebins-package" class="section level3">
+<h3>Attempt to use <code>statebins</code> package</h3>
+<p>It worked fine, but the hexbin approach looked better. Might have been able to
+improve it with more effort, tho.</p>
+<pre><code>## Warning: `show_guide` has been deprecated. Please use `show.legend` instead.</code></pre>
+<p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/using_statebins-1.png" width="672" /></p>
+</div>
+<div id="straight-map-using-albers-projection" class="section level3">
+<h3>Straight map using Albers projection</h3>
+<p>Begs the question, “Why use a map at all?”</p>
+<p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/better_map_projection-1.png" width="672" /></p>
+</div>
+<div id="top-mackerel" class="section level3">
+<h3>Top mackerel</h3>
+<p>Notes:</p>
+<ol style="list-style-type: decimal">
+<li>Looking for something like Paula Scher’s
+<a href="https://www.printmag.com/featured/paula-scher-maps/">maps</a></li>
+<li>Can we use find better words using word frequency?
+(<a href="https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists">Gutenberg data?</a>)</li>
+<li>Is mapping this on a physical map a good rendering? Just nouns? Just good
+nouns?</li>
+</ol>
 <pre class="r"><code>first_mackerel &lt;- mackerels %&gt;%
   mutate(str_len = str_length(keyword)) %&gt;%
   group_by(state) %&gt;%
@@ -95,95 +134,19 @@ first_mackerel %&gt;%
   arrange(desc(str_len))</code></pre>
 <pre><code>## # A tibble: 32 x 4
 ## # Groups:   state [32]
-##    keyword                 state       composable str_len
-##    &lt;chr&gt;                   &lt;chr&gt;       &lt;lgl&gt;        &lt;int&gt;
-##  1 counterproductivenesses alabama     FALSE           23
-##  2 hydrochlorofluorocarbon mississippi FALSE           23
-##  3 overscrupulousnesses    hawaii      FALSE           20
-##  4 microelectrophoretic    kansas      FALSE           20
-##  5 transcendentalnesses    ohio        FALSE           20
-##  6 expressionlessnesses    utah        FALSE           20
-##  7 psychophysiologists     nevada      FALSE           19
-##  8 intersubjectivities     oklahoma    FALSE           19
-##  9 spectrophotometers      indiana     FALSE           18
-## 10 biobibliographical      tennessee   FALSE           18
+##    keyword                 state       any_shared_letters str_len
+##    &lt;chr&gt;                   &lt;chr&gt;       &lt;lgl&gt;                &lt;int&gt;
+##  1 counterproductivenesses alabama     FALSE                   23
+##  2 hydrochlorofluorocarbon mississippi FALSE                   23
+##  3 overscrupulousnesses    hawaii      FALSE                   20
+##  4 microelectrophoretic    kansas      FALSE                   20
+##  5 transcendentalnesses    ohio        FALSE                   20
+##  6 expressionlessnesses    utah        FALSE                   20
+##  7 psychophysiologists     nevada      FALSE                   19
+##  8 intersubjectivities     oklahoma    FALSE                   19
+##  9 spectrophotometers      indiana     FALSE                   18
+## 10 biobibliographical      tennessee   FALSE                   18
 ## # … with 22 more rows</code></pre>
-<pre class="r"><code>library(&quot;maps&quot;)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;maps&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:purrr&#39;:
-## 
-##     map</code></pre>
-<pre class="r"><code>us_states &lt;- map_data(&quot;state&quot;)
-
-labeled_centroids &lt;- us_states %&gt;%
-  group_by(region) %&gt;%
-  summarise(
-    long = mean(long),
-    lat = mean(lat)
-  ) %&gt;%
-  inner_join(first_mackerel, by=c(&quot;region&quot;=&quot;state&quot;))
-
-us_states %&gt;%
-  ggplot(aes(long, lat, group=region)) +
-  geom_polygon(aes(group=group), fill = &quot;white&quot;)</code></pre>
 <p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/map_first_mackerel-1.png" width="672" /></p>
-<pre class="r"><code>us_states %&gt;%
-  ggplot(aes(long, lat, group=region)) +
-  geom_polygon(aes(group=group), fill = &quot;white&quot;, color=&quot;grey50&quot;) +
-  geom_text(data = labeled_centroids, aes(long, lat, label=keyword), size=2) +
-  coord_map(projection = &quot;albers&quot;, lat0=39, lat1=45) +
-  # coord_map() +
-  guides(fill=FALSE) +
-  theme_void() </code></pre>
-<p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/map_first_mackerel-2.png" width="672" /></p>
-<pre class="r"><code>us_states %&gt;%
-  left_join(mackerels %&gt;% count(state), by=c(&quot;region&quot; = &quot;state&quot;)) %&gt;%
-  mutate(n = replace(n, is.na(n), 0)) %&gt;%
-  ggplot(aes(long, lat, group=region)) +
-  geom_polygon(aes(group=group, fill=n), color=&quot;grey80&quot;) +
-  coord_map(projection = &quot;albers&quot;, lat0=30, lat1=55) +
-  scale_fill_viridis_c(
-    trans=&quot;log1p&quot;, 
-    breaks=c(0, 10, 100, 1000, 10000), 
-    name=&quot;Mackerels&quot;) +
-  theme(legend.position = &quot;right&quot;) +
-  theme_void()</code></pre>
-<p><img src="/post/riddler/2020-05-22-fishy-state-names_files/figure-html/map_first_mackerel-3.png" width="672" /></p>
-<pre class="r"><code>mackerels %&gt;%
-  count(state, sort = TRUE)</code></pre>
-<pre><code>##           state     n
-## 1          ohio 11342
-## 2       alabama  8274
-## 3          utah  6619
-## 4   mississippi  4863
-## 5        hawaii  1763
-## 6      kentucky  1580
-## 7       wyoming  1364
-## 8     tennessee  1339
-## 9        alaska  1261
-## 10       nevada  1229
-## 11       kansas   884
-## 12       oregon   682
-## 13      montana   648
-## 14        texas   639
-## 15      indiana   482
-## 16     colorado   481
-## 17     delaware   399
-## 18     oklahoma   369
-## 19   new jersey   337
-## 20         iowa   201
-## 21     virginia   107
-## 22     new york   105
-## 23     illinois    79
-## 24     missouri    73
-## 25     maryland    67
-## 26    wisconsin    60
-## 27 north dakota    54
-## 28   new mexico    30
-## 29      vermont    27
-## 30        maine    14
-## 31  connecticut     9
-## 32     michigan     4</code></pre>
-<pre class="r"><code># first_mackerel </code></pre>
+</div>
 </div>

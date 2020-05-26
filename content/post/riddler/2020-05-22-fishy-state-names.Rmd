@@ -12,54 +12,48 @@ From Riddler, a fishy puzzle about state names.
 
 <!--more-->
 
-### Inspiration
-1.  Paula Scher https://www.printmag.com/featured/paula-scher-maps/
-
-### TODO
-
-1.  Try using Javascript DataTables (https://rstudio.github.io/DT/). Examples
-    [here](https://blogdown-demo.rbind.io/about/)
-2.  Try using plotly for the dynamic state table.
-3.  Can we model the number of potential anti-words? Based on simple letter
-    probabilities? Or some sort of covariance structure?
-4.  Can we use find better words using word frequency? 
-    ([Gutenberg data?](https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists))
-5.  Is mapping this on a physical map a good rendering? Just nouns? Just good 
-    nouns?
-6.  Both Python and R implementations? Code appendix?
-7.  Put Alaska and Hawaii on the map
-
-```{r load_packages, include=FALSE}
+```{r load_packages, include=FALSE, cache=TRUE}
 library("tidyverse")
 library("glue")
+# https://stackoverflow.com/questions/31935516/installing-r-packages-error-in-readrdsfile-error-reading-from-connection
 ```
-```{r setup_python_venv, include=FALSE}
+```{r setup_python_venv, include=FALSE, cache=TRUE}
 library("here")
 library("reticulate")
 use_virtualenv(here("public", "venv"))
 py_config()
 ```
-```{r import_lists, include=FALSE}
+```{r import_lists, include=FALSE, cache=TRUE}
 library("here")
 words <- readr::read_csv(here(
   "public", "data", "riddler", 
   "2020-05-22-fishy-state-names_files", "word.list.txt"),
   col_names="word")
 ```
-```{python q}
-def x_plus_one(x):
-    return x+1
-```
 
-```{python calcs}
+
+```{python calcs, include=FALSE}
 import pandas as pd
 import scipy as sp
 from scipy.sparse import csr_matrix
 import string
 
   
-def identify_mackerels(states, words):
-
+def any_shared_letters(states, words):
+    """
+    For a list of states and words, find whether the state uses any letter
+    in the word.
+       
+    1.  Construct a matrix from the list of tokens. For each token, construct 
+        a vector of booleans to indicate whether each letter is in the token.
+        Then stitch together these vectors row-wise into a sparse matrix.
+    2.  Multiply the word matrix by the transpose of the state matrix. The
+        result will have a row for each word, and a column for each state.
+        For each cell, we will have an indicator of whether the word shares
+        any letter with the state.
+    
+    """
+    
     state_matrix = sp.sparse.csr_matrix([
         [
             letter in state 
@@ -83,41 +77,198 @@ def identify_mackerels(states, words):
 
 ```
 
+```{r summarise_mackerels, include=FALSE}
+# Run Python routine via reticulate
+pdf <- py$any_shared_letters(tolower(state.name), as.vector(words$word))
 
-```{r leverage_python}
-pdf <- py$identify_mackerels(tolower(state.name), as.vector(words$word))
 mackerels <- pdf %>%
-  mutate(num_states = rowSums(.)) %>%
+  rownames_to_column(var = "keyword") %>%
+  mutate(num_states = rowSums(subset(., select=-keyword))) %>%
   filter(num_states == 49) %>%
   select(everything(), -num_states) %>%
-  rownames_to_column(var = "keyword") %>%
-  gather(key = "state", value = "composable", -keyword) %>%
-  filter(!composable)
+  gather(key = "state", value = "any_shared_letters", -keyword) %>%
+  filter(!any_shared_letters)
+
+states_df <- tibble(state = state.name)
+mackerel_state_summary <- mackerels %>% 
+  mutate(state = str_to_title(state)) %>%
+  count(state, sort = TRUE) %>%
+  right_join(states_df, by="state") %>%
+  mutate(n = replace(n, is.na(n), 0)) %>%
+  mutate(state_abbr = state.abb[which(state.name == state)])  
 ```
 
-```{r plot_state_summary, echo = FALSE}
-mackerels %>%
-  count(state, sort = TRUE) %>%
-  mutate(state = str_to_title(state)) %>%
+
+```{r no_mackerels, include=FALSE}
+no_mackerels <- mackerel_state_summary %>%
+  filter(n == 0)
+no_mackerels %>%
+  pull(state) %>%
+  as.vector(.)
+
+```
+
+
+```{r plot_state_summary, include=FALSE}
+mackerel_state_summary %>%
+  filter(n > 0) %>%
   mutate(state = fct_reorder(state, n)) %>%
   ggplot(aes(state, n)) +
   geom_col(fill = "orange") +
   labs(
     title = "Number of 'mackerels' by state",
-    subtitle = "Log scale",
-    x = "", y = "") +
-  coord_flip() +
+    subtitle = "Mackerel-having states",
+    x = "", y = "Num mackerels") +
   scale_y_log10() +
-  theme_light()
+  theme_light() +
+  coord_flip()
+
+  # https://github.com/tidyverse/ggplot2/issues/881  
+  # annotation_logticks(sides="l") 
 ```
 
 
-```{r longest_mackerel}
-mackerels %>%
-  mutate(str_len = str_length(keyword)) %>%
-  arrange(desc(str_len)) %>% 
-  head(10)
 
+
+## Mapping mackerels
+
+Notes:
+Used all of these resources, especially [Bob
+Rudis](http://twitter.com/hrbrmstr)'s guide. Invaluable stuff.
+
+1.  https://rud.is/b/2015/05/14/geojson-hexagonal-statebins-in-r/ 
+2.  https://geocompr.robinlovelace.net/adv-map.html
+3.  https://www.r-graph-gallery.com/328-hexbin-map-of-the-usa.html
+4.  https://source.opennews.org/articles/choosing-right-map-projection/
+
+
+```{r loading_hexbins, echo=FALSE, include=FALSE}
+library("rgdal")
+library("rgeos")
+
+us <- readOGR(
+  here("public", "data", "us_states_hexgrid.geojson"), 
+  "us_states_hexgrid") 
+centers <- cbind.data.frame(
+  data.frame(gCentroid(us, byid=TRUE), 
+             id=us@data$iso3166_2)) %>%
+  filter(id != "DC")
+us_hex <- fortify(us, region="iso3166_2") %>%
+  filter(id != "DC")
+# https://geocompr.robinlovelace.net/adv-map.html
+# https://www.r-graph-gallery.com/328-hexbin-map-of-the-usa.html
+# https://rud.is/b/2015/05/14/geojson-hexagonal-statebins-in-r/ 
+# https://source.opennews.org/articles/choosing-right-map-projection/
+
+```
+```{r using_hexbins, echo=FALSE}
+mackerel_us <- us_hex %>%
+  left_join(mackerel_state_summary, by=c("id" = "state_abbr"))
+us_hex %>%
+  ggplot(aes(map_id=id, x=long, y=lat)) +
+  geom_map(map=us_hex, color="black", fill="white") +
+  geom_map(
+    data=mackerel_us, map=us_hex, 
+    aes(fill=n, map_id=id)) +
+  geom_text(
+    data=centers, 
+    aes(label=id, x=x, y=y),
+    color="grey20", size=2) +
+  coord_map() +
+  theme_bw() +
+  theme(
+    panel.border=element_blank(),
+    panel.grid=element_blank(),
+    axis.ticks=element_blank(),
+    axis.text=element_blank()) +
+  labs(
+    x = "", 
+    y = "",
+    fill = "Mackerels",
+    title = "Mackerels by state"
+  ) +
+  scale_fill_viridis_c(
+    trans="log1p", breaks=c(10, 100, 1000, 10000, 100000),
+    alpha = .6)
+
+```
+
+
+
+
+---
+
+## Code
+The approach is very similar to a lot of text analytics. 
+
+* We start by
+representing the words and states as vectors, in this case with 26 boolean 
+elements to indicate the presence or absence of each letter. (We don't care
+about number of occurrences.
+* Then, we can use a simple matrix multiplication to see if any of the letters
+are shared.
+* The choice of a sparse matrix format and using booleans help speed up the 
+calculations a bit.
+
+
+```{r calcs_redux, ref.label="calcs", eval=FALSE}
+```
+
+```{r calcs_redux, ref.label="summarise_mackerels", eval=FALSE}
+```
+
+## Less promising viz
+
+### Attempt to use `statebins` package
+It worked fine, but the hexbin approach looked better. Might have been able to
+improve it with more effort, tho.
+```{r using_statebins, echo=FALSE}
+library(statebins)
+# https://github.com/hrbrmstr/statebins
+# https://cran.r-project.org/web/packages/statebins/statebins.pdf
+statebins::statebins(
+  mackerel_state_summary %>% 
+    mutate(logn = log1p(n)), 
+  state_col="state_abbr",
+  value_col="logn") 
+```
+
+### Straight map using Albers projection
+Begs the question, "Why use a map at all?"
+
+```{r better_map_projection, echo=FALSE}
+library(albersusa)
+# https://github.com/hrbrmstr/albersusa
+# # https://doc.arcgis.com/en/insights/3.3/create/choropleth-maps.htm
+states_sf <- usa_sf("laea") %>%
+  mutate(name = as.character(name))
+states_sf %>%
+  left_join(mackerel_state_summary, by=c("name" = "state")) %>%
+  ggplot() +
+  geom_sf(aes(fill=n), size=0.125) +
+  coord_sf() +
+  theme_void() +
+  scale_fill_viridis_c(
+    trans="log1p", 
+    breaks=c(0, 10, 100, 1000, 10000), 
+    name="Mackerels")
+
+```
+
+
+### Top mackerel
+
+Notes:
+
+1.  Looking for something like Paula Scher's 
+    [maps](https://www.printmag.com/featured/paula-scher-maps/)
+1.  Can we use find better words using word frequency? 
+    ([Gutenberg data?](https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists))
+2.  Is mapping this on a physical map a good rendering? Just nouns? Just good 
+    nouns?
+
+
+```{r longest_mackerel}
 first_mackerel <- mackerels %>%
   mutate(str_len = str_length(keyword)) %>%
   group_by(state) %>%
@@ -126,10 +277,11 @@ first_mackerel <- mackerels %>%
 
 first_mackerel %>%
   arrange(desc(str_len))
-
 ```
 
-```{r map_first_mackerel}
+
+```{r map_first_mackerel, echo=FALSE, message=FALSE, warning=FALSE}
+# Attempt to plot first mackerel on the map. Not very promising.
 library("maps")
 us_states <- map_data("state")
 
@@ -143,16 +295,18 @@ labeled_centroids <- us_states %>%
 
 us_states %>%
   ggplot(aes(long, lat, group=region)) +
-  geom_polygon(aes(group=group), fill = "white")
-
-us_states %>%
-  ggplot(aes(long, lat, group=region)) +
   geom_polygon(aes(group=group), fill = "white", color="grey50") +
   geom_text(data = labeled_centroids, aes(long, lat, label=keyword), size=2) +
   coord_map(projection = "albers", lat0=39, lat1=45) +
-  # coord_map() +
   guides(fill=FALSE) +
   theme_void() 
+```
+
+
+```{r simple_map_mackerels, eval=FALSE, include=FALSE}
+# Simple map (a la Kieran Healy socviz book), but excludes Hawaii, Alaska, etc
+library("maps")
+us_states <- map_data("state")
 
 us_states %>%
   left_join(mackerels %>% count(state), by=c("region" = "state")) %>%
@@ -166,30 +320,4 @@ us_states %>%
     name="Mackerels") +
   theme(legend.position = "right") 
 
-mackerels %>%
-  count(state, sort = TRUE)
-
-# first_mackerel 
 ```
-
-```{r better_map_projection, eval=FALSE}
-library(albersusa)
-# https://github.com/hrbrmstr/albersusa
-states_sf <- usa_sf("laea")
-
-ggplot() +
-  geom_sf(data = us_sf, size=0.125) +
-  coord_sf(crs = us_longlat_proj) +
-  theme_void()
-```
-
-
-
-
-
-
-
-
-
-
-
