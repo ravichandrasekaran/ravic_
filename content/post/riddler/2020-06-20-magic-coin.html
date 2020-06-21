@@ -1,0 +1,90 @@
+---
+title: Magic coin
+author: ravic
+date: '2020-06-20'
+slug: magic-coin
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From the Riddler, the <a href="https://fivethirtyeight.com/features/can-you-flip-the-magic-coin/">growing certainty of magic</a>.</p>
+<!--more-->
+<p>From the Riddler, the <a href="https://fivethirtyeight.com/features/can-you-flip-the-magic-coin/">growing certainty of magic</a>.</p>
+<div id="problem" class="section level2">
+<h2>Problem</h2>
+<blockquote>
+<p>I have a coin with a sun on the front and a moon on the back. I claim that on most days, it’s a fair coin, with a 50 percent chance of landing on either the sun or the moon.<br />
+<br />
+But once a year, on the summer solstice, the coin absorbs the sun’s rays and exhibits a strange power: It always comes up the opposite side as the previous flip.<br />
+<br />
+Of course, you are skeptical of my claim. You figure there’s a 1 percent chance that the coin is magical and a 99 percent chance that it’s just an ordinary fair coin. You then ask me to “prove” the coin is magical by flipping it some number of times.<br />
+<br />
+How many successfully alternating coin flips will it take for you to think there’s a 99 percent chance the coin is magical (or, more likely, that I’ve rigged it in some way so it always alternates)?</p>
+</blockquote>
+</div>
+<div id="bayes-rule-priors-and-posteriors" class="section level2">
+<h2>Bayes Rule, Priors and posteriors</h2>
+<p>We can update our probability of the coin being magic – beginning with our prior
+of only a 1% probability – by leveraging Bayes’ Rule. This gives us an easy
+way to see the probabilities increasing with each flip.</p>
+$$
+<span class="math display">\[\begin{aligned}
+P(M \mid X = n) &amp; = \frac{P(X = n \mid M) \cdot P(M)}{P(X = n)} \\
+\\
+&amp; = \frac{1 \cdot p_0}{1 \cdot p_0 + (\frac{1}{2})^n \cdot (1 - p_0)} \\ 
+
+
+\end{aligned}\]</span>
+<p>$$</p>
+<p><img src="/post/riddler/2020-06-20-magic-coin_files/figure-html/plot-prob-1.png" width="672" /></p>
+</div>
+<div id="odds-bayes-factor" class="section level2">
+<h2>Odds, Bayes factor</h2>
+<p>We can also articulate the relationship using odds. Here, the relationship is
+clearer — <strong>with each successful flip, the odds double</strong> for the coin being
+magic.</p>
+<p>The formulation to update odds incorporating the Bayes Factor is pretty easy
+to re-derive when needed, so here it is.</p>
+<p><span class="math display">\[
+\begin{aligned}
+O(M | X) &amp; = \frac{P(M \mid X)}{P(M^c \mid X)} \\
+&amp; = \frac{P(X \mid M)\cdot P(M)}{P(X \mid M^c) \cdot P(M^c)} \\
+&amp; = \frac{P(X \mid M)}{P(X \mid M^c)} \cdot \frac{P(M)}{P(M^c)} \\
+&amp; = \frac{P(X \mid M)}{P(X \mid M^c)} \cdot O(M) \\
+\end{aligned}
+\]</span>
+The Bayes Factor (<span class="math inline">\(BF\)</span>) captures the ratio of the likelihood of the observations
+given the competing hypothesis – that the coin is magic or not magic. If the
+coin is magic, the observations are guaranteed. But the likelihood of the fair
+coin decreases with each consecutive flip.</p>
+<p><span class="math display">\[
+\begin{aligned}
+BF &amp; = \frac{P(X \mid M)}{P(X \mid M^c)} \\
+o_{t+1} &amp; = BF \cdot o_t \\
+\\
+BF &amp; = \frac{1}{(\frac{1}{2})} = 2 \\
+o_n &amp; = 2^n \cdot o_0
+\end{aligned}
+\]</span></p>
+</div>
+<div id="analytic-solution" class="section level2">
+<h2>Analytic solution</h2>
+<p>And if we choose, we can solve directly for the <span class="math inline">\(n\)</span> value which gives us a
+probability that exceeds our threshold, <span class="math inline">\(p_t = 0.99\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+n \log{2} &amp; \le \log{o_t} - \log{o_0} \\
+n &amp; \ge \log_2{o_t} - \log_2{o_0} \\
+n &amp; \ge \log_2{\left(\frac{.99}{.01}\right)} - \log_2{\left(\frac{.01}{.99}\right)} \\
+n &amp; \ge 13.26 \\
+\end{aligned}
+\]</span>
+Here, we see that the number of consecutive flips needs to be <strong>at least 14</strong>.
+Why does it take us so long to reach that conclusion if the odds are doubling
+with each alternating flip? We’ve chosen a very conservative Muggle prior –
+that it is beyond a shadow of doubt that there is no magic. And we’re demanding
+a similar standard of proof to convince us otherwise.</p>
+</div>

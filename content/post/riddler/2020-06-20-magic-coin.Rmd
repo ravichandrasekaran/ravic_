@@ -1,0 +1,174 @@
+---
+title: Magic coin
+author: ravic
+date: '2020-06-20'
+slug: magic-coin
+categories: []
+tags:
+  - riddler
+---
+
+From the Riddler, the [growing certainty of magic](https://fivethirtyeight.com/features/can-you-flip-the-magic-coin/).
+
+<!--more-->
+
+```{block, include=FALSE, eval=FALSE}
+1.  [Probability and the Law](https://www.jstor.org/stable/2987898)
+2.  [Probability and Legal Proceedings](https://scholarlycommons.law.northwestern.edu/cgi/viewcontent.cgi?article=5359&context=jclc)
+3.  [Table of legal standards](https://books.google.com/books?id=nSa7DwAAQBAJ&pg=PA102&lpg=PA102&dq=likelier+than+not+beyond+a+reasonable+doubt&source=bl&ots=qeD2MT6_dA&sig=ACfU3U0AdxUZeqGY-AJzJ4R4Kbiv8Gt65g&hl=en&sa=X&ved=2ahUKEwiKtt-T0pHqAhVLHTQIHYVGDcUQ6AEwAHoECAcQAQ#v=onepage&q=likelier%20than%20not%20beyond%20a%20reasonable%20doubt&f=false).  Probable cause < preponderance of evidence < beyond a reasonable doubt < beyond a shadow of a doubt
+3.  Unfold over time, a la Ava Duvernay 13th
+5.  https://lawprofessors.typepad.com/evidenceprof/2014/11/best-of-burden-probable-cause-vs-preponderance-of-the-evidence-in-ferguson.html
+6.  http://eprints.lse.ac.uk/61159/1/Picinali_Threshold%20lies%20in%20method.pdf
+7.  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.902.8603&rep=rep1&type=pdf
+8.  https://digitalcommons.law.scu.edu/cgi/viewcontent.cgi?article=1969&context=facpubs
+9.  https://digitalrepository.unm.edu/cgi/viewcontent.cgi?article=1480&context=law_facultyscholarship
+10.  https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading12b.pdf
+11. https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading12b.pdf
+```
+
+
+From the Riddler, the [growing certainty of magic](https://fivethirtyeight.com/features/can-you-flip-the-magic-coin/).
+
+## Problem
+> I have a coin with a sun on the front and a moon on the back. I claim that on most days, it’s a fair coin, with a 50 percent chance of landing on either the sun or the moon.  \
+\
+> But once a year, on the summer solstice, the coin absorbs the sun’s rays and exhibits a strange power: It always comes up the opposite side as the previous flip.  \
+\
+> Of course, you are skeptical of my claim. You figure there’s a 1 percent chance that the coin is magical and a 99 percent chance that it’s just an ordinary fair coin. You then ask me to “prove” the coin is magical by flipping it some number of times.  \
+\
+> How many successfully alternating coin flips will it take for you to think there’s a 99 percent chance the coin is magical (or, more likely, that I’ve rigged it in some way so it always alternates)?  
+
+
+```{r load-packages, include=FALSE}
+library("tidyverse")
+library("scales")
+library("ggrepel")
+```
+
+
+## Bayes Rule, Priors and posteriors
+We can update our probability of the coin being magic -- beginning with our prior
+of only a 1% probability -- by leveraging Bayes' Rule. This gives us an easy
+way to see the probabilities increasing with each flip.
+
+$$ 
+\begin{aligned}
+P(M \mid X = n) & = \frac{P(X = n \mid M) \cdot P(M)}{P(X = n)} \\
+\\
+& = \frac{1 \cdot p_0}{1 \cdot p_0 + (\frac{1}{2})^n \cdot (1 - p_0)} \\ 
+
+
+\end{aligned}
+$$
+```{r update_prob, echo=FALSE}
+library("tidyverse")
+posterior <- function(prior) {
+  total_prob <- prior * 1 + 1/2 * (1 - prior)
+  likelihood <- 1
+  posterior <- likelihood * prior / total_prob
+  return(posterior)
+}
+max_flips <- 20 
+lst <- vector(mode = "list", length = max_flips)
+lst[[1]] <- 1 / 100
+for (i in seq(2, max_flips + 1)) {
+  lst[[i]] <- posterior(lst[[i - 1]])
+}
+df <- tibble(
+  alt_flips = seq(1, max_flips + 1) - 1,
+  prob_magic = lst) %>%
+  unnest(prob_magic)
+```
+```{r plot-prob, echo=FALSE}
+df %>%
+  mutate(over_99 = prob_magic >= .99) %>%
+  ggplot(aes(alt_flips, prob_magic)) + 
+  geom_point(aes(col=over_99), show.legend = FALSE) + 
+  theme_light() + 
+  scale_y_continuous(
+    labels = scales::label_percent(accuracy=1), 
+    expand = c(.01, .01),
+    breaks = seq(0, 1, .2), minor_breaks = NULL
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, max_flips), 
+    minor_breaks = NULL, 
+    expand = c(0, 0)
+  ) +
+  labs(
+    title = "Updated probability of coin being magic with increasing consecutive flips",
+    x = "", y = ""
+  ) +
+  geom_hline(yintercept = 0.99, lty=2, col="darkgrey") +
+  geom_text_repel(
+    aes(label=scales::percent(prob_magic)), 
+    data = subset(df, df$alt_flips == 0), 
+    nudge_x = .5, nudge_y = .05, size=3) + 
+  geom_text_repel(
+    aes(label=scales::percent(prob_magic, accuracy = .1)), 
+    data = df %>% filter(prob_magic > .99) %>% arrange(prob_magic) %>% slice(1), 
+    nudge_x = .5, nudge_y = -.05, size=3) 
+  
+```
+
+## Odds, Bayes factor
+We can also articulate the relationship using odds. Here, the relationship is 
+clearer ---  **with each successful flip, the odds double** for the coin being 
+magic.
+
+The formulation to update odds incorporating the Bayes Factor is pretty easy 
+to re-derive when needed, so here it is.
+
+
+$$
+\begin{aligned}
+O(M | X) & = \frac{P(M \mid X)}{P(M^c \mid X)} \\
+& = \frac{P(X \mid M)\cdot P(M)}{P(X \mid M^c) \cdot P(M^c)} \\
+& = \frac{P(X \mid M)}{P(X \mid M^c)} \cdot \frac{P(M)}{P(M^c)} \\
+& = \frac{P(X \mid M)}{P(X \mid M^c)} \cdot O(M) \\
+\end{aligned}
+$$
+The Bayes Factor ($BF$) captures the ratio of the likelihood of the observations
+given the competing hypothesis -- that the coin is magic or not magic. If the 
+coin is magic, the observations are guaranteed. But the likelihood of the fair 
+coin decreases with each consecutive flip.
+
+$$
+\begin{aligned}
+BF & = \frac{P(X \mid M)}{P(X \mid M^c)} \\
+o_{t+1} & = BF \cdot o_t \\
+\\
+BF & = \frac{1}{(\frac{1}{2})} = 2 \\
+o_n & = 2^n \cdot o_0
+\end{aligned}
+$$
+
+## Analytic solution
+And if we choose, we can solve directly for the $n$ value which gives us a 
+probability that exceeds our threshold, $p_t = 0.99$. 
+
+$$
+\begin{aligned}
+n \log{2} & \le \log{o_t} - \log{o_0} \\
+n & \ge \log_2{o_t} - \log_2{o_0} \\
+n & \ge \log_2{\left(\frac{.99}{.01}\right)} - \log_2{\left(\frac{.01}{.99}\right)} \\
+n & \ge `r round(log(.99/.01, base=2) - log(.01/.99, base=2), 2)` \\
+\end{aligned}
+$$
+Here, we see that the number of consecutive flips needs to be **at least 14**. 
+Why does it take us so long to reach that conclusion if the odds are doubling 
+with each alternating flip? We've chosen a very conservative Muggle prior -- 
+that it is beyond a shadow of doubt that there is no magic. And we're demanding
+a similar standard of proof to convince us otherwise.
+
+
+```{r log-odds, eval=FALSE, include=FALSE}
+df %>%
+  mutate(odds = log(prob_magic / (1 - prob_magic))) %>%
+  ggplot(aes(alt_flips, odds)) + 
+  geom_point() +
+  theme_light() + 
+  labs(title="Log odds of probability of magic coin",
+       y = "Log odds", 
+       x = "Consecutive flips")
+```
