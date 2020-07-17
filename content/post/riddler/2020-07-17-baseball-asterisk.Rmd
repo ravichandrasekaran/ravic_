@@ -1,0 +1,72 @@
+---
+title: Baseball asterisk
+author: ravic
+date: '2020-07-17'
+slug: baseball-asterisk
+categories: []
+tags:
+  - riddler
+---
+
+<!--more-->
+
+```{r}
+batting_avg <- .350
+at_bats_per_game <- 4
+games <- 60
+
+prob_400 <- function(batting_avg, at_bats_per_game, games) {
+  at_bats <- at_bats_per_game * games
+  
+}
+```
+
+Binomial distribution. 
+Normal approximation?
+Simulation or historical analysis - flirting with success?
+David Robinson's Empirical Bayes primer & baseball.
+Graph - more or fewer games with p-values? Maintain same p-value and raise threshold?
+
+
+```{r}
+shortened_400_rarity <- 1 - pbinom(.4 * 60 * 4, size = 60 * 4, prob = .35)
+usual_400_rarity <- 1 - pbinom(.4 * 162 * 4, size = 162 * 4, prob = .35)
+
+c(shortened_400_rarity, usual_400_rarity)
+```
+https://en.wikipedia.org/wiki/List_of_Major_League_Baseball_players_with_a_.400_batting_average_in_a_season
+
+https://en.wikipedia.org/wiki/James%E2%80%93Stein_estimator
+
+
+```{r lahman-stats}
+library("Lahman")
+Batting %>%
+  filter(AB > 100) %>%
+  mutate(batting_avg = H / AB) %>%
+  arrange(desc(batting_avg)) %>%
+  relocate(batting_avg)
+
+Batting %>%
+  left_join(Master %>% select(playerID, nameFirst, nameLast), 
+            by = "playerID") %>%
+  filter(nameLast == "Williams", nameFirst == "Ted") %>%
+  mutate(batting_avg = H / AB) %>%
+  relocate(nameFirst, nameLast, H, AB, batting_avg)
+
+Batting %>%
+  left_join(Master %>% select(playerID, nameFirst, nameLast), 
+            by = "playerID") %>%
+  mutate(batting_avg = round(H / AB, 3),
+         ab_per_game = round(AB / G, 1)) %>%
+  filter(batting_avg >= .400) %>%
+  filter(yearID >= 1876) %>%
+  filter(G >= 60, AB >= 3 * 60) %>%
+  arrange(yearID, desc(batting_avg)) %>%
+  mutate(p_value = round(1 - pbinom(H, AB, prob = .350), 4)) %>%
+  select(nameFirst, nameLast, yearID, 
+         H, AB, G, batting_avg, ab_per_game, p_value) 
+
+```
+
+
