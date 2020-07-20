@@ -4,6 +4,7 @@ author: ravic
 date: '2020-07-17'
 slug: baseball-asterisk
 categories: []
+draft: true
 tags:
   - riddler
 ---
