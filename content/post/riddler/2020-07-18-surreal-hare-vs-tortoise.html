@@ -170,6 +170,8 @@ start_duration &lt;- seconds_to_period(start_time * 60)
 formatted_start &lt;- glue(
   &quot;{start_duration@minute}&quot;, &quot;:&quot;, 
   &quot;{round(second(start_duration), 0)}&quot;)</code></pre>
+<p>So, in the fourth minute, the hare should run for 0.33
+of the minute.</p>
 </div>
 <div id="answer-revisited" class="section level3">
 <h3>Answer revisited</h3>
@@ -205,17 +207,16 @@ plt &lt;- df %&gt;%
 full_stage &lt;- plt + 
   labs(title = &quot;Full race&quot;, 
        y = &quot;&quot;, x = &quot;&quot;) 
-
-late_stage &lt;- plt +
-  labs(title = &quot;Hare vs. tortoise, late stage of race&quot;, 
-       y = &quot;&quot;, x = &quot;&quot;) +
-  coord_cartesian(xlim=c(8000, 12367))
-early_state &lt;- plt +
-  labs(title = &quot;Hare vs. tortoise, early stage of race&quot;, 
-       y = &quot;&quot;, x = &quot;&quot;) +
-  coord_cartesian(xlim=c(1, 200))
 full_stage </code></pre>
 <p><img src="/post/riddler/2020-07-18-surreal-hare-vs-tortoise_files/figure-html/watch-the-race-1.png" width="672" /></p>
-<pre class="r"><code>early_state | late_stage</code></pre>
+<pre class="r"><code>early_state &lt;- plt +
+  labs(title = &quot;Early stage&quot;, 
+       y = &quot;&quot;, x = &quot;&quot;) +
+  coord_cartesian(xlim=c(1, 200))
+late_stage &lt;- plt +
+  labs(title = &quot;Late stage&quot;, 
+       y = &quot;&quot;, x = &quot;&quot;) +
+  coord_cartesian(xlim=c(8000, 12367))
+early_state | late_stage</code></pre>
 <p><img src="/post/riddler/2020-07-18-surreal-hare-vs-tortoise_files/figure-html/watch-the-race-2.png" width="672" /></p>
 </div>

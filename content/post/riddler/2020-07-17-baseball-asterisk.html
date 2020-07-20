@@ -1,0 +1,101 @@
+---
+title: Baseball asterisk
+author: ravic
+date: '2020-07-17'
+slug: baseball-asterisk
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<!--more-->
+<div id="problem" class="section level3">
+<h3>Problem</h3>
+<blockquote>
+<p>From Taylor Firman comes an opportunity to make baseball history:  <br />
+This year, Major League Baseball announced it will play a shortened 60-game
+season, as opposed to the typical 162-game season. Baseball is a sport of
+numbers and statistics, and so Taylor wondered about the impact of the season’s
+length on some famous baseball records.<br />
+<br />
+Some statistics are more achievable than others in a shortened season. Suppose
+your true batting average is .350, meaning you have a 35 percent chance of
+getting a hit with every at-bat. If you have four at-bats per game, what are
+your chances of batting at least .400 over the course of the 60-game season? And
+how does this compare to your chances of batting at least .400 over the course
+of a 162-game season?</p>
+</blockquote>
+</div>
+<div id="answer" class="section level3">
+<h3>Answer</h3>
+<p>We can code up a quick look at the binomial distribution to see how likely we
+would be to get a sample as extreme as the .400 record.</p>
+<pre class="r"><code>seasons &lt;- c(60, 162)
+at_bats_per_game &lt;- 4
+
+df &lt;- tibble(seasons = c(60, 162)) %&gt;%
+  mutate(rarities = 1 - pbinom(.400 * seasons * at_bats_per_game, 
+                               size = seasons * at_bats_per_game, 
+                               prob = .350)) %&gt;%
+  mutate(rarities = formattable::percent(rarities, digits = 1))
+df</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   seasons rarities  
+##     &lt;dbl&gt; &lt;formttbl&gt;
+## 1      60 4.6%      
+## 2     162 0.4%</code></pre>
+<p>Let’s take a look at Ted Williams’s record:</p>
+<pre><code>##    nameFirst nameLast   H  AB batting_avg yearID   G ab_per_game
+## 1        Ted Williams 185 565       0.327   1939 149         3.8
+## 2        Ted Williams 193 561       0.344   1940 144         3.9
+## 3        Ted Williams 185 456       0.406   1941 143         3.2
+## 4        Ted Williams 186 522       0.356   1942 150         3.5
+## 5        Ted Williams 176 514       0.342   1946 150         3.4
+## 6        Ted Williams 181 528       0.343   1947 156         3.4
+## 7        Ted Williams 188 509       0.369   1948 137         3.7
+## 8        Ted Williams 194 566       0.343   1949 155         3.7
+## 9        Ted Williams 106 334       0.317   1950  89         3.8
+## 10       Ted Williams 169 531       0.318   1951 148         3.6
+## 11       Ted Williams   4  10       0.400   1952   6         1.7
+## 12       Ted Williams  37  91       0.407   1953  37         2.5
+## 13       Ted Williams 133 386       0.345   1954 117         3.3
+## 14       Ted Williams 114 320       0.356   1955  98         3.3
+## 15       Ted Williams 138 400       0.345   1956 136         2.9
+## 16       Ted Williams 163 420       0.388   1957 132         3.2
+## 17       Ted Williams 135 411       0.328   1958 129         3.2
+## 18       Ted Williams  69 272       0.254   1959 103         2.6
+## 19       Ted Williams  98 310       0.316   1960 113         2.7</code></pre>
+<p>We can also take a look at those who achieved a .400 batting average in the
+major leagues.</p>
+<pre><code>##       nameFirst  nameLast yearID   H  AB   G batting_avg ab_per_game p_value
+## 1          Ross    Barnes   1876 138 322  66       0.429         4.9  0.0015
+## 2          Fred    Dunlap   1884 185 449 101       0.412         4.4  0.0028
+## 3           Tip   O&#39;Neill   1887 225 517 124       0.435         4.2  0.0000
+## 4          Pete  Browning   1887 220 547 134       0.402         4.1  0.0049
+## 5          Hugh     Duffy   1894 237 539 125       0.440         4.3  0.0000
+## 6          Tuck    Turner   1894 145 347  82       0.418         4.2  0.0037
+## 7           Sam  Thompson   1894 187 451 102       0.415         4.4  0.0019
+## 8            Ed Delahanty   1894 200 494 116       0.405         4.3  0.0049
+## 9         Billy  Hamilton   1894 225 558 132       0.403         4.2  0.0040
+## 10        Jesse   Burkett   1895 225 555 132       0.405         4.2  0.0029
+## 11           Ed Delahanty   1895 194 480 116       0.404         4.1  0.0060
+## 12        Jesse   Burkett   1896 240 586 133       0.410         4.4  0.0012
+## 13       Hughie  Jennings   1896 209 521 130       0.401         4.0  0.0067
+## 14       Willie    Keeler   1897 239 564 129       0.424         4.4  0.0001
+## 15           Ed Delahanty   1899 238 581 146       0.410         4.0  0.0012
+## 16          Nap    Lajoie   1901 232 544 131       0.426         4.2  0.0001
+## 17           Ty      Cobb   1911 248 591 146       0.420         4.0  0.0002
+## 18 Shoeless Joe   Jackson   1911 233 571 147       0.408         3.9  0.0017
+## 19           Ty      Cobb   1912 226 553 140       0.409         4.0  0.0018
+## 20       George    Sisler   1920 257 631 154       0.407         4.1  0.0012
+## 21       George    Sisler   1922 246 586 142       0.420         4.1  0.0002
+## 22           Ty      Cobb   1922 211 526 137       0.401         3.8  0.0065
+## 23       Rogers   Hornsby   1922 250 623 154       0.401         4.0  0.0034
+## 24        Harry  Heilmann   1923 211 524 144       0.403         3.6  0.0054
+## 25       Rogers   Hornsby   1924 227 536 143       0.424         3.7  0.0002
+## 26       Rogers   Hornsby   1925 203 504 138       0.403         3.7  0.0061
+## 27         Bill     Terry   1930 254 633 154       0.401         4.1  0.0032
+## 28          Ted  Williams   1941 185 456 143       0.406         3.2  0.0059</code></pre>
+</div>
