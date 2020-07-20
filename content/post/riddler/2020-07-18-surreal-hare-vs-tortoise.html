@@ -1,0 +1,221 @@
+---
+title: Surreal hare vs. tortoise
+author: ravic
+date: '2020-07-18'
+slug: surreal-hare-vs-tortoise
+categories: []
+tags:
+  - riddler
+---
+
+
+
+<p>From the <a href="https://fivethirtyeight.com/features/can-the-hare-beat-the-tortoise/">Riddler</a> comes a horrible dystopian vision of a quick 10-mi race
+that turns into a nearly never-ending rally of epic proportions.</p>
+<!--more-->
+<p>From the <a href="https://fivethirtyeight.com/features/can-the-hare-beat-the-tortoise/">Riddler</a> comes a horrible dystopian vision of a quick 10-mi race
+that turns into a nearly never-ending rally of epic proportions. Will it ever
+end?</p>
+<div id="problem" class="section level3">
+<h3>Problem</h3>
+<blockquote>
+<p>The tortoise and the hare are about to begin a 10-mile race along a “stretch” of road. The tortoise is driving a car that travels 60 miles per hour, while the hare is driving a car that travels 75 miles per hour. (For the purposes of this problem, assume that both cars accelerate from 0 miles per hour to their cruising speed instantaneously.)<br />
+<br />
+The hare does a quick mental calculation and realizes if it waits until two minutes have passed, they’ll cross the finish line at the exact same moment. And so, when the race begins, the tortoise drives off while the hare patiently waits.<br />
+<br />
+But one minute into the race, after the tortoise has driven 1 mile, something extraordinary happens. The road turns out to be magical and instantaneously stretches by 10 miles! As a result of this stretching, the tortoise is now 2 miles ahead of the hare, who remains at the starting line.<br />
+<br />
+At the end of every subsequent minute, the road stretches by 10 miles. With this in mind, the hare does some more mental math.<br />
+<br />
+How long after the race has begun should the hare wait so that both the tortoise and the hare will cross the finish line at the same exact moment?</p>
+</blockquote>
+</div>
+<div id="answer" class="section level3">
+<h3>Answer</h3>
+<p>The hare should start at the <strong>4:40 mark</strong>, and settle in for a very, very long
+race.</p>
+</div>
+<div id="whats-going-on" class="section level3">
+<h3>What’s going on?</h3>
+<p>Let’s start with the tortoise, and see what’s going on.</p>
+<ol style="list-style-type: decimal">
+<li>In the first minute, the tortoise travels a full mile. At the end of that
+minute, it’s completed 1/10-th of the course.</li>
+<li>Now the course stretches. The tortoise’s progress is conserved – it still
+keeps the 1/10-th she’s already completed. (We’re not going to worry about
+her actual position.)</li>
+<li>In the next minute, it again travels a full mile, which is now 1/20-th of
+the course.</li>
+</ol>
+<p>So at minute <span class="math inline">\(t\)</span>, she will travel 1 mile on a course of length <span class="math inline">\(10t\)</span>, completing
+<span class="math inline">\(1/10t\)</span>-th of the course. We can describe its total progress as a fraction of
+the course <span class="math inline">\(f(t)\)</span> as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+f(t) &amp; = \frac{1}{10} + \frac{1}{20} + \frac{1}{30} + \dots + \frac{1}{10t}, &amp;&amp; t &lt; T_{\max} \\
+&amp; = \frac{1}{10}\sum_{k=1}^{t} \frac{1}{k}
+\end{aligned}
+\]</span></p>
+</div>
+<div id="will-the-tortoise-finish" class="section level3">
+<h3>Will the tortoise finish?</h3>
+<p>When I showed this problem to my son, his first question was whether either
+the tortoise would actually finish. Fair question. We’re looking at a
+<em><a href="https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)#Partial_sums">partial sum of a harmonic series</a></em>. As such, it’s very slowly diverging.
+We should settle in for a very long race – although it will complete.</p>
+<p>We will want to find the time where we’ve completed as much of the course as we
+can without overshooting the end. (Although in this case, we could just look up
+the answer in <a href="https://oeis.org/A004080">OEIS</a> without any work.)</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;formattable&quot;)
+
+# Build the table 
+df &lt;- tibble(min = seq(1, 12500)) %&gt;%
+  mutate(pct_tort_progress = 1/min * 1 / 10) %&gt;%
+  mutate(total_tort_pct_progress = cumsum(pct_tort_progress)) %&gt;%
+  filter(total_tort_pct_progress &lt; 1)
+
+df %&gt;%
+  mutate(across(contains(&quot;pct_&quot;), ~formattable::percent(.x, digits = 4))) %&gt;%
+  arrange(desc(min)) %&gt;%
+  head(5)</code></pre>
+<pre><code>## # A tibble: 5 x 3
+##     min pct_tort_progress total_tort_pct_progress
+##   &lt;int&gt; &lt;formttbl&gt;        &lt;formttbl&gt;             
+## 1 12366 0.0008%           99.9996%               
+## 2 12365 0.0008%           99.9988%               
+## 3 12364 0.0008%           99.9980%               
+## 4 12363 0.0008%           99.9972%               
+## 5 12362 0.0008%           99.9964%</code></pre>
+<p>The partial sum will push over 10 at term 12367. We don’t want to go over, so
+we’ll look at 12366 as the last complete minute for the tortoise.</p>
+</div>
+<div id="wait-the-tortoise-isnt-finished-yet" class="section level3">
+<h3>Wait, the tortoise isn’t finished yet!</h3>
+<p>For the last minute – minute 12367 – we need to directly look at the distance
+left to cover, and the tortoise’s speed.</p>
+<pre class="r"><code>penultimate_pct &lt;- df %&gt;%
+  filter(min == max(min)) %&gt;%
+  pull(total_tort_pct_progress)
+penultimate_minute &lt;- max(df$min)
+last_minute &lt;- penultimate_minute  + 1
+remaining_distance &lt;- (1 - penultimate_pct) * (last_minute * 10)
+tortoise_speed &lt;- 1
+pct_last_minute &lt;- remaining_distance / tortoise_speed
+
+# Summary metrics
+total_minutes &lt;- penultimate_minute + pct_last_minute 
+total_days &lt;- total_minutes / 60 / 24</code></pre>
+<p>So in the last minute, the tortoise will finish part way in, using
+0.47 of the minute. So we end up with an elapsed time
+of 12366.47 minutes (<em>8.59 days!</em>) for
+the tortoise.</p>
+</div>
+<div id="the-hare" class="section level3">
+<h3>The hare</h3>
+<p>We can use the partial sums of the harmonic series for the hare as well. But we
+have to be a little careful on both ends – there’s the fractional minute at the
+end to match the tortoise, and presumably a fractional start at the beginning as
+well. We’ll start at the end of the race and work backwards to find which is the
+<em>first</em> complete minute that the hare will race.</p>
+<p><span class="math display">\[
+\begin{aligned}
+h(t) &amp; = \frac{1.25}{10i} + \frac{1.25}{10(i + 1)} + \dots + \frac{1.25}{10 \cdot 12366} 
+  + \frac{.48 \cdot 1.25}{10 \cdot 12367} \\
+&amp; = \frac{.48 \cdot 1.25}{10 \cdot 12367} + \frac{1.25}{10}\sum_i^{12366} \frac{1}{k}
+\end{aligned}
+\]</span></p>
+<pre class="r"><code>hare_speed &lt;- 1.25
+last_min_hare_pct_progress = pct_last_minute * hare_speed / (last_minute * 10)
+df &lt;- df %&gt;% 
+  mutate(pct_hare_progress = 1/min * hare_speed / 10) %&gt;%
+  arrange(desc(min)) %&gt;%
+  mutate(total_hare_pct_progress = cumsum(pct_hare_progress) + last_min_hare_pct_progress) 
+
+df %&gt;%
+  filter(total_hare_pct_progress &lt; 1) %&gt;%
+  arrange(min) %&gt;%
+  mutate(across(contains(&quot;pct_&quot;), ~formattable::percent(.x, digits = 3))) %&gt;%
+  select(min, contains(&quot;hare_&quot;)) %&gt;%
+  head(5)</code></pre>
+<pre><code>## # A tibble: 5 x 3
+##     min pct_hare_progress total_hare_pct_progress
+##   &lt;int&gt; &lt;formttbl&gt;        &lt;formttbl&gt;             
+## 1     5 2.500%            98.958%                
+## 2     6 2.083%            96.458%                
+## 3     7 1.786%            94.375%                
+## 4     8 1.562%            92.589%                
+## 5     9 1.389%            91.027%</code></pre>
+<p>So, the hare will do the full 5th minute. And in the 4th minute, the hare should
+start not at the beginning of the minute, but at the right time to make that ~1%
+of progress that it needs to finish right with the tortoise.</p>
+<p>Let’s do the maths.</p>
+</div>
+<div id="the-hares-first-minute" class="section level3">
+<h3>The hare’s first minute</h3>
+<pre class="r"><code>library(&quot;glue&quot;)
+library(&quot;lubridate&quot;)
+
+second_minute_record &lt;- df %&gt;%
+  filter(total_hare_pct_progress &lt; 1) 
+second_minute_pct &lt;- max(second_minute_record$total_hare_pct_progress)
+second_minute &lt;- min(second_minute_record$min)
+first_minute &lt;- second_minute - 1 
+initial_distance &lt;- (1 - second_minute_pct) * (first_minute * 10)
+pct_first_minute &lt;- initial_distance / hare_speed
+
+# Summary metrics
+start_time &lt;- first_minute + (1 - pct_first_minute)
+start_duration &lt;- seconds_to_period(start_time * 60)
+formatted_start &lt;- glue(
+  &quot;{start_duration@minute}&quot;, &quot;:&quot;, 
+  &quot;{round(second(start_duration), 0)}&quot;)</code></pre>
+</div>
+<div id="answer-revisited" class="section level3">
+<h3>Answer revisited</h3>
+<p>So, if we handled all the fractional pieces at the beginning and the end
+correctly, the hare should start at <strong>4.67</strong>, or
+<strong>4:40</strong>.</p>
+<div class="figure">
+<img src="https://rustsports.com/wp-content/uploads/2020/06/20200115DAK0032-A.S.O_DPPI.jpg" alt="" />
+<p class="caption">Dakar rally</p>
+</div>
+<hr />
+</div>
+<div id="visualizing-the-progress-of-the-race" class="section level3">
+<h3>Visualizing the progress of the race</h3>
+<p>This doesn’t seem to be a great way of visualizing the race, but it shows a bit
+of the hare falling behind at the start, and the arduous last stage where it
+closes in on the tortoise.</p>
+<pre class="r"><code>library(&quot;patchwork&quot;)
+
+df &lt;- df %&gt;%
+  arrange(min) %&gt;%
+  mutate(total_total_hare_pct_progress = 
+           cumsum(if_else(min &gt;= 5, pct_hare_progress, 0)) + 
+                    (1 - second_minute_pct))
+plt &lt;- df %&gt;% 
+  select(min, total_tort_pct_progress, total_total_hare_pct_progress) %&gt;%
+  gather(key = &quot;competitor&quot;, value = &quot;pct_progress&quot;, -min) %&gt;%
+  ggplot(aes(min, pct_progress, color = competitor)) +
+  geom_line(alpha = .9, show.legend = FALSE) +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent_format()) 
+
+full_stage &lt;- plt + 
+  labs(title = &quot;Full race&quot;, 
+       y = &quot;&quot;, x = &quot;&quot;) 
+
+late_stage &lt;- plt +
+  labs(title = &quot;Hare vs. tortoise, late stage of race&quot;, 
+       y = &quot;&quot;, x = &quot;&quot;) +
+  coord_cartesian(xlim=c(8000, 12367))
+early_state &lt;- plt +
+  labs(title = &quot;Hare vs. tortoise, early stage of race&quot;, 
+       y = &quot;&quot;, x = &quot;&quot;) +
+  coord_cartesian(xlim=c(1, 200))
+full_stage </code></pre>
+<p><img src="/post/riddler/2020-07-18-surreal-hare-vs-tortoise_files/figure-html/watch-the-race-1.png" width="672" /></p>
+<pre class="r"><code>early_state | late_stage</code></pre>
+<p><img src="/post/riddler/2020-07-18-surreal-hare-vs-tortoise_files/figure-html/watch-the-race-2.png" width="672" /></p>
+</div>
