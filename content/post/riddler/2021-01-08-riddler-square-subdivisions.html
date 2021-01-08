@@ -1,0 +1,56 @@
+---
+title: 'Riddler: Square subdivisions'
+author: ravic
+date: '2021-01-08'
+slug: riddler-square-subdivisions
+categories: []
+tags:
+  - riddler
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>From the Riddler, a problem on <a href="https://fivethirtyeight.com/features/can-you-cut-the-square-into-more-squares/">square subdivisions</a>.</p>
+<!--more-->
+<div id="problem" class="section level2">
+<h2>Problem</h2>
+<p>From the Riddler, a problem on <a href="https://fivethirtyeight.com/features/can-you-cut-the-square-into-more-squares/">square subdivisions</a>.</p>
+<blockquote>
+<p>From Rob Peacock comes a matter of squaring a multitude of squares:<br />
+<br />
+There are many ways to slice a big square into smaller squares (not necessarily
+of equal size), so that the smaller squares don’t overlap, while still making up
+the entire area of the big square.<br />
+<br />
+For example, you can slice the big square into four smaller squares, each a
+quarter of the area of the big square. Or you could slice it into seven squares,
+if you take one of those four squares and slice it into four yet smaller
+squares.<br />
+<br />
+What whole numbers of squares can you not slice the big square into?</p>
+</blockquote>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<p>One realization is that given a working number of squares, you can always
+replace one of those squares with a set of four smaller squares. Another way to
+articulate this is that for any valid <span class="math inline">\(n\)</span>, <span class="math inline">\(n + 3\)</span> must also be valid.</p>
+<p>The next realization is that you don’t have to cut each square into quadrants,
+but can instead tile the outside with small squares. If we take that approach,
+we can find ourselves with 4, 6, or 8 squares based on our grid sizes:</p>
+<p><img src="/post/riddler/2021-01-08-riddler-square-subdivisions_files/figure-html/grids-1.png" width="672" /></p>
+<p>If we combine those two ideas, we get four starters that we can build sequences
+off of:</p>
+<ul>
+<li>1</li>
+<li>4: <span class="math inline">\(\langle 4, 7, 10, 13, \dots \rangle\)</span></li>
+<li>6: <span class="math inline">\(\langle 6, 9, 12, 15, \dots \rangle\)</span></li>
+<li>8: <span class="math inline">\(\langle 8, 11, 14, 17, \dots \rangle\)</span></li>
+</ul>
+</div>
+<div id="answer" class="section level2">
+<h2>Answer</h2>
+<p>What’s missing? The numbers <strong>2, 3, and 5.</strong> Turns out, there’s no way to get
+to those number of squares.</p>
+</div>
