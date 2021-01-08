@@ -1,0 +1,97 @@
+---
+title: 'Riddler: Square subdivisions'
+author: ravic
+date: '2021-01-08'
+slug: riddler-square-subdivisions
+categories: []
+tags:
+  - riddler
+---
+[1]: https://fivethirtyeight.com/features/can-you-cut-the-square-into-more-squares/
+
+From the Riddler, a problem on [square subdivisions][1].
+
+<!--more-->
+
+```{r load-pacakges, include=FALSE, message=FALSE, warning=FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+
+
+## Problem
+
+From the Riddler, a problem on [square subdivisions][1].
+
+> From Rob Peacock comes a matter of squaring a multitude of squares: \
+\
+There are many ways to slice a big square into smaller squares (not necessarily
+of equal size), so that the smaller squares don’t overlap, while still making up
+the entire area of the big square. \
+\
+For example, you can slice the big square into four smaller squares, each a
+quarter of the area of the big square. Or you could slice it into seven squares,
+if you take one of those four squares and slice it into four yet smaller
+squares. \
+\
+What whole numbers of squares can you not slice the big square into?
+
+
+## Notes
+
+One realization is that given a working number of squares, you can always
+replace one of those squares with a set of four smaller squares. Another way to
+articulate this is that for any valid $n$, $n + 3$ must also be valid.
+
+The next realization is that you don't have to cut each square into quadrants,
+but can instead tile the outside with small squares. If we take that approach,
+we can find ourselves with 4, 6, or 8 squares based on our grid sizes:
+
+```{r grids, include=TRUE, echo=FALSE, message=FALSE, warning=FALSE,fig.height=3}
+library("patchwork")
+
+grid_plot <- function(s) {
+  df <- expand.grid(x = 0:(s-1), y = 0:(s-1)) %>%
+    mutate(width=1, height=1) %>%
+    filter(x == 0 | y == (s-1)) %>%
+    add_row(x = 1 + (s-2)/2, 
+            y=  (s-2)/2, 
+            width=(s-1), 
+            height=(s-1)) %>%
+    mutate(z = as.factor(if_else(x == 0 | y == (s-1), 1, 0))) 
+  # default is compatible with geom_tile()
+  ggplot(df, aes(x, y, width=width, height=height, fill = z)) + 
+    geom_tile(color="black", alpha=.3) + 
+    theme_minimal() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "transparent", color = NA)) +
+    scale_fill_manual(values = c("black", "darkgrey")) +
+    scale_x_continuous(breaks=NULL, minor_breaks = NULL, labels=NULL) +
+    scale_y_continuous(breaks=NULL, minor_breaks = NULL, labels=NULL) +
+    labs(x= NULL,
+         y = NULL) +
+    coord_fixed()
+}
+
+grid_plot(1) | grid_plot(2) | grid_plot(3) | grid_plot(4)
+```
+
+
+If we combine those two ideas, we get four starters that we can build sequences
+off of:
+
+* 1
+* 4: $\langle 4, 7, 10, 13, \dots \rangle$
+* 6: $\langle 6, 9, 12, 15, \dots \rangle$
+* 8: $\langle 8, 11, 14, 17, \dots \rangle$
+
+## Answer
+
+What's missing? The numbers **2, 3, and 5.** Turns out, there's no way to get
+to those number of squares.
+
+
+
+
+
