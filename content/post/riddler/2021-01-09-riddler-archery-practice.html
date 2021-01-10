@@ -1,0 +1,235 @@
+---
+title: 'Riddler: Archery practice'
+author: ravic
+date: '2021-01-09'
+slug: riddler-archery-practice
+categories: []
+tags:
+  - riddler
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>From the Riddler, a puzzle on <a href="https://fivethirtyeight.com/features/can-you-cut-the-square-into-more-squares/">archery practice</a></p>
+<!--more-->
+<p>From the Riddler, a puzzle on <a href="https://fivethirtyeight.com/features/can-you-cut-the-square-into-more-squares/">archery practice</a></p>
+<div id="problem" class="section level2">
+<h2>Problem</h2>
+<blockquote>
+<p>Robin of Foxley has entered the FiveThirtyEight archery tournament. Her aim is
+excellent (relatively speaking), as she is guaranteed to hit the circular
+target, which has no subdivisions — it’s just one big circle. However, her
+arrows are equally likely to hit each location within the target.<br />
+<br />
+Her true love, Marian, has issued a challenge. Robin must fire as many arrows as
+she can, such that each arrow is closer to the center of the target than the
+previous arrow. For example, if Robin fires three arrows, each closer to the
+center than the previous, but the fourth arrow is farther than the third, then
+she is done with the challenge and her score is four.<br />
+<br />
+On average, what score can Robin expect to achieve in this archery challenge?</p>
+</blockquote>
+</div>
+<div id="preview" class="section level2">
+<h2>Preview</h2>
+<p>We’re going to eventually find that our answer to Robin is that she should
+expect to score <strong><span class="math inline">\(e \approx\)</span> 2.71</strong> arrows in her challenge. We’ll cover
+this two ways – first, via a <a href="#simulation">simulation</a>, and then
+<a href="#analysis">analytically</a>.</p>
+</div>
+<div id="simulation" class="section level2">
+<h2>Simulation</h2>
+<p>Here, getting the radius probability right is slightly tricky. We’re using the
+inverse cumulative probability distribution function to get at that, and
+assuming a target radius of 1 for convenience.</p>
+<pre class="r"><code># Simulation
+n_arrows &lt;- 10000
+df &lt;- 
+  tibble(
+    r = 1  * sqrt(runif(n_arrows)),
+    theta = 2 * pi * runif(n_arrows)) </code></pre>
+<p>To assign the grouping, we need to scan the rows, identifying last arrows in a
+trial, and looking for arrows that either fall closer or than the previous ones.
+There might be a “tidy” way of implementing this, but currently requires a full
+scan.</p>
+<pre class="r"><code>group_trials &lt;- function(pdf, method=&quot;basic&quot;) {
+  grouping &lt;- integer(nrow(df))
+  prev_grouping &lt;- 0
+  n &lt;- 0
+  prev_r &lt;- 1
+  
+  for (idx in 1:nrow(df)) {
+    grouping[idx] &lt;- prev_grouping
+    # For the basic method, we test for strictly closer, where for the extra
+    # credit method, we test for whether it falls in a closer ring.
+    if (method == &quot;basic&quot;) {
+      non_decline &lt;- df[idx, &quot;r&quot;] &gt;= prev_r
+    }
+    else {
+      non_decline &lt;- floor(df[idx, &quot;r&quot;] * 10) &gt;= floor(prev_r * 10)
+    }
+    
+    if (n &gt; 0 &amp; non_decline) {
+      n &lt;- 0
+      prev_r &lt;- 1
+      prev_grouping &lt;- prev_grouping + 1
+    } else {
+      n &lt;- n + 1
+      prev_r &lt;- df[idx, &quot;r&quot;]
+    } 
+  }
+  grouping &lt;- as.integer(grouping)
+  return(grouping) 
+}</code></pre>
+<p>Here’s a sample of the grouping results:</p>
+<pre class="r"><code># Assign groups. Chuck out last (incomplete) trial
+df &lt;- df %&gt;%
+  mutate(basic_grouping = group_trials(df)) %&gt;%
+  filter(basic_grouping != max(basic_grouping))
+df %&gt;% 
+  select(r, theta, basic_grouping) %&gt;%
+  head(10)</code></pre>
+<pre><code>## # A tibble: 10 x 3
+##        r theta basic_grouping
+##    &lt;dbl&gt; &lt;dbl&gt;          &lt;int&gt;
+##  1 0.957 4.21               0
+##  2 0.974 4.71               0
+##  3 0.519 1.63               1
+##  4 0.674 0.133              1
+##  5 0.903 5.08               2
+##  6 0.963 4.65               2
+##  7 0.939 4.00               3
+##  8 0.356 4.35               3
+##  9 0.822 5.21               3
+## 10 0.782 3.46               4</code></pre>
+</div>
+<div id="findings" class="section level2">
+<h2>Findings</h2>
+<p>Here is a plot of our simulation results:</p>
+<p><img src="/post/riddler/2021-01-09-riddler-archery-practice_files/figure-html/simulation-results-1.png" width="672" /></p>
+</div>
+<div id="result" class="section level2">
+<h2>Result</h2>
+<p>And so, we get a final mean number of arrows from the simulation of
+<strong>2.71</strong></p>
+<p>The extra credit is only a slight difference in the simulation code, so we can
+grab that too.</p>
+<pre class="r"><code>df &lt;- df %&gt;%
+  mutate(extra_grouping = group_trials(df, method=&quot;extra&quot;)) %&gt;%
+  filter(extra_grouping != max(extra_grouping))
+mean_arrows_extra_credit &lt;- df %&gt;%
+  count(extra_grouping) %&gt;%
+  summarise(mean_n = mean(n), 
+            .groups=&quot;drop&quot;) %&gt;%
+  pull(mean_n)</code></pre>
+<p>The mean number of arrows in that extra credit ring condition is
+<strong>2.54</strong></p>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>Let’s set up some of the simple, conditional, and joint probabilities that we
+are going to need. First, let’s set up some random variables:</p>
+<ul>
+<li><span class="math inline">\(A_i\)</span> as a Bernoulli random variable for the <span class="math inline">\(i\)</span>-th arrow (<span class="math inline">\(i &gt; 0\)</span>), which can
+take on values of <span class="math inline">\(S\)</span> if successful, or <span class="math inline">\(M\)</span> if it misses.</li>
+<li><span class="math inline">\(R_i\)</span> for the radius after the <span class="math inline">\(i\)</span>-th arrow (<span class="math inline">\(i &gt; 0\)</span>) strikes the target. Note
+that <span class="math inline">\(R_0\)</span> is just a constant, <span class="math inline">\(R_0 = R\)</span> that describes the radius of the target.</li>
+<li><span class="math inline">\(X\)</span> for the number of arrows shot, including the final (missing) arrow.</li>
+</ul>
+<p>This allows us to write an equation for the conditional probability of hitting
+the target area given the arrow that struck before, based on the area of that
+inner circle below. Trivially, <span class="math inline">\(P(A_1) = 1\)</span> since <span class="math inline">\(R_0 = R\)</span> – Robin cannot miss
+on the first arrow.</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(A_{i+1} =  S \mid R_i = r_i) &amp; = \frac{\pi r_i^2}{\pi R^2}  \\
+\end{aligned}
+\]</span></p>
+<p>We’ll assume for convenience that the target is a unit circle with radius
+<span class="math inline">\(R = 1\)</span>, to simplify some of the arithmetic.</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(A_{i+1} =  S \mid R_i = r_i) &amp; = r_i^2 \\
+\end{aligned}
+\]</span>
+Now, let’s establish the probability of a given radius <span class="math inline">\(R_{i+1}\)</span> given the arrow
+strike radius before it, <span class="math inline">\(R_{i}\)</span>. The arrow is uniform over the area of the
+remaining target, and the chances are greater for the higher radius values,
+since they have a larger circumference.</p>
+<p><span class="math display">\[ 
+\begin{aligned}
+P(R_{i+1} = r_{i+1} \mid R_i = r_i) &amp; = \frac{2\pi r_{i+1}}{\pi r_i^2} = \frac{2r_{i+1}}{r_i^2} \\
+\end{aligned}
+\]</span></p>
+<p>This is enough to stitch together the joint probabilities and determine the
+probability mass function for <span class="math inline">\(P(X = k)\)</span>. Broadly, for a given <span class="math inline">\(k\)</span>, we will be
+looking for <span class="math inline">\(k-1\)</span> successes and a final <span class="math inline">\(k\)</span>-th failure – where the radii
+from each of the arrow strikes can take on any valid value. We can write that
+up as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+P(X = k) &amp; = \int \dotsi \int \left( \prod_{i=1}^{k-1} 
+  P(A_i = S \mid R_{i-1} = r_{i-1}) \right)
+  \cdot P(A_k = M \mid R_{k-1} = r_{k-1}) \cdot \prod_i^{k-1} 
+  P(R_i = r_i \mid R_{i-1} = r_{i-1}) 
+  \; dr_{k-1} \dots dr_1 \\
+\end{aligned}
+\]</span></p>
+<p>This looks tedious and cumbersome, but the probabilities themselves are very
+simple expressions, and lots of terms cancel out.</p>
+$$
+<span class="math display">\[\begin{aligned}
+P(X = k) = \int \dotsi \int \left( \cancel{\prod_{i=1}^{k-1} r_i^2} \right) \cdot (1 - r_k^2) 
+  \cdot \prod_{i=0}^{k-1} \frac{2r_{i+1}}{\cancel{r_{i}^2}} \;\; 
+  \; dr_{k-1} \dots dr_1 \\
+P(X = k) = 2^{k-1} \int \dots \int  (1 - r_k^2) 
+  \cdot  \prod_{i=0}^{k-1} r_{i+1} \;\; 
+  \; dr_{k-1} \dots dr_1 \\
+  
+\end{aligned}\]</span>
+<p>$$</p>
+<p>Let’s do a couple:</p>
+<p><span class="math display">\[
+\newcommand{\diff}{\mathop{}\!d}
+\begin{aligned}
+P(X = 2) &amp; = 2 \int_0^1  (1 - r_1^2) \cdot r_1 \; dr_1 \\
+&amp; = 2 \int_0^1 (r_1 - r_1^3) \; dr_1 \\
+&amp; = r_1^2 - \frac{1}{2}r_1^4 \;\; \Big|_0^1 \\
+&amp; = 1 - \frac{1}{2} = \frac{1}{2} \\
+\\
+P(X = 3) &amp; = 2^2 \int_0^1 \int_0^{r_1} (1 - r_2^2) r_1 r_2 \; dr_2 \; dr_1 \\
+&amp; = 4 \int_0^1 \int_0^{r_1} (r_1r_2 - r_1r_2^3) \; dr_2 \; dr_1 \\
+&amp; = \int_0^1 \Big[ 2r_1r_2^2 - r_1r_2^4 \,\,\, \Big|_0^{r_1} \Big] \; dr_1 \\
+&amp; = \int_0^1 (2r_1^3 - r_1^5) \; dr_1 \\
+&amp; =  \frac{1}{2} r_1^4 - \frac{1}{6}r_1^6 \,\, \Big|_0^1 \\
+&amp; = \frac{1}{2} - \frac{1}{6} = \frac{1}{3} \\
+\\
+P(X = 4) &amp; = 2 ^3 \int_0^1 \int_0^{r_1} \int_0^{r_2} (1 - r_3^2)
+  r_3 r_2 r_1 \; dr_3 \; dr_2 \; dr_1 \\
+&amp; = 8 \int_0^1 \int_0^{r_1} \int_0^{r_2} (r_1r_2r_3 - r_1r_2r_3^2) \; dr_3 \; \; dr_2 \; dr_1 \\
+&amp; = \frac{1}{6} - \frac{1}{24} \\
+&amp; = \frac{1}{3!} - \frac{1}{4!}
+\end{aligned}
+\]</span></p>
+<p>So far, so good – these probabilities line up with our plot from simulation
+before. And the pattern starts to pop out pretty quickly. Since we’re looking
+for the expectation of the number of arrows, <span class="math inline">\(E[X]\)</span>, we can actually use this to
+help simplify quite a bit:</p>
+<p><span class="math display">\[ 
+\begin{aligned}
+E[X] &amp; = \sum_{k=2}^{\infty} k \cdot P(X= k) \\
+&amp; = \sum_{k=2}^{\infty} k \cdot \left( \frac{1}{(k-1)!}  - \frac{1}{k!}\right) \\
+\end{aligned}
+\]</span>
+If we expand this summation, many of the intermediate terms are reduced, and
+we get a familar sum of fractions of successive factorials with a familiar
+result.</p>
+<p><span class="math display">\[
+\begin{aligned}
+E[X] &amp; = \sum_{k=2}^\infty \frac{1}{k!} \\
+= &amp; 1 + \sum_{k=1}^\infty \frac{1}{k!} \\
+= &amp; 1 + (e - 1) = e \\
+\end{aligned}
+\]</span></p>
+</div>
