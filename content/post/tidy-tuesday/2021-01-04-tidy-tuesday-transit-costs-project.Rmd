@@ -1,0 +1,417 @@
+---
+title: 'Tidy Tuesday: Transit Costs Project'
+author: ravic
+date: '2021-01-04'
+slug: tidy-tuesday-transit-costs-project
+categories: []
+tags:
+  - tidy-tuesday
+---
+
+A #tidytuesday for transit costs.
+
+<!--more-->
+
+A #tidytuesday for transit costs.
+
+```{r set-options, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set( message = FALSE, warning = FALSE )
+options(scipen=999)
+options(digits=4)
+set.seed(722)
+```
+```{r load-packages, include=FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("scales", quietly=TRUE, warn.conflicts = FALSE)
+require("glue", quietly=TRUE, warn.conflicts = FALSE)
+require("patchwork", quietly=TRUE, warn.conflicts = FALSE)
+suppressPackageStartupMessages(library("tidymodels"))
+```
+```{r plot-options, include=FALSE}
+knitr::opts_chunk$set(dev.args=list(bg="transparent"))
+theme_set(theme_light())
+theme_update(panel.background = element_rect(fill = "transparent", colour = NA),
+             plot.background = element_rect(fill = "transparent", colour = NA))
+```
+```{r import-data, include=FALSE}
+base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/"
+file_path <- "2021/2021-01-05/transit_cost.csv"
+  
+df_raw <- 
+  readr::read_csv(
+    paste0(base_url, file_path),
+    col_types = cols(
+      e = col_double(),
+      country = col_character(),
+      city = col_character(),
+      line = col_character(),
+      start_year = col_character(),
+      end_year = col_character(),
+      rr = col_double(),
+      length = col_double(),
+      tunnel_per = col_character(),
+      tunnel = col_double(),
+      stations = col_double(),
+      source1 = col_character(),
+      cost = col_double(),
+      currency = col_character(),
+      year = col_double(),
+      ppp_rate = col_double(),
+      real_cost = col_character(),
+      cost_km_millions = col_double(),
+      source2 = col_character(),
+      reference = col_character()
+    )
+  )
+
+readr::spec(df_raw)
+```
+```{r clean-data, include=FALSE}
+require("httr", quietly=TRUE, warn.conflicts=FALSE)
+require("countrycode", quietly=TRUE, warn.conflicts=FALSE)
+
+df <- df_raw %>%
+  rename(entry = e,
+         tunnel_pct_complete = tunnel_per,
+         country_code = country,
+         currency_code = currency) %>%
+  filter(!is.na(entry)) %>%
+  mutate(tunnel_pct_complete = parse_number(tunnel_pct_complete) / 100,
+         real_cost = na_if(parse_number(real_cost), 0)) %>%
+  mutate(across(ends_with("_year"), ~ suppressWarnings(as.double(str_replace(.x, "\\D", ""))))) %>%
+  mutate(across(ends_with("_year"), ~ if_else(.x < 1900, NA_real_, .x))) %>%
+  mutate(across(starts_with("source"), factor)) %>%
+  mutate(railroad_ind = as.logical(rr)) %>%
+  mutate(tunnel_complete_ind = near(tunnel_pct_complete, 1)) %>%
+  select(-rr, -tunnel_pct_complete)
+```
+
+```{r basic-features, include=FALSE}
+df <- df %>%
+  mutate(country_code = case_when(country_code == "UK" ~ "GB", 
+                                  TRUE ~ country_code)) %>%
+  mutate(country_name = map_chr(country_code, countrycode::countrycode, 
+                                origin="iso2c", dest="country.name")) %>%
+  mutate(country_name = factor(country_name)) %>%
+  mutate(across(c(country_code, currency_code), factor)) 
+
+df <- df %>%
+  mutate(duration = end_year - start_year) 
+
+df <- df %>%
+  mutate(parsed_url = map(reference, parse_url)) %>% 
+  mutate(hostname = map_chr(parsed_url, pluck, "hostname", .default=NA)) %>%
+  select(-parsed_url) 
+
+unfiltered <- df
+
+df <- df %>%
+  filter(tunnel_complete_ind,
+         real_cost > 0,
+         end_year < 2020) %>%
+  mutate(log_real_cost = log1p(real_cost))
+  
+```
+```{r split-data, include=FALSE}
+splitter <- initial_split(df, prop = .8)
+train <- training(splitter)
+test <- testing(splitter)
+```
+```{r skim-data, eval=FALSE, include=FALSE}
+library("skimr")
+skimr::skim(df)
+```
+```{r correlations-pairs, include=FALSE, eval=FALSE}
+library("ggcorrplot")
+df %>% 
+  select(where(is.numeric), -entry, -ends_with("year")) %>%
+  filter(complete.cases(.)) %>%
+  cor(.) %>%
+  ggcorrplot(., hc.order = TRUE, legend.title=bquote(rho)) +
+  theme_light() +
+  labs(title="Correlation plot",
+       y = NULL,
+       x = NULL) +
+  theme(axis.text.x = element_text(angle = 90, hjust=1))
+
+```
+
+```{r view-data, eval=FALSE, include=FALSE}
+df %>%
+  view(title="df")
+```
+
+
+
+Because of China's overwhelming investment in public transit, this dataset tells 
+stories mostly of China. However, we're most interested in the United States 
+story here. We'll caveat at the beginning that this is a pretty small sample,
+of the transit records which are completed and have cost information as shown 
+here (N = `r df %>% nrow()`):
+
+```{r sample-size, echo= FALSE}
+df %>% 
+  mutate(country_name = fct_lump(country_name, n = 10)) %>%
+  group_by(country_name) %>%
+  summarise(n = n(),
+            .groups="drop") %>%
+  mutate(pct = n / sum(n)) %>%
+  arrange(country_name == "Other", desc(n)) 
+  
+```
+
+
+The distribution of the real costs across completed projects is roughly log-
+normal. In judging each country's mean cost, we correspondingly used the
+geometric mean, which shows the United States roughly equal to China and Japan.
+However, the scatter indicates a more variance for the United States and Japan
+with fewer, dispersed observations.
+
+```{r country-plot, echo=FALSE, fig.width=8, fig.height=4}
+real_cost_dist <- df %>%
+  filter(tunnel_complete_ind, 
+         real_cost > 0) %>%
+  ggplot(aes(real_cost)) +
+  geom_histogram(fill = "lightblue", bins=20) +
+  scale_x_log10() +
+  labs(title = "Distribution of real cost, log scale",
+       x = NULL,
+       y = NULL)
+
+country_primed <- df %>%
+  filter(tunnel_complete_ind,
+         real_cost > 0) %>%
+  mutate(country_name = fct_lump(country_name, n=10)) %>%
+  group_by(country_name) %>%  
+  summarise(geom_mean_cost = exp(mean(log(real_cost + 1))),
+            .groups = "drop")
+
+real_cost_scatter <- df %>%
+  filter(tunnel_complete_ind,
+         real_cost > 0) %>%
+  mutate(country_name = fct_lump(country_name, n=10)) %>%
+  left_join(country_primed, by = "country_name") %>%
+  mutate(country_name = fct_reorder(country_name, geom_mean_cost)) %>%
+  mutate(country_name = fct_relevel(country_name, "Other")) %>%
+  ggplot(aes(real_cost, country_name)) +
+  geom_point(alpha=.3) +
+  geom_point(data = country_primed, aes(x=geom_mean_cost), color="blue", shape=4, size=2) +
+  scale_x_log10() + 
+  labs(title = "Real cost by country",
+       subtitle = "Includes geometric mean real cost for each country",
+       y = NULL,
+       x = NULL) + 
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank())
+
+real_cost_dist | real_cost_scatter
+```
+
+The next set of questions for those in the United States is, "Why are the costs
+so high?" We could imagine that the projects in the United States are uniquely
+complex (especially with such a small sample), or that they are overly long in
+duration for their complexity -- or that they are expensive even taking time 
+and project complexity into consideration.
+
+Here, we fit a linear regression to all completed projects with real cost 
+information, and see what we can determine.
+
+```{r plot-stations-tunnels, eval=FALSE, include=FALSE}
+df %>%
+  filter(stations > 0,
+         real_cost > 0,
+         tunnel_complete_ind) %>%
+  ggplot(aes(stations, real_cost)) +
+  geom_point(alpha=.2) + 
+  geom_smooth(formula=y ~ x, method="loess", se=TRUE) +
+  scale_x_continuous(trans="log1p", breaks=seq(10, 60, 10)) +
+  scale_y_continuous(trans="log1p", breaks=10 ^ seq(2, 5)) +
+  coord_cartesian(xlim=c(1, 50)) +
+  labs(title="Relationship between real cost and stations", 
+       y = "Real cost",
+       x = "Stations")
+
+df %>%
+  filter(tunnel > 0,
+         real_cost > 0,
+         tunnel_complete_ind) %>%
+  ggplot(aes(tunnel, real_cost)) +
+  geom_point(alpha=.2) + 
+  geom_smooth(formula=y ~ x, method="loess", se=TRUE) +
+  scale_x_continuous(trans="log1p", breaks=seq(10, 60, 10)) +
+  scale_y_continuous(trans="log1p", breaks=10 ^ seq(2, 5)) +
+  coord_cartesian(xlim=c(1, 50)) +
+  labs(title="Relationship between real cost and tunnels", 
+       y = "Real cost",
+       x = "Tunnels")
+
+
+```
+
+```{r tidy-linear-model}
+library("tidymodels")
+
+linear_mod <- linear_reg() %>%
+  set_engine("lm")
+
+transit_recipe <- 
+  recipe(log_real_cost ~ entry + length + duration + country_name + tunnel, 
+         data = df) %>%
+  update_role(entry, new_role="id") %>%
+  step_filter(tunnel > 0, skip=FALSE) %>%
+  step_naomit(duration, tunnel, country_name, length) %>%
+  step_log(tunnel) %>%
+  step_other(country_name, threshold = 10) %>%
+  prep()
+
+transit_workflow <- workflow() %>%
+  add_recipe(transit_recipe) %>%
+  add_model(linear_mod) 
+
+baked_train <- transit_recipe %>%
+  bake(new_data = df)
+
+fitted_workflow <- transit_workflow %>%
+  fit(data=df)
+
+```
+
+
+Again, the dataset we're looking at is very small. So the high $R^2$ value 
+should be taken with a great deal of salt.
+
+```{r inspect-tidy-linear-model, echo=FALSE}
+require("broom", quietly=TRUE, warn.conflicts = FALSE)
+
+options(scipen=0)
+options(digits=3)
+
+fitted_transit_linear <- fitted_workflow %>%
+  pull_workflow_fit() %>%
+  pluck("fit")
+augmented <- broom::augment(fitted_transit_linear)
+# broom::tidy(fitted_transit_linear)
+broom::glance(fitted_transit_linear)
+```
+
+And here we examine the linear regression residuals to see if any observations
+warrant further notice. And here, we do find a few that are interesting, even
+with inclusion of length, tunnels (complexity proxy) and duration into our 
+covariates.
+
+```{r residuals-outliers, eval=TRUE, echo = FALSE, fig.width=8, fig.height=4}
+suppressWarnings(require("ggfortify", quietly=TRUE, warn.conflicts = FALSE))
+
+autoplot(fitted_transit_linear, alpha=.2, which=1:2) +
+  theme_light() +
+  theme(legend.position = "none") +
+  theme(panel.background = element_rect(fill = "transparent", colour = NA),
+        plot.background = element_rect(fill = "transparent", colour = NA))
+
+
+augmented %>%
+  bind_cols(baked_train %>% select(entry)) %>%
+  left_join(df, by = "entry") %>%
+  filter(.std.resid > 2) %>%
+  mutate(line = str_sub(line, 1, 30)) %>%
+  select(country_name=country_name.y, city, line, length = length.y, 
+         tunnel = tunnel.y, duration = duration.x, real_cost)
+
+
+```
+
+<!-- Appendix: Unused code -->
+
+```{r evaluate-linear-model, eval=FALSE, echo=FALSE}
+library("tidymodels")
+
+baked_test <- transit_recipe %>%
+  bake(new_data = test)
+
+predictions <-
+  fitted_workflow %>%
+  predict(new_data=test) %>%
+  rename(prediction = .pred) %>%
+  bind_cols(baked_test %>% select(log_real_cost)) %>%
+  filter(is.finite(prediction)) %>%
+  mutate(across(c(prediction, log_real_cost), exp))
+
+eval_metrics <- metric_set(rmse, rsq)
+eval_metrics(predictions, truth=log_real_cost, estimate=prediction)
+
+```
+```{r final-linear-model, eval=FALSE, echo=FALSE}
+options(scipen=0)
+final_fitted_lm <- transit_workflow %>%
+  fit(data = df) %>%
+  pull_workflow_fit() %>%
+  pluck("fit") 
+final_fitted_lm %>%
+  tidy(conf.int = TRUE)
+final_fitted_lm %>%
+  autoplot(., alpha=.2, which=c(1, 2, 4, 6)) +
+  theme_light() +
+  theme(legend.position = "none") 
+augmented <- broom::augment(final_fitted_lm)
+baked_df <- transit_recipe %>%
+  bake(new_data=df)
+
+
+augmented %>%
+  bind_cols(baked_df %>% select(entry)) %>%
+  select(entry, starts_with(".")) %>%
+  left_join(df %>% select(-length, -duration, -country_name, -tunnel, -length), by="entry") %>%
+  filter(.std.resid > 2) 
+
+baked_df %>%
+  slice(c(39, 40, 90)) %>%
+  select(entry) %>%
+  left_join(df, by="entry")
+```
+```{r duration-model, eval=FALSE, echo=FALSE}
+duration_model <- df %>%
+  filter(end_year < 2020,
+         complete.cases(.)) %>%
+  mutate(country_name = fct_lump(country_name, n = 10)) %>%
+  lm(duration ~ log1p(stations) + length + country_name, data=.) 
+
+duration_model %>%
+  broom::glance() 
+
+duration_model %>%
+  autoplot(., alpha=.4) +
+  theme_light() 
+
+df %>%
+  filter(end_year < 2020,
+         complete.cases(.)) %>%
+  slice(c(35, 66, 30))
+```
+
+## Notes-to-self
+
+[1]: https://yihui.org/knitr/options/
+[2]: https://stackoverflow.com/questions/17152312/r-shiny-removing-ggplot2-background-to-make-it-transparent
+[3]: https://gist.github.com/cboettig/5600558
+
+1.  Making a transparent background for the plots was harder to track down than
+    I would have thought. Yihui Xie's [detailed guide][1] has some description,
+    but I needed to update the themes as well, as shown here[2] and here[3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+

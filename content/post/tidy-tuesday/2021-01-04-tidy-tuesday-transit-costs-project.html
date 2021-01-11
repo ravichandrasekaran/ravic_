@@ -1,0 +1,100 @@
+---
+title: 'Tidy Tuesday: Transit Costs Project'
+author: ravic
+date: '2021-01-04'
+slug: tidy-tuesday-transit-costs-project
+categories: []
+tags:
+  - tidy-tuesday
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>A #tidytuesday for transit costs.</p>
+<!--more-->
+<p>A #tidytuesday for transit costs.</p>
+<p>Because of China’s overwhelming investment in public transit, this dataset tells
+stories mostly of China. However, we’re most interested in the United States
+story here. We’ll caveat at the beginning that this is a pretty small sample,
+of the transit records which are completed and have cost information as shown
+here (N = 93):</p>
+<pre><code>## # A tibble: 11 x 3
+##    country_name      n    pct
+##    &lt;fct&gt;         &lt;int&gt;  &lt;dbl&gt;
+##  1 China            24 0.258 
+##  2 Germany           8 0.0860
+##  3 Spain             8 0.0860
+##  4 Turkey            8 0.0860
+##  5 France            6 0.0645
+##  6 Italy             6 0.0645
+##  7 South Korea       4 0.0430
+##  8 Canada            3 0.0323
+##  9 Japan             3 0.0323
+## 10 United States     3 0.0323
+## 11 Other            20 0.215</code></pre>
+<p>The distribution of the real costs across completed projects is roughly log-
+normal. In judging each country’s mean cost, we correspondingly used the
+geometric mean, which shows the United States roughly equal to China and Japan.
+However, the scatter indicates a more variance for the United States and Japan
+with fewer, dispersed observations.</p>
+<p><img src="/post/tidy-tuesday/2021-01-04-tidy-tuesday-transit-costs-project_files/figure-html/country-plot-1.png" width="768" /></p>
+<p>The next set of questions for those in the United States is, “Why are the costs
+so high?” We could imagine that the projects in the United States are uniquely
+complex (especially with such a small sample), or that they are overly long in
+duration for their complexity – or that they are expensive even taking time
+and project complexity into consideration.</p>
+<p>Here, we fit a linear regression to all completed projects with real cost
+information, and see what we can determine.</p>
+<pre class="r"><code>library(&quot;tidymodels&quot;)
+
+linear_mod &lt;- linear_reg() %&gt;%
+  set_engine(&quot;lm&quot;)
+
+transit_recipe &lt;- 
+  recipe(log_real_cost ~ entry + length + duration + country_name + tunnel, 
+         data = df) %&gt;%
+  update_role(entry, new_role=&quot;id&quot;) %&gt;%
+  step_filter(tunnel &gt; 0, skip=FALSE) %&gt;%
+  step_naomit(duration, tunnel, country_name, length) %&gt;%
+  step_log(tunnel) %&gt;%
+  step_other(country_name, threshold = 10) %&gt;%
+  prep()
+
+transit_workflow &lt;- workflow() %&gt;%
+  add_recipe(transit_recipe) %&gt;%
+  add_model(linear_mod) 
+
+baked_train &lt;- transit_recipe %&gt;%
+  bake(new_data = df)
+
+fitted_workflow &lt;- transit_workflow %&gt;%
+  fit(data=df)</code></pre>
+<p>Again, the dataset we’re looking at is very small. So the high <span class="math inline">\(R^2\)</span> value
+should be taken with a great deal of salt.</p>
+<pre><code>## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.780         0.769 0.597      76.1 1.95e-27     4  -79.7  171.  186.
+## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<p>And here we examine the linear regression residuals to see if any observations
+warrant further notice. And here, we do find a few that are interesting, even
+with inclusion of length, tunnels (complexity proxy) and duration into our
+covariates.</p>
+<p><img src="/post/tidy-tuesday/2021-01-04-tidy-tuesday-transit-costs-project_files/figure-html/residuals-outliers-1.png" width="768" /></p>
+<pre><code>## # A tibble: 4 x 7
+##   country_name  city     line                  length tunnel duration real_cost
+##   &lt;fct&gt;         &lt;chr&gt;    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Poland        Warsaw   Line 2                   6.5    6.5        5     3286.
+## 2 United States New York 7 extension              1.6    1.6        7     2400 
+## 3 United States New York Second Avenue Phase 1    2.7    2.7        9     4450 
+## 4 Egypt         Cairo    Line 3 Phase 1           4.3    4.3        6     3000</code></pre>
+<!-- Appendix: Unused code -->
+<div id="notes-to-self" class="section level2">
+<h2>Notes-to-self</h2>
+<ol style="list-style-type: decimal">
+<li>Making a transparent background for the plots was harder to track down than
+I would have thought. Yihui Xie’s <a href="https://yihui.org/knitr/options/">detailed guide</a> has some description,
+but I needed to update the themes as well, as shown here<a href="https://stackoverflow.com/questions/17152312/r-shiny-removing-ggplot2-background-to-make-it-transparent">2</a> and here<a href="https://gist.github.com/cboettig/5600558">3</a></li>
+</ol>
+</div>
