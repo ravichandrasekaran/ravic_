@@ -8,32 +8,41 @@ A #tidytuesday for transit costs.
 
 A #tidytuesday for transit costs.
 
-```{r set-options, include=FALSE, message=FALSE, warning=FALSE}
+```{r set-options, include = FALSE}
 options(scipen=999)
 options(digits=4)
-options(tidyverse.quiet=TRUE)
 set.seed(722)
 ```
-```{r load-packages, include=FALSE, message=FALSE, warning=FALSE}
-library("tidyverse")
-library("tidytuesdayR")
-library("scales")
-library("glue")
-library("tidymodels")
+```{r knit-options, include = FALSE}
+library("knitr")
+knitr::opts_chunk$set(
+  cache = TRUE, warning = FALSE, message = FALSE, 
+  echo = TRUE, dev = "svg", dpi = 300, cache.lazy = FALSE,
+  tidy = "styler", fig.width = 8, fig.height = 5)
 ```
-```{r package-options, include=FALSE, message=FALSE, warning=FALSE}
+```{r load-packages, include=FALSE}
+options(tidyverse.quiet=TRUE)
+require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+require("scales", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+tidymodels::tidymodels_prefer(quiet = TRUE)
+require("tidymodels", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r theme-options, include=FALSE}
 theme_set(theme_light())
+update_geom_defaults("point", list(alpha = .5))
+update_geom_defaults("rect", list(colour = "lightblue"))
 ```
 
-```{r import-data, include=FALSE, message=FALSE, warning=FALSE}
+```{r import-data, include=FALSE}
 tuesdata <- tidytuesdayR::tt_load('2021-02-23')  
 employed_raw <- tuesdata$employed
 earn_raw <- tuesdata$earn
 ```
-```{r clean-data, include=FALSE, message=FALSE, warning=FALSE}
+```{r clean-data, include=FALSE}
 employed_clean <- employed_raw 
 ```
-```{r basic-features, include=FALSE, message=FALSE, warning=FALSE}
+```{r basic-features, include=FALSE}
 employed <- employed_clean
 ```
 ```{r skim-data, eval=FALSE, include=FALSE}
@@ -48,7 +57,7 @@ employed %>%
 
 
 <!--Appendix-->
-```{r correlations-pairs, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE}
+```{r correlations-pairs, include=FALSE, eval=FALSE}
 library("ggcorrplot")
 train %>% 
   select(where(is.numeric)) %>%
