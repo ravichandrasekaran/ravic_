@@ -1,0 +1,233 @@
+---
+title: 'Riddler: Anti-isoceles sets'
+author: ravic
+date: '2021-05-24'
+slug: riddler-anti-isoceles-sets
+categories: []
+tags:
+  - riddler
+---
+
+
+A Riddler challenge involving anti-isoceles sets.
+
+<!--more-->
+
+```{r load-packages, include=FALSE}
+library("tidyverse")
+```
+```{r include=FALSE}
+library("here")
+best <- readr::read_csv(here("static/data/riddler", "isoceles-best.csv"))
+iso_lengths <- readr::read_csv(here("static/data/riddler", "isoceles-set-lengths.csv"), col_types = cols())
+```
+
+### Problem
+
+This feels like a NP-complete problem, where we are faced with too many possibilities to recursively exhaust for an exact answer for anything more than a small grid width $N$. Not quite sure yet which of the [Karp problems](https://en.wikipedia.org/wiki/Karp%27s_21_NP-complete_problems) most resembles this one, though. My approach here was simply to use the brute-force recursive approach, which allowed me to find solutions up to $N = 7$.  
+
+While getting exact answers is possible for a limited range of grid-widths, the broader relationship seems hard to get a fix on.
+
+### Limited solutions
+
+The maximum size for the anti-isoceles set at each given grid-width is given here, with example plots below.  
+
+```{r basic-summary, echo = FALSE}
+best %>%
+  group_by(grid_size) %>%
+  summarise(anti_isoceles_set_size = max(size),
+            .groups = "drop")
+```
+
+
+```{r example-solutions, echo = FALSE, fig.width = 6, fig.height = 6}
+best %>%
+  group_by(grid_size) %>%
+  filter(idx == min(idx)) %>%
+  ungroup() %>%
+  ggplot(aes(x, y)) +
+  geom_point() + 
+  facet_wrap(~grid_size) +
+  theme_light() +
+  labs(subtitle = "Examples of largest anti-isoceles sets",
+       x = NULL, y = NULL)
+```
+
+
+
+### Unique distances in the grid
+
+
+```{r unique-distances, include=FALSE}
+tbl <- tibble(
+  grid_size = 1:7,
+  non_isoceles_size = c(1, 2, 4, 6, 7, 9, 10),
+  unq_distances = c(1, 3, 6, 10, 15, 20, 27))
+```
+
+Is the maximum size of the anti-isoceles set a function of the number of unique distances in the grid? The number of unique distances in the grid is a sequence with initial terms `r tbl$unq_distances`, and discussed as [OEIS A047800](https://oeis.org/A047800). 
+
+The OEIS entry includes this conjecture from Vaclav Kotesovec (after Landau and Erdős), which shows a mostly quadratic term from the triangular sequence muted somewhat.
+
+$a(n) \sim c \cdot \frac{n^2}{\sqrt{\log(n)}}, c = 0.79$
+
+
+### Unique distances and relationship to largest anti-isoceles set
+
+We might pose a possible relationship between the root of the number of unique distances and the size of the largest anti-isoceles set for a given grid width $N$. Basically, that the relationship is roughly linear with $N$, but takes into account that muting term above. Here, we plot these values, fitting a square root curve to the data.
+
+```{r unique-distances-plot, fig.width=6, fig.height=6*5/8, echo = FALSE}
+tbl %>%
+  ggplot(aes(unq_distances, non_isoceles_size)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y ~ sqrt(x), se = F, color="black", 
+              size=.5, lty=2) +
+  labs(subtitle = paste0("Relationship between largest anti-isoceles set ",
+                         "and unique distances in the grid"),
+       x = "Unique distances",
+       y = "Size of anti-isoceles set") +
+  scale_y_continuous(breaks=seq(0, 10, 2), minor_breaks=0:10)  +
+  theme_light() 
+```
+
+
+### Distribution of anti-isoceles set sizes
+
+Looking beyond just the largest anti-isoceles set, it seems like that perhaps we can model the distribution at play here, using a Conway-Maxwell-Poisson (CMP) distribution. Does that suggest the a range of likely maximum values for each grid size?  
+
+```{r distributions, fig.width = 6, fig.height = 6, echo = FALSE}
+iso_lengths %>%
+  ggplot(aes(size, sets)) +
+  geom_col(fill = "lightblue") +
+  theme_light() +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  facet_wrap(~grid_size, scales="free_y") +
+  labs(subtitle = "Distribution of anti-isoceles set sizes",
+       x = NULL, y = NULL) +
+  scale_x_continuous(breaks=1:10, minor_breaks=NULL)
+```
+
+
+***
+
+### Code
+
+```{python, eval=FALSE}
+import numpy as np
+import pandas as pd
+from scipy.spatial.distance import cdist
+
+
+def unique_distances(grid_size: int):
+    """Get number of unique distances in coordinate grid"""
+
+    coords = [[x, y] for x in list(range(grid_size))
+              for y in list(range(grid_size))]
+    distances = cdist(coords, coords, metric="sqeuclidean")
+    return len(np.unique(distances))
+
+
+def validate(current):
+    """Validate whether current set of points contains no isoceles triangles"""
+
+    distances = cdist(current, current, metric="sqeuclidean")
+    valid = np.all(
+        np.apply_along_axis(
+            lambda x: np.all(np.unique(x, return_counts=True)[1] <= 1),
+            axis=1, arr=distances
+        ))
+    return valid
+
+
+def construct(current, candidates):
+    """Construct set of non-isoceles points"""
+
+    if not candidates:
+        return []
+
+    with_new_item = current + [candidates[0]]
+    if validate(with_new_item):
+        return (
+            construct(current, candidates[1:]) +
+            construct(with_new_item, candidates[1:]) +
+            [with_new_item]
+        )
+    return construct(current, candidates[1:])
+
+
+def process_grid(grid_size: int):
+    """Process grid with side length grid_size"""
+
+    coords = [[x, y] for x in list(range(grid_size))
+              for y in list(range(grid_size))]
+    results = construct([], coords)
+    return np.max([len(result) for result in results])
+
+
+def main_control(max_size: int):
+    """Loop through grids and process each"""
+
+    max_sizes = [process_grid(idx) for idx in in list(range(max_size))]
+    print(max_sizes)
+
+if __name__ == "__main__":
+    main_control(max_size=10)
+```
+
+
+<!--Appendix-->
+
+```{r linear-relationship, include = FALSE, echo = FALSE, fig.width = 8, fig.width = 5}
+best_summary <- best %>%
+  group_by(grid_size) %>%
+  summarise(anti_isoceles_set_size = max(size),
+            .groups = "drop")
+
+best_summary %>%
+  ggplot(aes(grid_size, anti_isoceles_set_size)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = F, color = "black", 
+              size = .5, lty = 2) +
+  theme_light() +
+  labs(subtitle = "Largest anti-isoceles set size vs. grid width",
+       x = "Grid width",
+       y = "Size of anti-isoceles set")
+```
+
+
+```{r linear-model, include = FALSE, fig.width = 8, fig.height = 5}
+library("broom")
+linear_model <- 
+  best_summary %>%
+  lm(data = ., formula = anti_isoceles_set_size ~ grid_size) 
+
+summary(linear_model)
+slope <- linear_model %>%
+  broom::tidy() %>%
+  filter(term != "(Intercept)") %>%
+  pull(estimate)
+
+library("broom")
+new_tbl <- tibble(
+  grid_size = 8:10,
+  unq_distances = c(34, 42, 51)
+)
+model <- lm(data = tbl, formula = non_isoceles_size ~ sqrt(unq_distances))
+summary(model)
+model %>%
+  broom::augment(newdata=new_tbl)
+```
+
+
+
+
+```{r include=FALSE, eval=FALSE}
+best %>%
+  group_by(grid_size) %>%
+  summarise(num_unqs = n_unique(idx))
+```
+
+
+
+

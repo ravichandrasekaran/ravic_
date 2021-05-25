@@ -1,0 +1,115 @@
+---
+title: 'Riddler: Anti-isoceles sets'
+author: ravic
+date: '2021-05-24'
+slug: riddler-anti-isoceles-sets
+categories: []
+tags:
+  - riddler
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>A Riddler challenge involving anti-isoceles sets.</p>
+<!--more-->
+<div id="problem" class="section level3">
+<h3>Problem</h3>
+<p>This feels like a NP-complete problem, where we are faced with too many possibilities to recursively exhaust for an exact answer for anything more than a small grid width <span class="math inline">\(N\)</span>. Not quite sure yet which of the <a href="https://en.wikipedia.org/wiki/Karp%27s_21_NP-complete_problems">Karp problems</a> most resembles this one, though. My approach here was simply to use the brute-force recursive approach, which allowed me to find solutions up to <span class="math inline">\(N = 7\)</span>.</p>
+<p>While getting exact answers is possible for a limited range of grid-widths, the broader relationship seems hard to get a fix on.</p>
+</div>
+<div id="limited-solutions" class="section level3">
+<h3>Limited solutions</h3>
+<p>The maximum size for the anti-isoceles set at each given grid-width is given here, with example plots below.</p>
+<pre><code>## # A tibble: 7 x 2
+##   grid_size anti_isoceles_set_size
+##       &lt;dbl&gt;                  &lt;dbl&gt;
+## 1         1                      1
+## 2         2                      2
+## 3         3                      4
+## 4         4                      6
+## 5         5                      7
+## 6         6                      9
+## 7         7                     10</code></pre>
+<p><img src="/post/riddler/2021-05-24-riddler-anti-isoceles-sets_files/figure-html/example-solutions-1.png" width="576" /></p>
+</div>
+<div id="unique-distances-in-the-grid" class="section level3">
+<h3>Unique distances in the grid</h3>
+<p>Is the maximum size of the anti-isoceles set a function of the number of unique distances in the grid? The number of unique distances in the grid is a sequence with initial terms 1, 3, 6, 10, 15, 20, 27, and discussed as <a href="https://oeis.org/A047800">OEIS A047800</a>.</p>
+<p>The OEIS entry includes this conjecture from Vaclav Kotesovec (after Landau and Erdős), which shows a mostly quadratic term from the triangular sequence muted somewhat.</p>
+<p><span class="math inline">\(a(n) \sim c \cdot \frac{n^2}{\sqrt{\log(n)}}, c = 0.79\)</span></p>
+</div>
+<div id="unique-distances-and-relationship-to-largest-anti-isoceles-set" class="section level3">
+<h3>Unique distances and relationship to largest anti-isoceles set</h3>
+<p>We might pose a possible relationship between the root of the number of unique distances and the size of the largest anti-isoceles set for a given grid width <span class="math inline">\(N\)</span>. Basically, that the relationship is roughly linear with <span class="math inline">\(N\)</span>, but takes into account that muting term above. Here, we plot these values, fitting a square root curve to the data.</p>
+<p><img src="/post/riddler/2021-05-24-riddler-anti-isoceles-sets_files/figure-html/unique-distances-plot-1.png" width="576" /></p>
+</div>
+<div id="distribution-of-anti-isoceles-set-sizes" class="section level3">
+<h3>Distribution of anti-isoceles set sizes</h3>
+<p>Looking beyond just the largest anti-isoceles set, it seems like that perhaps we can model the distribution at play here, using a Conway-Maxwell-Poisson (CMP) distribution. Does that suggest the a range of likely maximum values for each grid size?</p>
+<p><img src="/post/riddler/2021-05-24-riddler-anti-isoceles-sets_files/figure-html/distributions-1.png" width="576" /></p>
+<hr />
+</div>
+<div id="code" class="section level3">
+<h3>Code</h3>
+<pre class="python"><code>import numpy as np
+import pandas as pd
+from scipy.spatial.distance import cdist
+
+
+def unique_distances(grid_size: int):
+    &quot;&quot;&quot;Get number of unique distances in coordinate grid&quot;&quot;&quot;
+
+    coords = [[x, y] for x in list(range(grid_size))
+              for y in list(range(grid_size))]
+    distances = cdist(coords, coords, metric=&quot;sqeuclidean&quot;)
+    return len(np.unique(distances))
+
+
+def validate(current):
+    &quot;&quot;&quot;Validate whether current set of points contains no isoceles triangles&quot;&quot;&quot;
+
+    distances = cdist(current, current, metric=&quot;sqeuclidean&quot;)
+    valid = np.all(
+        np.apply_along_axis(
+            lambda x: np.all(np.unique(x, return_counts=True)[1] &lt;= 1),
+            axis=1, arr=distances
+        ))
+    return valid
+
+
+def construct(current, candidates):
+    &quot;&quot;&quot;Construct set of non-isoceles points&quot;&quot;&quot;
+
+    if not candidates:
+        return []
+
+    with_new_item = current + [candidates[0]]
+    if validate(with_new_item):
+        return (
+            construct(current, candidates[1:]) +
+            construct(with_new_item, candidates[1:]) +
+            [with_new_item]
+        )
+    return construct(current, candidates[1:])
+
+
+def process_grid(grid_size: int):
+    &quot;&quot;&quot;Process grid with side length grid_size&quot;&quot;&quot;
+
+    coords = [[x, y] for x in list(range(grid_size))
+              for y in list(range(grid_size))]
+    results = construct([], coords)
+    return np.max([len(result) for result in results])
+
+
+def main_control(max_size: int):
+    &quot;&quot;&quot;Loop through grids and process each&quot;&quot;&quot;
+
+    max_sizes = [process_grid(idx) for idx in in list(range(max_size))]
+    print(max_sizes)
+
+if __name__ == &quot;__main__&quot;:
+    main_control(max_size=10)</code></pre>
+<!--Appendix-->
+</div>
