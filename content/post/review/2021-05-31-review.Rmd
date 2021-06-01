@@ -1,0 +1,94 @@
+---
+title: 'Week ending 2021-05-31'
+author: ravic
+date: '2021-05-31'
+slug: week-ending-2021-05-31
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-05-31"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 7
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+```{r html-script, eval =FALSE, echo = FALSE}
+# **TK**: Need to reintroduce the widgets after the comment tag -- by default they get included too early.
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+  htmltools::attachDependencies(htmltools::div("Code here"), 
+                                tweetrmd:::html_dependency_twitter())
+
+```
+
+Week in review, `r start_date` - `r end_date`.
+
+***
+
+
+```{r organize-tweets, include = FALSE}
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweet_url(user_id, status_id))
+recent_faves <- recent_faves %>%
+  mutate(grouping = case_when(
+    str_detect(text, "P-Values|logistic regression|frequentism|sample size") ~ "methods",
+    str_detect(text, "cities|Safety is|Goodhart|sexy|Businesses") ~ "org",
+    str_detect(text, "Safety is|FURIOUS COOL|readership") ~ "books",
+    str_detect(text, "SQLite") ~ "tools",
+    str_detect(text, "biscuits") ~ "dataviz",
+    TRUE ~ "other"
+  ))
+```
+
+### Methods
+
+```{r tweet-embed-methods, echo = FALSE}
+htmltools::tagList(
+  lapply(recent_faves %>% 
+           filter(grouping %in% c("methods", "org", "tools")) %>% 
+           pull(url), 
+         tweet_embed, plain = TRUE, omit_script = TRUE)
+)
+```
+
+
+
+
+### Interesting
+
+```{r tweet-embed-full, echo = FALSE}
+htmltools::tagList(
+  lapply(recent_faves %>% 
+           filter(!grouping %in% c("methods", "org", "tools")) %>% 
+           pull(url), 
+         tweet_embed, plain = FALSE, omit_script = TRUE)
+)
+```
+
+
+
