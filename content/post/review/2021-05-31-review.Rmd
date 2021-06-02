@@ -62,11 +62,12 @@ Week in review, `r start_date` - `r end_date`.
 
 ### Read
 
-<iframe type="text/html" width="140" height="243" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08W8TZ7CZ&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_4M958BKHB3GBNDWJ97K7" ></iframe>
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08W8TZ7CZ&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_4M958BKHB3GBNDWJ97K7" ></iframe>
 
-<iframe type="text/html" width="150" height="243" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FZLGGP7&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_HV5J3QATG5BC8E8S5F77" ></iframe>
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FZLGGP7&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_HV5J3QATG5BC8E8S5F77" ></iframe>
 
-
+  
+\
 
 1.  **"Notes on Grief"**, Chimamanda Ngozi Adichie.  
     So powerful and raw. There's so much here that's perfectly specific to an immigrant academic family that I connected with. But maybe that's also what makes it universal. It commands you.
@@ -79,7 +80,10 @@ Week in review, `r start_date` - `r end_date`.
 
 ### Watched
 
-![arrival-movie-message](https://media.wired.com/photos/59269e9ccefba457b079a9bc/master/w_1280%2Cc_limit/Arrival8-1.jpg)
+```{r arrival-movie-message, echo=FALSE, out.width="80%", fig.cap="Arrival movie"}
+knitr::include_graphics("https://media.wired.com/photos/59269e9ccefba457b079a9bc/master/w_1280%2Cc_limit/Arrival8-1.jpg")
+```
+
 
 1.  **Arrival** ★★★★.  
   Real moments of wonder. Beautiful, threatening, puzzling, all at once. The linguistics behind it deserve their own post. 
