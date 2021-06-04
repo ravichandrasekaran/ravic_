@@ -21,22 +21,26 @@ tags:
 <p class="caption">Font face</p>
 </div>
 <blockquote>
-<p>Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: <strong>YIRTHA</strong>. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.</p>
+<p>Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: <strong><code>YIRTHA</code></strong>. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.</p>
 </blockquote>
 </div>
 <div id="approach" class="section level3">
 <h3>Approach</h3>
-<p>The word <em>sans-serif</em> is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, “K” as shown is a three-stroke letter.)</p>
+<p>The word <em>sans-serif</em> is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, <code>K</code> as shown is a three-stroke letter.)</p>
 <p>Then all that’s left is to load <a href="https://norvig.com/ngrams/enable1.txt">Peter Norvig’s word list</a>, map the letters to strokes, and found the candidate answers.</p>
 </div>
 <div id="answer" class="section level3">
 <h3>Answer</h3>
-<p>I know that there’s supposed to only be one unique answer, but I found these three candidates. <strong>“Eureka”</strong> feels like it’s got the right celebratory feel, though :)</p>
+<p>I know that there’s supposed to only be one unique answer, but I found these three candidates. <strong>EUREKA</strong> feels like it’s got the right celebratory feel, though :)</p>
 <ol style="list-style-type: decimal">
 <li><strong>EUREKA</strong></li>
 <li><strong>TWEAKY</strong></li>
 <li><strong>APATHY</strong></li>
 </ol>
+</div>
+<div id="extension" class="section level3">
+<h3>Extension</h3>
+<p>Assuming our mapping of letterforms matches Alexander’s intent, we can also use this to pull out words whose stroke counts match only one word. That list, sorted by <a href="https://norvig.com/ngrams/count_1w100k.txt">Norvig’s word frequency</a> data, is shown below, featuring words like <strong>HEALTH, THOUGH, CHURCH</strong>. (It’s heavy on the <code>H</code> and <code>K</code> letters, since they are the only ones that require three strokes in this font face.)</p>
 </div>
 <div id="code" class="section level3">
 <h3>Code</h3>
@@ -68,4 +72,59 @@ candidates</code></pre>
 ## 6844    APATHY  212232
 ## 51297   EUREKA  212232
 ## 159733  TWEAKY  212232</code></pre>
+<hr />
+<div id="unique-words" class="section level4">
+<h4>Unique words</h4>
+<pre class="python"><code>pd.set_option(&#39;max_rows&#39;, 80) 
+word_freq = (
+    pd.read_csv(
+        &quot;https://norvig.com/ngrams/count_1w100k.txt&quot;, header=None, 
+        names=[&quot;word&quot;, &quot;freq&quot;], sep=&quot;\t&quot;, 
+        dtype={
+            &quot;word&quot;: str,
+            &quot;freq&quot;: &quot;Int64&quot;
+        }
+    )
+    .assign(word = lambda x: x.word.str.strip())
+)
+
+unique_words = (
+    pdf
+    .assign(encoded = lambda x: x.word.str.translate(translation_table))
+    .groupby(&quot;encoded&quot;)
+    .agg(word_count=(&quot;word&quot;, &quot;count&quot;))
+    .loc[lambda x: x.word_count == 1]
+    .reset_index()
+    .loc[lambda x: x.encoded.str.len() == 6]
+)
+(
+    pdf
+    .assign(encoded = lambda x: x.word.str.translate(translation_table))
+    .merge(unique_words, how=&quot;inner&quot;, on=&quot;encoded&quot;)
+    .merge(word_freq, how=&quot;inner&quot;, on=&quot;word&quot;)
+    .sort_values(by=[&quot;freq&quot;], ascending=[False])
+)</code></pre>
+<pre><code>##       word encoded  word_count       freq
+## 4   HEALTH  322123           1  440416431
+## 19  THOUGH  231113           1   91905891
+## 0   CHURCH  131213           1   84556943
+## 6   HEIGHT  321132           1   30745406
+## 20  THREAT  232222           1   18546277
+## 13  KNIGHT  311132           1   12563918
+## 16  RHYTHM  232231           1    6993833
+## 1   EIGHTH  211323           1    4949260
+## 17  SHEIKH  132133           1    2138230
+## 5   HEARTH  322223           1    1549883
+## 7   HIKERS  313221           1     704921
+## 2   FATHOM  222311           1     660038
+## 8   HITHER  312322           1     483579
+## 9   HURRAH  312223           1     479525
+## 10  KAHUNA  323112           1     408943
+## 14  MARKKA  122332           1     295777
+## 3   HAKEEM  323221           1     276560
+## 15  REHASH  223213           1     203931
+## 11  KHAKIS  332311           1     200185
+## 18  SUKKOT  113312           1     145967
+## 12  KNACKS  312131           1     105281</code></pre>
+</div>
 </div>
