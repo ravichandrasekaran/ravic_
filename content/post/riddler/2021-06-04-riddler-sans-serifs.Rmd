@@ -1,0 +1,73 @@
+---
+title: 'Riddler: Sans Serifs'
+author: ravic
+date: '2021-06-04'
+slug: riddler-sans-serifs
+categories: []
+tags:
+  - riddler
+---
+
+[riddler-problem]: https://fivethirtyeight.com/features/can-you-decipher-the-secret-message/
+[norvig-word-list]: https://norvig.com/ngrams/enable1.txt
+
+From the Riddler, a problem concerning typography and topology. Eureka!
+
+<!--more-->
+
+### Problem
+
+In [this week's Riddler][riddler-problem], via Alexander Zhang, we're invited to consider this *sans-serif* font example:  
+
+![Font face](https://fivethirtyeight.com/wp-content/uploads/2021/06/Screen-Shot-2021-05-31-at-6.53.29-PM.png?w=700)
+
+> Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: **YIRTHA**. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.
+
+### Approach
+
+The word *sans-serif* is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the **number of distinct strokes** -- where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, "K" as shown is a three-stroke letter.)
+
+Then all that's left is to load [Peter Norvig's word list][norvig-word-list], map the letters to strokes, and found the candidate answers.
+
+### Answer
+
+I know that there's supposed to only be one unique answer, but I found these three candidates. **"Eureka"** feels like it's got the right celebratory feel, though :)
+
+1.  **EUREKA**
+2.  **TWEAKY**
+2.  **APATHY**
+
+
+### Code 
+
+```{python}
+import pandas as pd
+
+# Get word list
+pdf = (
+    pd.read_csv("https://norvig.com/ngrams/enable1.txt", header=None, names=["word"])
+    .assign(word = lambda x: x.word.str.upper())
+)
+```
+
+
+```{python encoding}
+# Set up mapping of letter to number of distinct strokes
+translation_table = str.maketrans({
+    "A": "2", "B": "1", "C": "1", "D": "1", "E": "2",
+    "F": "2", "G": "1", "H": "3", "I": "1", "J": "1",
+    "K": "3", "L": "1", "M": "1", "N": "1", "O": "1",
+    "P": "1", "Q": "2", "R": "2", "S": "1", "T": "2",
+    "U": "1", "V": "1", "W": "1", "X": "2", "Y": "2",
+    "Z": "1",
+})
+
+# Determine candidates based on translation
+candidates = (
+    pdf
+    .assign(encoded = lambda x: x.word.str.translate(translation_table))
+    .loc[lambda x: x.encoded == "YIRTHA".translate(translation_table)]
+)
+candidates
+```
+

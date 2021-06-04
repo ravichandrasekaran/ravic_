@@ -1,0 +1,5 @@
+R_MAX_VSIZE=32Gb
+GITHUB_PAT=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
+TWITTER_PAT=/Users/eclipse/.rtweet_token.rds
+CENSUS_API_KEY=75932fb8dc57cc2cca5c4211975fd0088a16c382
+RETICULATE_PYTHON=~/ravic_/venv/bin/python
