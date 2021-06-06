@@ -1,0 +1,192 @@
+---
+title: 'Week ending 2021-05-31'
+author: ravic
+date: '2021-05-31'
+slug: week-ending-2021-05-31
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-05-31"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 7
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+```{r list-tweets, include = FALSE, eval=FALSE}
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweet_url(user_id, status_id))
+recent_faves %>% 
+  mutate(command = glue('tweet_embed("{url}")')) %>% 
+  pull(command) %>% 
+  purrr::walk(cat, sep="\n")
+```
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+```{r html-script, eval =FALSE, echo = FALSE}
+# **TK**: Need to reintroduce the widgets after the comment tag -- by default they get included too early.
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+  htmltools::attachDependencies(htmltools::div("Code here"), 
+                                tweetrmd:::html_dependency_twitter())
+
+```
+
+Week in review, `r start_date` - `r end_date`.
+
+***
+
+### Read
+
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08W8TZ7CZ&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_4M958BKHB3GBNDWJ97K7" ></iframe>
+
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FZLGGP7&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_HV5J3QATG5BC8E8S5F77" ></iframe>
+
+  
+\
+
+1.  **"Notes on Grief"**, Chimamanda Ngozi Adichie.  
+    So powerful and raw. There's so much here that's perfectly specific to an immigrant academic family that I connected with. But maybe that's also what makes it universal. It commands you.
+    
+2.  **"Black Water Sister"**, Zen Cho.  
+    Thought I had got this from Rebecca F. Kuang's 2021 AAPI Heritage reading list. Not true
+    
+
+***
+
+### Watched
+
+```{r arrival-movie-message, echo=FALSE, out.width="80%", fig.cap="Arrival movie"}
+knitr::include_graphics("https://media.wired.com/photos/59269e9ccefba457b079a9bc/master/w_1280%2Cc_limit/Arrival8-1.jpg")
+```
+
+
+1.  **Arrival** ★★★★.  
+  Real moments of wonder. Beautiful, threatening, puzzling, all at once. The linguistics behind it deserve their own post. 
+2.  **Isle of Dogs** ★★★★★.  
+  This is the third time through, and it's still such breathtaking genius that it makes me want to watch it frame by frame. It even has it's own `ggplot2` palette, [`{wesanderson}`](https://github.com/karthik/wesanderson). 
+3.  **About Time** ★★★★½.  
+  This is perhaps the third time through, although in the spirit of the movie, I cannot remember exactly how many times we've watched it before. Pitch perfect. And who can resist Bill Nighy at his best. 
+
+***
+
+
+### To read
+
+1.  **"Furious Cool"** - David and Joe Henry    
+    A Richard Pryor biography, via this bump from [Saeed Jones](https://twitter.com/15649438/status/1396966431187783680)
+2.  **"Long Division"** -  [Kiese Laymon](https://twitter.com/50885824/status/1396816340208521216)  
+   A "meta-fictive book about the ways Black children in Mississippi creatively grieve across generations", by 
+3.  **"Stories of Your Life"** - Ted Chiang  
+    Via [Rebecca F. Kuang](https://twitter.com/kuangrf). *Arrival* is based on a Ted Chiang short story! (Actually, [the whole list from Rebecca Kuang](https://twitter.com/kuangrf/status/1388508642203291649) looks worthy of a full course in Asian American fiction.)
+4.  **"Close to the Machine"** - Ellen Ullman  
+
+
+***
+
+### For Study
+
+The entire thread by Dr. Meager is exceptionally strong and pointed. This requires a huge amount of mental energy, entails constant questioning/validation, and a mismatch with its use by laypeople. It is massively error-prone and at best, a huge weight to carry. [Bayesian Data Analysis](http://www.stat.columbia.edu/~gelman/book/) by Gelman et al is already on my shelf for the summer :)
+
+Perhaps there are minor ways to address smaller issues within the system. But it's hard when the system is so hard to grasp and hold in your head. (And to be clear, the argmax and p-value issues presented below are hardly "small".)
+
+```{r tweet-methods, echo = FALSE}
+# Methods
+tweet_embed("https://twitter.com/143430352/status/1397158994653941762")          
+tweet_embed("https://twitter.com/10834752/status/1399348241142104064")           
+tweet_embed("https://twitter.com/2728761/status/1399110129832841223",
+            hide_media = TRUE)            
+tweet_embed("https://twitter.com/231008287/status/1398277330527793154")          
+tweet_embed("https://twitter.com/191645855/status/1397356480097972224")          
+```
+
+***
+
+### For Thought
+
+I'm not familiar with [Ellen Ullman's works](https://en.wikipedia.org/wiki/Ellen_Ullman). But I like the visceral framing of this idea of building on top of ruins. Sometimes we use this as a positive with either phoenix metaphors or as a "desire paths", an official/unofficial [design strategy](https://news.wisc.edu/desire-paths-the-unofficial-footpaths-that-frustrate-captivate-campus-planners/). But this framing that views the inevitability and decay feels more powerful, and akin to some of the reframing of "data pipelines" in more naturalistic, fallible terms. 
+
+In the richness of Twitter, both Charles Lambdin and John Cutler seem to provide more value than the books they reference. Followed.
+
+```{r tweet-metrics, echo = FALSE}
+# Metrics
+tweet_embed("https://twitter.com/1547384077/status/1398267222993391618")         
+tweet_embed("https://twitter.com/312681953/status/1398639350288637965")
+tweet_embed("https://twitter.com/2480185704/status/1397946381910773766")         
+tweet_embed("https://twitter.com/533409964/status/1397736060352749569")  
+tweet_embed("https://twitter.com/32692341/status/1396874537677967362")     
+tweet_embed("https://twitter.com/1118579966/status/1397912668736921603",
+            hide_media = TRUE)        
+
+```
+
+***
+
+### Pretties
+
+```{r tweet-pretties, echo = FALSE}
+# For the Mario Kart Tidy Tuesday, reaction times:
+# tweet_embed("https://twitter.com/970129891147632641/status/1398000353875005444")
+tweet_embed("https://twitter.com/339718476/status/1398546083790442498")          
+tweet_embed("https://twitter.com/54896883/status/1397895322093895681")          
+tweet_embed("https://twitter.com/3844032503/status/1397447351913140225")         
+tweet_embed("https://twitter.com/1296481398392360960/status/1398859845927784452")
+```
+
+
+```{r tweet-embed-methods, echo = FALSE, eval = FALSE, include = FALSE}
+htmltools::tagList(
+  lapply(recent_faves %>% 
+           pull(url), 
+         tweet_embed, plain = TRUE, omit_script = TRUE)
+)
+```
+
+
+<!--Appendix-->
+
+```{r tweet-other, echo = FALSE, eval = FALSE}
+# Books
+# tweet_embed("https://twitter.com/15649438/status/1396966431187783680")          
+# tweet_embed("https://twitter.com/50885824/status/1396816340208521216")
+# On verdant society:
+# tweet_embed("https://twitter.com/555851927/status/1398286150243176452")          
+
+# Observable SQLite
+# tweet_embed("https://twitter.com/43593/status/1397629045613891586",
+#             hide_media = TRUE)              
+
+```
+
+
+***
+
+### Credits
+
+1.  I regularly read up on Khoi Vinh's movie reviews on his Subtraction blog. I still find his approach -- and taste -- really inviting. Using a bit of his formatting, and might do the same longer-form reviews elsewhere.
+2.  The Twitter embeds here leverage Garrick Aden-Buie's sweet `{tweetrmd}` package to capture tweets I've favorited in the last week. Also used a bit of Alison Hill's RMarkdown parameterization, one of those things that is basically as easy as one would hope. (Turns out, Hugo shortcodes in `{blogdown}` are still not one of those easy things.) I've really enjoyed how Roxane Gay uses tweets she accumulates for her ["The Audacity" newsletter](https://audacity.substack.com/), so I'll play with this embedded format a bit -- even if straight links are probably better :)
+3.  Next week, I hope to bring in the Kindle highlights in the same semi-automated fashion. 
