@@ -32,13 +32,12 @@ tags:
 </div>
 <div id="approach" class="section level3">
 <h3>Approach</h3>
-<p>The word <em>sans-serif</em> is a hint, telling us that we should look carefully at the letterforms. An initial cut would be to map letters based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, <code>K</code> as shown is a three-stroke letter.)</p>
-<p>Then, we can load <a href="https://norvig.com/ngrams/enable1.txt">Peter Norvig’s word list</a>, map the letters to strokes, and find the candidate answers.</p>
-<p>It turns out, though, that won’t be enough to get a unique answer. (With this mapping, we get three possible candidates: <code>EUREKA</code>, <code>TWEAKY</code>, and <code>APATHY</code>).</p>
-<p>The next cut would add a feature for the <strong>number of enclosed regions</strong> formed by the letter. That gets us to our unique answer, <strong><code>EUREKA</code></strong>. (A bit of <a href="https://en.wikipedia.org/wiki/HARKing">HARKing</a> perhaps, but it does make for a nice, unique solution.)</p>
+<p>The word <em>sans-serif</em> is a hint, telling us that we should look carefully at the letterforms. An initial cut would be to map letters based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The letters <code>J</code>, <code>A</code>, and <code>H</code> have one, two, and three strokes, respectively.) Then, we can load <a href="https://norvig.com/ngrams/enable1.txt">Peter Norvig’s word list</a>, map the letters to strokes, and find the candidate answers.</p>
+<p>It turns out, though, that won’t be enough to get a unique answer. With this mapping, we get three possible candidates: <code>EUREKA</code>, <code>TWEAKY</code>, and <code>APATHY</code>. The next cut would add a feature for the <strong>number of enclosed regions</strong> formed by the letter. (<code>J</code>, <code>A</code>, and <code>B</code> have zero, one, and two enclosed regions, respectively.) That gets us to a unique answer, <strong><code>EUREKA</code></strong>.</p>
 <p>Is this enough to decode Laurent Lessard’s clue here? Let’s run it this through our decoder and find out.</p>
 <blockquote class="twitter-tweet" data-width="550" data-lang="en" data-dnt="true" data-theme="light"><p lang="en" dir="ltr"><a href="https://twitter.com/hashtag/ThisWeeksRiddler?src=hash&amp;ref_src=twsrc%5Etfw">#ThisWeeksRiddler</a> asks to decipher the secret message in the word &quot;YIRTHA&quot;. Here is my (encrypted) explanation of how to decode the secret message:<br><br>&quot;OYEORNRYMDU (FOPDVOUZVAL HDWTOUDRQKVWJ) USYXOCE GOZWAQMJZM PADFAUOGGM QDRTZDUM&quot;<br><br>Will post my full solution on Monday! <a href="https://twitter.com/xaqwg?ref_src=twsrc%5Etfw">@xaqwg</a></p>&mdash; Laurent Lessard (@LaurentLessard) <a href="https://twitter.com/LaurentLessard/status/1401256340555812870?ref_src=twsrc%5Etfw">June 5, 2021</a></blockquote>
 
+<p>Seems like we’ve got it right:</p>
 <pre><code>## &#39;DEFORMATION TOPOLOGICAL HOMEOMORPHISM WITHOUT COLLAPSING PROTRUDING PORTIONS&#39;</code></pre>
 </div>
 <div id="extension" class="section level3">
@@ -93,4 +92,5 @@ candidates</code></pre>
 <hr />
 <p><em>Additional code for this post on <a href="https://github.com/ravichandrasekaran/ravic_/blob/master/content/post/riddler/2021-06-04-riddler-sans-serifs.Rmd">Github</a></em></p>
 <!--Appendix-->
+<!--img src="/riddler/2021-06-04-riddler-sans-serifs_files/eureka-6884380.png" alt="Light bulb with Eureka text"-->
 </div>
