@@ -16,7 +16,7 @@ tags:
 From the Riddler, a problem concerning typography and topology. Eureka!
 
 <!--more-->
-<script src="static/rmarkdown-libs/twitter-widget/widgets.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
 
 
 
@@ -29,23 +29,7 @@ In [this week's Riddler][riddler-problem], via Alexander Zhang, we're invited to
 
 > Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: **YIRTHA**. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.
 
-### Answer
-
-**EUREKA**!!
-
-
-### Approach
-
-The word *sans-serif* is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the **number of distinct strokes** -- where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, `K` as shown is a three-stroke letter.)
-
-Then all that's left is to load [Peter Norvig's word list][norvig-word-list], map the letters to strokes, and found the candidate answers.
-
-It turns out, though, that won't be enough to get a unique answer. (For our code, we get three possible candidates: "EUREKA", "TWEAKY", and "APATHY"). So, I added a feature for the **number of enclosed regions** formed by the letter. A bit of [HARKing][harking] perhaps, but it does make for a nice solution. 
-
-
-### Code 
-
-```{python read-words}
+```{python read-words, include=FALSE}
 import pandas as pd
 
 # Get word list
@@ -69,7 +53,7 @@ word_freq = (
 ```
 
 
-```{python encoding}
+```{python encoding, include = FALSE}
 # A mapping of letterforms:
 # 1. The first digit is the number of required strokes
 # 2. The second character indicates the number of enclosed regions ('/' for zero,
@@ -93,13 +77,23 @@ candidates
 ```
 
 
-***
+### Answer
 
-### Laurent Lessard's clue
-
-Can we decode this clue here? Seems like yes -- at least, enough to see that Laurent is using a different model based on protuding sections. When we run this through our decoder, we get **"Deformation (topological homeomorphism) without collapsing protruding portions."** 
+**`EUREKA`**!!
 
 
+### Approach
+
+The word *sans-serif* is a hint, telling us that we should look carefully at the letterforms. An initial cut would be to map letters based on the **number of distinct strokes** -- where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, `K` as shown is a three-stroke letter.)
+
+Then, we can load [Peter Norvig's word list][norvig-word-list], map the letters to strokes, and find the candidate answers.
+
+It turns out, though, that won't be enough to get a unique answer. (With this mapping, we get three possible candidates: `EUREKA`, `TWEAKY`, and `APATHY`). 
+
+The next cut would add a feature for the **number of enclosed regions** formed by the letter. That gets us to our unique answer, **`EUREKA`**. (A bit of [HARKing][harking] perhaps, but it does make for a nice, unique solution.)
+
+
+Is this enough to decode Laurent Lessard's clue here? Let's run it this through our decoder and find out.
 
 ```{r clue, echo = FALSE, message = FALSE, warning = FALSE}
 require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
@@ -108,7 +102,8 @@ tweet_embed("https://twitter.com/LaurentLessard/status/1401256340555812870",
 ```
 
 
-```{python decode-clue, include = FALSE}
+```{python decode-clue, echo=FALSE}
+# Laurent Lessard's clue
 clue = pd.DataFrame({"token": [
       "OYEORNRYMDU", "FOPDVOUZVAL", "HDWTOUDRQKVWJ", "USYXOCE", "GOZWAQMJZM", 
       "PADFAUOGGM", "QDRTZDUM"]})
@@ -117,7 +112,6 @@ clue = (
   .assign(idx = lambda x: x.index)
   .assign(encoded = lambda x: x.token.str.translate(translation_table))
 )
-clue
 
 decoded = (
     pdf
@@ -133,14 +127,20 @@ decoded = (
     ["word"].tolist()
     
 )
-decoded_sentence = ' '.join([tok.lower() for tok in decoded])
+decoded_sentence = ' '.join(decoded)
 decoded_sentence
 ```
 
-***
 
 
-```{python unique-words, echo = FALSE, eval = FALSE}
+
+
+
+### Extension
+
+Are all words unique under this scheme? Which words tend to get projected to the same encodings? The most ambiguous encoding captures the words below, including "minimum", "missing", "winning". Maybe unsurprisingly, they're composed of single-stroke, non-enclosing letterforms. 
+
+```{python ambiguous-words, echo = FALSE}
 pd.set_option('max_rows', None) 
 pd.set_option('display.max_columns', None)
 
@@ -152,25 +152,47 @@ ambiguous_encodings = (
     .reset_index()
     .loc[lambda x: x.word_count > 1]
     .assign(encoding_length = lambda x: x.encoded.str.len())
-    .groupby("encoding_length")
-    .apply(lambda group: group.nlargest(1, columns="word_count"))
-    .reset_index(level = -1, drop=True)
+#    .groupby("encoding_length")
+#    .apply(lambda group: group.nlargest(1, columns="word_count"))
+#    .reset_index(level = -1, drop=True)
+    .loc[lambda x: x.encoding_length > 10]    
+    .nlargest(1, columns="word_count")
 )
 
-(
+ambiguous_words = (
     pdf
     .assign(encoded = lambda x: x.word.str.translate(translation_table))
-    .merge(ambiguous_words, how="inner", on="encoded")
+    .merge(ambiguous_encodings, how="inner", on="encoded")
     .merge(word_freq, how="left", on="word")
     .sort_values(by=["word_count", "freq"], ascending=[False, False])
     .assign(word_length = lambda x: x.word.str.len())
     .loc[lambda x: x.freq > 0]
     .loc[lambda x: x.word_length > 5]
     .loc[:, ["word", "word_length", "word_count", "freq"]]
+    .loc[:, ["word"]]
+    ["word"].tolist()
 )
-
+ambiguous_words
 ```
 
+A side benefit of this scheme is that it deals well with certain kinds of British vs. American English spelling, where the `S` and `Z` are equivalent.
+
+***
+
+
+
+
+### Code 
+
+
+```{python read-words, eval=FALSE, echo = TRUE}
+```
+```{python encoding, eval=FALSE, echo = TRUE}
+```
+
+***
+
+*Additional code for this post on [Github](https://github.com/ravichandrasekaran/ravic_/blob/master/content/post/riddler/2021-06-04-riddler-sans-serifs.Rmd)*
 
 
 <!--Appendix-->

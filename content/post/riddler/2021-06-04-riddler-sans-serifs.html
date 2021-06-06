@@ -14,7 +14,7 @@ tags:
 
 <p>From the Riddler, a problem concerning typography and topology. Eureka!</p>
 <!--more-->
-<script src="static/rmarkdown-libs/twitter-widget/widgets.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
 <div id="problem" class="section level3">
 <h3>Problem</h3>
 <p>In <a href="https://fivethirtyeight.com/features/can-you-decipher-the-secret-message/">this week’s Riddler</a>, via Alexander Zhang, we’re invited to consider this <em>sans-serif</em> font example:</p>
@@ -28,13 +28,25 @@ tags:
 </div>
 <div id="answer" class="section level3">
 <h3>Answer</h3>
-<p><strong>EUREKA</strong>!!</p>
+<p><strong><code>EUREKA</code></strong>!!</p>
 </div>
 <div id="approach" class="section level3">
 <h3>Approach</h3>
-<p>The word <em>sans-serif</em> is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, <code>K</code> as shown is a three-stroke letter.)</p>
-<p>Then all that’s left is to load <a href="https://norvig.com/ngrams/enable1.txt">Peter Norvig’s word list</a>, map the letters to strokes, and found the candidate answers.</p>
-<p>It turns out, though, that won’t be enough to get a unique answer. (For our code, we get three possible candidates: “EUREKA”, “TWEAKY”, and “APATHY”). So, I added a feature for the <strong>number of enclosed regions</strong> formed by the letter. A bit of <a href="https://en.wikipedia.org/wiki/HARKing">HARKing</a> perhaps, but it does make for a nice solution.</p>
+<p>The word <em>sans-serif</em> is a hint, telling us that we should look carefully at the letterforms. An initial cut would be to map letters based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, <code>K</code> as shown is a three-stroke letter.)</p>
+<p>Then, we can load <a href="https://norvig.com/ngrams/enable1.txt">Peter Norvig’s word list</a>, map the letters to strokes, and find the candidate answers.</p>
+<p>It turns out, though, that won’t be enough to get a unique answer. (With this mapping, we get three possible candidates: <code>EUREKA</code>, <code>TWEAKY</code>, and <code>APATHY</code>).</p>
+<p>The next cut would add a feature for the <strong>number of enclosed regions</strong> formed by the letter. That gets us to our unique answer, <strong><code>EUREKA</code></strong>. (A bit of <a href="https://en.wikipedia.org/wiki/HARKing">HARKing</a> perhaps, but it does make for a nice, unique solution.)</p>
+<p>Is this enough to decode Laurent Lessard’s clue here? Let’s run it this through our decoder and find out.</p>
+<blockquote class="twitter-tweet" data-width="550" data-lang="en" data-dnt="true" data-theme="light"><p lang="en" dir="ltr"><a href="https://twitter.com/hashtag/ThisWeeksRiddler?src=hash&amp;ref_src=twsrc%5Etfw">#ThisWeeksRiddler</a> asks to decipher the secret message in the word &quot;YIRTHA&quot;. Here is my (encrypted) explanation of how to decode the secret message:<br><br>&quot;OYEORNRYMDU (FOPDVOUZVAL HDWTOUDRQKVWJ) USYXOCE GOZWAQMJZM PADFAUOGGM QDRTZDUM&quot;<br><br>Will post my full solution on Monday! <a href="https://twitter.com/xaqwg?ref_src=twsrc%5Etfw">@xaqwg</a></p>&mdash; Laurent Lessard (@LaurentLessard) <a href="https://twitter.com/LaurentLessard/status/1401256340555812870?ref_src=twsrc%5Etfw">June 5, 2021</a></blockquote>
+
+<pre><code>## &#39;DEFORMATION TOPOLOGICAL HOMEOMORPHISM WITHOUT COLLAPSING PROTRUDING PORTIONS&#39;</code></pre>
+</div>
+<div id="extension" class="section level3">
+<h3>Extension</h3>
+<p>Are all words unique under this scheme? Which words tend to get projected to the same encodings? The most ambiguous encoding captures the words below, including “minimum”, “missing”, “winning”. Maybe unsurprisingly, they’re composed of single-stroke, non-enclosing letterforms.</p>
+<pre><code>## [&#39;MINIMUM&#39;, &#39;MISSING&#39;, &#39;WINNING&#39;, &#39;WILLING&#39;, &#39;SINGING&#39;, &#39;SIGNING&#39;, &#39;CLINICS&#39;, &#39;INSULIN&#39;, &#39;ISSUING&#39;, &#39;SMILING&#39;, &#39;MUSINGS&#39;, &#39;INNINGS&#39;, &#39;MILLING&#39;, &#39;CUMMINS&#39;, &#39;CUNNING&#39;, &#39;SUMMING&#39;, &#39;SLICING&#39;, &#39;CUMULUS&#39;, &#39;LININGS&#39;, &#39;GUNNING&#39;, &#39;CULLING&#39;, &#39;MULLING&#39;, &#39;JUICING&#39;, &#39;SINNING&#39;, &#39;MUGGING&#39;, &#39;UNCIVIL&#39;, &#39;LUGGING&#39;, &#39;SUNNING&#39;, &#39;CUSSING&#39;, &#39;GIGGING&#39;]</code></pre>
+<p>A side benefit of this scheme is that it deals well with certain kinds of British vs. American English spelling, where the <code>S</code> and <code>Z</code> are equivalent.</p>
+<hr />
 </div>
 <div id="code" class="section level3">
 <h3>Code</h3>
@@ -78,15 +90,7 @@ candidates = (
     .loc[lambda x: x.encoded == &quot;YIRTHA&quot;.translate(translation_table)]
 )
 candidates</code></pre>
-<pre><code>##          word       encoded
-## 51297  EUREKA  2/1/2-2/3/2-</code></pre>
 <hr />
-</div>
-<div id="laurent-lessards-clue" class="section level3">
-<h3>Laurent Lessard’s clue</h3>
-<p>Can we decode this clue here? Seems like yes – at least, enough to see that Laurent is using a different model based on protuding sections. When we run this through our decoder, we get <strong>“Deformation (topological homeomorphism) without collapsing protruding portions.”</strong></p>
-<blockquote class="twitter-tweet" data-width="550" data-lang="en" data-dnt="true" data-theme="light"><p lang="en" dir="ltr"><a href="https://twitter.com/hashtag/ThisWeeksRiddler?src=hash&amp;ref_src=twsrc%5Etfw">#ThisWeeksRiddler</a> asks to decipher the secret message in the word &quot;YIRTHA&quot;. Here is my (encrypted) explanation of how to decode the secret message:<br><br>&quot;OYEORNRYMDU (FOPDVOUZVAL HDWTOUDRQKVWJ) USYXOCE GOZWAQMJZM PADFAUOGGM QDRTZDUM&quot;<br><br>Will post my full solution on Monday! <a href="https://twitter.com/xaqwg?ref_src=twsrc%5Etfw">@xaqwg</a></p>&mdash; Laurent Lessard (@LaurentLessard) <a href="https://twitter.com/LaurentLessard/status/1401256340555812870?ref_src=twsrc%5Etfw">June 5, 2021</a></blockquote>
-
-<hr />
+<p><em>Additional code for this post on <a href="https://github.com/ravichandrasekaran/ravic_/blob/master/content/post/riddler/2021-06-04-riddler-sans-serifs.Rmd">Github</a></em></p>
 <!--Appendix-->
 </div>
