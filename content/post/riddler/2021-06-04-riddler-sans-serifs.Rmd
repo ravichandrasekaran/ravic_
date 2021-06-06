@@ -11,10 +11,15 @@ tags:
 [riddler-problem]: https://fivethirtyeight.com/features/can-you-decipher-the-secret-message/
 [norvig-word-list]: https://norvig.com/ngrams/enable1.txt
 [norvig-word-freq]: https://norvig.com/ngrams/count_1w100k.txt
+[harking]: https://en.wikipedia.org/wiki/HARKing
 
 From the Riddler, a problem concerning typography and topology. Eureka!
 
 <!--more-->
+<script src="static/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+
+
 
 ### Problem
 
@@ -24,28 +29,23 @@ In [this week's Riddler][riddler-problem], via Alexander Zhang, we're invited to
 
 > Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: **YIRTHA**. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.
 
+### Answer
+
+**EUREKA**!!
+
+
 ### Approach
 
 The word *sans-serif* is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the **number of distinct strokes** -- where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, `K` as shown is a three-stroke letter.)
 
 Then all that's left is to load [Peter Norvig's word list][norvig-word-list], map the letters to strokes, and found the candidate answers.
 
-### Answer
-
-I know that there's supposed to only be one unique answer, but I found these three candidates. **EUREKA** feels like it's got the right celebratory feel, though :)
-
-1.  **EUREKA**
-2.  **TWEAKY**
-2.  **APATHY**
-
-### Extension
-
-Assuming our mapping of letterforms matches Alexander's intent, we can also use this to pull out words whose stroke counts match only one word. That list, sorted by [Norvig's word frequency][norvig-word-freq] data, is shown below, featuring words like **HEALTH, THOUGH, CHURCH**. (It's heavy on the `H` and `K` letters, since they are the only ones that require three strokes in this font face.)
+It turns out, though, that won't be enough to get a unique answer. (For our code, we get three possible candidates: "EUREKA", "TWEAKY", and "APATHY"). So, I added a feature for the **number of enclosed regions** formed by the letter. A bit of [HARKing][harking] perhaps, but it does make for a nice solution. 
 
 
 ### Code 
 
-```{python}
+```{python read-words}
 import pandas as pd
 
 # Get word list
@@ -53,18 +53,34 @@ pdf = (
     pd.read_csv("https://norvig.com/ngrams/enable1.txt", header=None, names=["word"])
     .assign(word = lambda x: x.word.str.upper())
 )
+
+# Get word frequencies for later
+word_freq = (
+    pd.read_csv(
+        "https://norvig.com/ngrams/count_1w100k.txt", header=None, 
+        names=["word", "freq"], sep="\t", 
+        dtype={
+            "word": str,
+            "freq": "Int64"
+        }
+    )
+    .assign(word = lambda x: x.word.str.strip())
+)
 ```
 
 
 ```{python encoding}
-# Set up mapping of letter to number of distinct strokes
+# A mapping of letterforms:
+# 1. The first digit is the number of required strokes
+# 2. The second character indicates the number of enclosed regions ('/' for zero,
+#    '-' for one, and '=' for two enclosed regions, respectively).
 translation_table = str.maketrans({
-    "A": "2", "B": "1", "C": "1", "D": "1", "E": "2",
-    "F": "2", "G": "1", "H": "3", "I": "1", "J": "1",
-    "K": "3", "L": "1", "M": "1", "N": "1", "O": "1",
-    "P": "1", "Q": "2", "R": "2", "S": "1", "T": "2",
-    "U": "1", "V": "1", "W": "1", "X": "2", "Y": "2",
-    "Z": "1",
+    "A": "2-", "B": "1=", "C": "1/", "D": "1-", "E": "2/",
+    "F": "2/", "G": "1/", "H": "3/", "I": "1/", "J": "1/",
+    "K": "3/", "L": "1/", "M": "1/", "N": "1/", "O": "1-",
+    "P": "1-", "Q": "1-", "R": "2-", "S": "1/", "T": "2/",
+    "U": "1/", "V": "1/", "W": "1/", "X": "3/", "Y": "2/",
+    "Z": "1/",
 })
 
 # Determine candidates based on translation
@@ -79,38 +95,111 @@ candidates
 
 ***
 
-#### Unique words
+### Laurent Lessard's clue
+
+Can we decode this clue here? Seems like yes -- at least, enough to see that Laurent is using a different model based on protuding sections. When we run this through our decoder, we get **"Deformation (topological homeomorphism) without collapsing protruding portions."** 
 
 
-```{python unique-words}
-pd.set_option('max_rows', 80) 
-word_freq = (
-    pd.read_csv(
-        "https://norvig.com/ngrams/count_1w100k.txt", header=None, 
-        names=["word", "freq"], sep="\t", 
-        dtype={
-            "word": str,
-            "freq": "Int64"
-        }
-    )
-    .assign(word = lambda x: x.word.str.strip())
+
+```{r clue, echo = FALSE, message = FALSE, warning = FALSE}
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+tweet_embed("https://twitter.com/LaurentLessard/status/1401256340555812870",
+            plain = FALSE)
+```
+
+
+```{python decode-clue, include = FALSE}
+clue = pd.DataFrame({"token": [
+      "OYEORNRYMDU", "FOPDVOUZVAL", "HDWTOUDRQKVWJ", "USYXOCE", "GOZWAQMJZM", 
+      "PADFAUOGGM", "QDRTZDUM"]})
+clue = (
+  clue
+  .assign(idx = lambda x: x.index)
+  .assign(encoded = lambda x: x.token.str.translate(translation_table))
 )
+clue
 
-unique_words = (
+decoded = (
+    pdf
+    .assign(encoded = lambda x: x.word.str.translate(translation_table))
+    .merge(clue, how="inner", on="encoded")
+    .merge(word_freq, how="left", on="word")
+    .assign(freq = lambda x: x.freq.fillna(0))
+    .groupby("token")
+    .apply(lambda group: group.nlargest(1, columns="freq"))
+    .reset_index(level = -1, drop=True)
+    .sort_values(by="idx", ascending=True)
+    .loc[:, ["word"]]
+    ["word"].tolist()
+    
+)
+decoded_sentence = ' '.join([tok.lower() for tok in decoded])
+decoded_sentence
+```
+
+***
+
+
+```{python unique-words, echo = FALSE, eval = FALSE}
+pd.set_option('max_rows', None) 
+pd.set_option('display.max_columns', None)
+
+ambiguous_encodings = (
     pdf
     .assign(encoded = lambda x: x.word.str.translate(translation_table))
     .groupby("encoded")
     .agg(word_count=("word", "count"))
-    .loc[lambda x: x.word_count == 1]
     .reset_index()
-    .loc[lambda x: x.encoded.str.len() == 6]
+    .loc[lambda x: x.word_count > 1]
+    .assign(encoding_length = lambda x: x.encoded.str.len())
+    .groupby("encoding_length")
+    .apply(lambda group: group.nlargest(1, columns="word_count"))
+    .reset_index(level = -1, drop=True)
 )
+
 (
     pdf
     .assign(encoded = lambda x: x.word.str.translate(translation_table))
-    .merge(unique_words, how="inner", on="encoded")
-    .merge(word_freq, how="inner", on="word")
-    .sort_values(by=["freq"], ascending=[False])
+    .merge(ambiguous_words, how="inner", on="encoded")
+    .merge(word_freq, how="left", on="word")
+    .sort_values(by=["word_count", "freq"], ascending=[False, False])
+    .assign(word_length = lambda x: x.word.str.len())
+    .loc[lambda x: x.freq > 0]
+    .loc[lambda x: x.word_length > 5]
+    .loc[:, ["word", "word_length", "word_count", "freq"]]
 )
+
+```
+
+
+
+<!--Appendix-->
+
+```{r tweet-final, include=FALSE, eval=FALSE}
+# Eureka! Found the answer to #ThisWeeksRiddler, @xaqwg.  https://ravic.netlify.app/post/riddler/riddler-sans-serifs/
+```
+
+```{python anchor-points, include=FALSE, eval=FALSE}
+
+# An unused basic mapping of strokes
+translation_table = str.maketrans({
+    "A": "2", "B": "1", "C": "1", "D": "1", "E": "2",
+    "F": "2", "G": "1", "H": "3", "I": "1", "J": "1",
+    "K": "3", "L": "1", "M": "1", "N": "1", "O": "1",
+    "P": "1", "Q": "1", "R": "2", "S": "1", "T": "2",
+    "U": "1", "V": "1", "W": "1", "X": "2", "Y": "2",
+    "Z": "1",
+})
+
+
+# An unused mapping using the number of anchor points
+translation_table = str.maketrans({
+    "A": "4", "B": "3", "C": "2", "D": "2", "E": "6",
+    "F": "5", "G": "4", "H": "5", "I": "2", "J": "2",
+    "K": "6", "L": "3", "M": "5", "N": "4", "O": "0",
+    "P": "3", "Q": "1", "R": "5", "S": "2", "T": "4",
+    "U": "2", "V": "3", "W": "5", "X": "5", "Y": "4",
+    "Z": "4",
+})
 ```
 

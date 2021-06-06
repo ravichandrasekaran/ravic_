@@ -9,10 +9,12 @@ tags:
 ---
 
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
 
 
 <p>From the Riddler, a problem concerning typography and topology. Eureka!</p>
 <!--more-->
+<script src="static/rmarkdown-libs/twitter-widget/widgets.js"></script>
 <div id="problem" class="section level3">
 <h3>Problem</h3>
 <p>In <a href="https://fivethirtyeight.com/features/can-you-decipher-the-secret-message/">this week’s Riddler</a>, via Alexander Zhang, we’re invited to consider this <em>sans-serif</em> font example:</p>
@@ -21,26 +23,18 @@ tags:
 <p class="caption">Font face</p>
 </div>
 <blockquote>
-<p>Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: <strong><code>YIRTHA</code></strong>. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.</p>
+<p>Alexander thinks many of these letters are equivalent, but he leaves it to you to figure out how and why. He also has a message for you: <strong>YIRTHA</strong>. It may not look like much, but Alexander assures me that it is equivalent to exactly one word in the English language.</p>
 </blockquote>
+</div>
+<div id="answer" class="section level3">
+<h3>Answer</h3>
+<p><strong>EUREKA</strong>!!</p>
 </div>
 <div id="approach" class="section level3">
 <h3>Approach</h3>
 <p>The word <em>sans-serif</em> is an unintentional clue, which means we should look carefully at the letterforms. Here, I think the mapping is based on the <strong>number of distinct strokes</strong> – where one has to pick up the pen to write the letter as shown without traversing a section twice. (The specific font face matters here, since, for example, <code>K</code> as shown is a three-stroke letter.)</p>
 <p>Then all that’s left is to load <a href="https://norvig.com/ngrams/enable1.txt">Peter Norvig’s word list</a>, map the letters to strokes, and found the candidate answers.</p>
-</div>
-<div id="answer" class="section level3">
-<h3>Answer</h3>
-<p>I know that there’s supposed to only be one unique answer, but I found these three candidates. <strong>EUREKA</strong> feels like it’s got the right celebratory feel, though :)</p>
-<ol style="list-style-type: decimal">
-<li><strong>EUREKA</strong></li>
-<li><strong>TWEAKY</strong></li>
-<li><strong>APATHY</strong></li>
-</ol>
-</div>
-<div id="extension" class="section level3">
-<h3>Extension</h3>
-<p>Assuming our mapping of letterforms matches Alexander’s intent, we can also use this to pull out words whose stroke counts match only one word. That list, sorted by <a href="https://norvig.com/ngrams/count_1w100k.txt">Norvig’s word frequency</a> data, is shown below, featuring words like <strong>HEALTH, THOUGH, CHURCH</strong>. (It’s heavy on the <code>H</code> and <code>K</code> letters, since they are the only ones that require three strokes in this font face.)</p>
+<p>It turns out, though, that won’t be enough to get a unique answer. (For our code, we get three possible candidates: “EUREKA”, “TWEAKY”, and “APATHY”). So, I added a feature for the <strong>number of enclosed regions</strong> formed by the letter. A bit of <a href="https://en.wikipedia.org/wiki/HARKing">HARKing</a> perhaps, but it does make for a nice solution.</p>
 </div>
 <div id="code" class="section level3">
 <h3>Code</h3>
@@ -50,32 +44,9 @@ tags:
 pdf = (
     pd.read_csv(&quot;https://norvig.com/ngrams/enable1.txt&quot;, header=None, names=[&quot;word&quot;])
     .assign(word = lambda x: x.word.str.upper())
-)</code></pre>
-<pre class="python"><code># Set up mapping of letter to number of distinct strokes
-translation_table = str.maketrans({
-    &quot;A&quot;: &quot;2&quot;, &quot;B&quot;: &quot;1&quot;, &quot;C&quot;: &quot;1&quot;, &quot;D&quot;: &quot;1&quot;, &quot;E&quot;: &quot;2&quot;,
-    &quot;F&quot;: &quot;2&quot;, &quot;G&quot;: &quot;1&quot;, &quot;H&quot;: &quot;3&quot;, &quot;I&quot;: &quot;1&quot;, &quot;J&quot;: &quot;1&quot;,
-    &quot;K&quot;: &quot;3&quot;, &quot;L&quot;: &quot;1&quot;, &quot;M&quot;: &quot;1&quot;, &quot;N&quot;: &quot;1&quot;, &quot;O&quot;: &quot;1&quot;,
-    &quot;P&quot;: &quot;1&quot;, &quot;Q&quot;: &quot;2&quot;, &quot;R&quot;: &quot;2&quot;, &quot;S&quot;: &quot;1&quot;, &quot;T&quot;: &quot;2&quot;,
-    &quot;U&quot;: &quot;1&quot;, &quot;V&quot;: &quot;1&quot;, &quot;W&quot;: &quot;1&quot;, &quot;X&quot;: &quot;2&quot;, &quot;Y&quot;: &quot;2&quot;,
-    &quot;Z&quot;: &quot;1&quot;,
-})
-
-# Determine candidates based on translation
-candidates = (
-    pdf
-    .assign(encoded = lambda x: x.word.str.translate(translation_table))
-    .loc[lambda x: x.encoded == &quot;YIRTHA&quot;.translate(translation_table)]
 )
-candidates</code></pre>
-<pre><code>##           word encoded
-## 6844    APATHY  212232
-## 51297   EUREKA  212232
-## 159733  TWEAKY  212232</code></pre>
-<hr />
-<div id="unique-words" class="section level4">
-<h4>Unique words</h4>
-<pre class="python"><code>pd.set_option(&#39;max_rows&#39;, 80) 
+
+# Get word frequencies for later
 word_freq = (
     pd.read_csv(
         &quot;https://norvig.com/ngrams/count_1w100k.txt&quot;, header=None, 
@@ -86,45 +57,36 @@ word_freq = (
         }
     )
     .assign(word = lambda x: x.word.str.strip())
-)
-
-unique_words = (
-    pdf
-    .assign(encoded = lambda x: x.word.str.translate(translation_table))
-    .groupby(&quot;encoded&quot;)
-    .agg(word_count=(&quot;word&quot;, &quot;count&quot;))
-    .loc[lambda x: x.word_count == 1]
-    .reset_index()
-    .loc[lambda x: x.encoded.str.len() == 6]
-)
-(
-    pdf
-    .assign(encoded = lambda x: x.word.str.translate(translation_table))
-    .merge(unique_words, how=&quot;inner&quot;, on=&quot;encoded&quot;)
-    .merge(word_freq, how=&quot;inner&quot;, on=&quot;word&quot;)
-    .sort_values(by=[&quot;freq&quot;], ascending=[False])
 )</code></pre>
-<pre><code>##       word encoded  word_count       freq
-## 4   HEALTH  322123           1  440416431
-## 19  THOUGH  231113           1   91905891
-## 0   CHURCH  131213           1   84556943
-## 6   HEIGHT  321132           1   30745406
-## 20  THREAT  232222           1   18546277
-## 13  KNIGHT  311132           1   12563918
-## 16  RHYTHM  232231           1    6993833
-## 1   EIGHTH  211323           1    4949260
-## 17  SHEIKH  132133           1    2138230
-## 5   HEARTH  322223           1    1549883
-## 7   HIKERS  313221           1     704921
-## 2   FATHOM  222311           1     660038
-## 8   HITHER  312322           1     483579
-## 9   HURRAH  312223           1     479525
-## 10  KAHUNA  323112           1     408943
-## 14  MARKKA  122332           1     295777
-## 3   HAKEEM  323221           1     276560
-## 15  REHASH  223213           1     203931
-## 11  KHAKIS  332311           1     200185
-## 18  SUKKOT  113312           1     145967
-## 12  KNACKS  312131           1     105281</code></pre>
+<pre class="python"><code># A mapping of letterforms:
+# 1. The first digit is the number of required strokes
+# 2. The second character indicates the number of enclosed regions (&#39;/&#39; for zero,
+#    &#39;-&#39; for one, and &#39;=&#39; for two enclosed regions, respectively).
+translation_table = str.maketrans({
+    &quot;A&quot;: &quot;2-&quot;, &quot;B&quot;: &quot;1=&quot;, &quot;C&quot;: &quot;1/&quot;, &quot;D&quot;: &quot;1-&quot;, &quot;E&quot;: &quot;2/&quot;,
+    &quot;F&quot;: &quot;2/&quot;, &quot;G&quot;: &quot;1/&quot;, &quot;H&quot;: &quot;3/&quot;, &quot;I&quot;: &quot;1/&quot;, &quot;J&quot;: &quot;1/&quot;,
+    &quot;K&quot;: &quot;3/&quot;, &quot;L&quot;: &quot;1/&quot;, &quot;M&quot;: &quot;1/&quot;, &quot;N&quot;: &quot;1/&quot;, &quot;O&quot;: &quot;1-&quot;,
+    &quot;P&quot;: &quot;1-&quot;, &quot;Q&quot;: &quot;1-&quot;, &quot;R&quot;: &quot;2-&quot;, &quot;S&quot;: &quot;1/&quot;, &quot;T&quot;: &quot;2/&quot;,
+    &quot;U&quot;: &quot;1/&quot;, &quot;V&quot;: &quot;1/&quot;, &quot;W&quot;: &quot;1/&quot;, &quot;X&quot;: &quot;3/&quot;, &quot;Y&quot;: &quot;2/&quot;,
+    &quot;Z&quot;: &quot;1/&quot;,
+})
+
+# Determine candidates based on translation
+candidates = (
+    pdf
+    .assign(encoded = lambda x: x.word.str.translate(translation_table))
+    .loc[lambda x: x.encoded == &quot;YIRTHA&quot;.translate(translation_table)]
+)
+candidates</code></pre>
+<pre><code>##          word       encoded
+## 51297  EUREKA  2/1/2-2/3/2-</code></pre>
+<hr />
 </div>
+<div id="laurent-lessards-clue" class="section level3">
+<h3>Laurent Lessard’s clue</h3>
+<p>Can we decode this clue here? Seems like yes – at least, enough to see that Laurent is using a different model based on protuding sections. When we run this through our decoder, we get <strong>“Deformation (topological homeomorphism) without collapsing protruding portions.”</strong></p>
+<blockquote class="twitter-tweet" data-width="550" data-lang="en" data-dnt="true" data-theme="light"><p lang="en" dir="ltr"><a href="https://twitter.com/hashtag/ThisWeeksRiddler?src=hash&amp;ref_src=twsrc%5Etfw">#ThisWeeksRiddler</a> asks to decipher the secret message in the word &quot;YIRTHA&quot;. Here is my (encrypted) explanation of how to decode the secret message:<br><br>&quot;OYEORNRYMDU (FOPDVOUZVAL HDWTOUDRQKVWJ) USYXOCE GOZWAQMJZM PADFAUOGGM QDRTZDUM&quot;<br><br>Will post my full solution on Monday! <a href="https://twitter.com/xaqwg?ref_src=twsrc%5Etfw">@xaqwg</a></p>&mdash; Laurent Lessard (@LaurentLessard) <a href="https://twitter.com/LaurentLessard/status/1401256340555812870?ref_src=twsrc%5Etfw">June 5, 2021</a></blockquote>
+
+<hr />
+<!--Appendix-->
 </div>
