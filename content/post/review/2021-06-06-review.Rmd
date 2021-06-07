@@ -60,18 +60,28 @@ Week in review, `r start_date` - `r end_date`.
 
 ***
 
+### Seen
+```{r nightingale, echo = FALSE, fig.cap="Georgiana Houghton, Glory be to God, via Nightingale"}
+knitr::include_graphics("https://miro.medium.com/max/2800/1*SSDpMzD3Gy7hXmHwHX4EGQ.jpeg")
+```
+
+
 ### Read
+[viet-nguyen-aapi]: https://www.nytimes.com/2021/05/31/opinion/asian-american-AAPI-decolonization.html
 
-<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FGSQYND&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_YZBNNTJHVXP529SAT52Y" ></iframe>
+<!--iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FGSQYND&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_YZBNNTJHVXP529SAT52Y"--><!--/iframe-->
 
-\
 
 1.  **"Somebody's Daughter"**, Ashley C. Ford  
     The tenuous position of continually possible violence and abuse looms large throughout here, even before meeting the incarcerated father. The detail of each specific memory is amazingly compelling.
+2.  **"The Beautiful, Flawed Fiction of ‘Asian American'"**, [Viet Thanh Nguyen][viet-nguyen-aapi]  
+    Tackles the origin, and resolves the challenges, of "Asian American" umbrella.
+
+
     
 
 ### Watched
-<--★★★½-->
+<!--★★★½-->
 
 [ezra-klein]: https://www.nytimes.com/2021/06/04/opinion/ezra-klein-podcast-brian-christian.html?searchResultPosition=1&showTranscript=1
 [alignment-problem]: https://www.amazon.com/Alignment-Problem-Machine-Learning-Values/dp/0393635821
@@ -88,15 +98,17 @@ Week in review, `r start_date` - `r end_date`.
 ### Listened
 
 1.  **Ezra Klein Show (Brian Christian)**  
-    "Coded Bias" pairs nicely with the recent [Ezra Klein show][ezra-klein] in support of Brian Christian's new book [The Alignment Problem][alignment-problem]. I was intrigued by the use of the word "irredeemable" for some of the AI initiatives, and how those can be highlighted from the jump. (Lemonade's video-based claims seem like one, for certain.)
+    "Coded Bias" pairs nicely with the recent [Ezra Klein show][ezra-klein] in support of Brian Christian's new book [The Alignment Problem][alignment-problem]. I was intrigued by the use of the word "irredeemable" for some of the AI initiatives, and how those can be highlighted from the jump. (Lemonade's video-based claims seem like one, for certain.) There's novel connective tissue here, from Quantified Self to rewards and temporal difference reinforcement learning to dopamine.
 2.  **Loud Numbers** ★★★.  
-  As a lead-in for the eponymous podcast, Duncan Geere and Miriam Quick hosted a set of sessions on [data sonification](https://twitter.com/1215604990645014528/status/1401270434633560067). It's an interesting exercise, maybe obviously set for radio, but curious about finding other applications.
+  As a lead-in for the eponymous podcast, Duncan Geere and Miriam Quick hosted a set of sessions on [data sonification](https://twitter.com/1215604990645014528/status/1401270434633560067). It's an interesting exercise, maybe obviously set for radio, but curious about finding other applications. Didn't expect musicality, but Alex Selby-Boothroyd from the Economist brought it (with Hanon!)
 
 ***
 
 ### Quotes
 
 > But if we’re to tell the stories that matter with integrity, we have to do the work, and that means reaching out to those most impacted. As South African disability rights activists said, “Nothing about us, without us, is for us.” -- [Annie Tan](https://annietan.com/2021/06/02/my-statement-on-the-hold-still-vincent-podcast/) 
+
+> We should look to other ideals: solidarity, unity and decolonization. Colonization and racism divide and conquer, telling the subjugated that they have nothing in common. That’s why unity is crucial, and a broader unity can grow from the solidarity we have expressed with one another as Asian Americans, the force that pulled together such disparate peoples and experiences. -- [Viet Thanh Nguyen][viet-nguyen-aapi]
 
 ```{r quote-methods, echo = FALSE}
 tweet_embed("https://twitter.com/94068362/status/1400097629908836362")
@@ -119,8 +131,10 @@ tweet_embed("https://twitter.com/957645568578334721/status/1400452902515138569")
 ***
 
 ### For study
+[koenker-vinaigrette]: http://www.econ.uiuc.edu/~roger/research/vinaigrettes/vinaigrette.html
 
-Looks like I should wait until end of summer for the next edition of [Introduction to Statistical Learning](https://twitter.com/139627907/status/1401398468871016451)
+1.  Looks like I should wait until end of summer for the next edition of [Introduction to Statistical Learning](https://twitter.com/139627907/status/1401398468871016451)
+2.  Really like Roger Koenker's notion of [*vinaigrettes*][koenker-vinaigrette] -- a more atomized version of the R "vignettes", that builds on the notion of literate programming from Knuth. 
 
 
 ```{r tweet-methods, echo = FALSE}
@@ -132,14 +146,18 @@ tweet_embed("https://twitter.com/1601593543/status/1400567197680943106")
 tweet_embed("https://twitter.com/951169512925097984/status/1400512668511920132")
 tweet_embed("https://twitter.com/821105693948264448/status/1400485671089971201")
 tweet_embed("https://twitter.com/16948477/status/1400188530547122181")
+tweet_embed("https://twitter.com/CedScherer/status/1398677194596044803")
 ```
 
-```{r more, echo = FALSE}
-```
 
 ***
 
-### For Thought
+### For thought
+[dan-hill-pm]: https://hackernoon.com/observations-on-product-management-3abc7e00148e
+[op-cadence]: https://www.reforge.com/blog
+
+1.  **"Rethinking Your Operating Cadence", [Elena Verna, Kaya Patel][op-cadence]
+2.  **"Observations on Product Management", [Dan Hill][dan-hill-pm]
 
 
 ```{r tweet-metrics, echo = FALSE}
@@ -147,7 +165,7 @@ tweet_embed("https://twitter.com/16948477/status/1400188530547122181")
 tweet_embed("https://twitter.com/17611446/status/1399935663684734977")
 tweet_embed("https://twitter.com/533409964/status/1399510290710941696")
 tweet_embed("https://twitter.com/23462787/status/1400481264306733057")
-
+tweet_embed("https://twitter.com/reforge/status/1040815354656829440")
 ```
 
 
