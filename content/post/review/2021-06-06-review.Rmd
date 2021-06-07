@@ -102,6 +102,17 @@ knitr::include_graphics("https://miro.medium.com/max/2800/1*SSDpMzD3Gy7hXmHwHX4E
 2.  **Loud Numbers** ★★★.  
   As a lead-in for the eponymous podcast, Duncan Geere and Miriam Quick hosted a set of sessions on [data sonification](https://twitter.com/1215604990645014528/status/1401270434633560067). It's an interesting exercise, maybe obviously set for radio, but curious about finding other applications. Didn't expect musicality, but Alex Selby-Boothroyd from the Economist brought it (with Hanon!)
 
+<!---
+Ezra Klein - Brian Christian
+CHRISTIAN: "So, it was giving you bonus points if you used this kind of martial speech in your resume. Eventually, they essentially decided to scrap the project, that it was kind of irredeemable"
+
+CHRISTIAN: "take delight in the ways that your predictions are wrong, but also improve your predictions"
+KLEIN: "we’re sitting here talking about how it’s hard to create the correct reward functions for machines, but we also don’t even really understand day-to-day how to create the correct reward functions for ourselves"
+
+KLEIN: "So, I love this. So, basically what is being said here is that dopamine is a way of updating our expectations about the world." Re: temporal difference reinforcement learning
+-->
+
+
 ***
 
 ### Quotes
