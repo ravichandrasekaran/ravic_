@@ -84,10 +84,9 @@ candidates
 
 ### Approach
 
-The word *sans-serif* is a hint, telling us that we should look carefully at the letterforms. An initial cut would be to map letters based on the **number of distinct strokes** -- where one has to pick up the pen to write the letter as shown without traversing a section twice. (The letters  `J`, `A`, and `H` have one, two, and three strokes, respectively.)  Then, we can load [Peter Norvig's word list][norvig-word-list], map the letters to strokes, and find the candidate answers.
+Zach's mention of "sans-serif" is a hint. Let's look  at the letterforms. First, let's map letters based on the **number of distinct strokes**. Do we have to pick up the pen again to avoid traversing a section twice? That's another stroke. (`J` has one, `A` has two, and `H` has three.)  Then we load [Peter Norvig's word list][norvig-word-list], map letters to strokes, and find the answer. 
 
-It turns out, though, that won't be enough to get a unique answer. With this mapping, we get three possible candidates: `EUREKA`, `TWEAKY`, and `APATHY`. The next cut would add a feature for the **number of enclosed regions** formed by the letter. (`J`, `A`, and `B` have zero, one, and two enclosed regions, respectively.) That gets us to a unique answer, **`EUREKA`**. 
-
+But not so fast. With this mapping, we get three possible candidates: `EUREKA`, `TWEAKY`, and `APATHY`. What's next? let's add a second feature -- the **number of enclosed regions** formed by the letter. (`J` has none, `A` has one, and `B` has two.) That gets us to a unique answer, **`EUREKA`**. 
 
 Is this enough to decode Laurent Lessard's clue here? Let's run it this through our decoder and find out.
 
@@ -134,9 +133,10 @@ decoded_sentence
 
 
 
-### Extension
 
-Are all words unique under this scheme? Which words tend to get projected to the same encodings? The most ambiguous encoding captures the words below, including "minimum", "missing", "winning". Maybe unsurprisingly, they're composed of single-stroke, non-enclosing letterforms. 
+### Ambiguous words
+
+Do all words have a unique mapping? If not, which words share the same encodings? The most ambiguous encoding captures the words below, including "minimum", "missing", "winning". No surprise -- they're composed of single-stroke, non-enclosing letterforms. 
 
 ```{python ambiguous-words, echo = FALSE}
 pd.set_option('max_rows', None) 
@@ -173,9 +173,9 @@ ambiguous_words = (
 ambiguous_words
 ```
 
-A side benefit of this scheme is that it deals well with certain kinds of British vs. American English spelling, where the `S` and `Z` are equivalent.
+One nice perk? This mapping doesn't care about British vs. American English -- the `S` and `Z` are equivalent.
 
-***
+
 
 
 
@@ -224,3 +224,34 @@ translation_table = str.maketrans({
 ```
 
 <!--img src="/riddler/2021-06-04-riddler-sans-serifs_files/eureka-6884380.png" alt="Light bulb with Eureka text"-->
+
+
+
+```{r letter-mapping, echo = FALSE, eval = FALSE}
+options(tidyverse.quiet = TRUE)
+require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+
+tbl <- tibble(letter = LETTERS,
+              stroke = c(2, 1, 1, 1, 2, 
+                          2, 1, 3, 1, 1, 
+                          3, 1, 1, 1, 1, 
+                          1, 1, 2, 1, 2, 
+                          1, 1, 1, 3, 2, 
+                          1),
+              enclosure = c(1, 2, 0, 1, 0, 
+                             0, 0, 0, 0, 0,
+                             0, 0, 0, 0, 1,
+                             1, 1, 1, 0, 0, 
+                             0, 0, 0, 0, 0,
+                             0))
+              
+tbl %>% 
+  nest(data = c(letter)) %>% 
+  mutate(letters = purrr::map(data, "letter") %>% 
+           purrr::map_chr(str_c, collapse = ",")) %>%
+  select(stroke, enclosure, letters) %>%
+  arrange(stroke, enclosure)
+```
+
+
+
