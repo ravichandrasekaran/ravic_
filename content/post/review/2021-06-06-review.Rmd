@@ -1,0 +1,158 @@
+---
+title: 'Week ending 2021-06-06'
+author: ravic
+date: '2021-06-06'
+slug: week-ending-2021-06-06
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-06-06"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 6
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+```{r list-tweets, include = FALSE, eval=FALSE}
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweet_url(user_id, status_id))
+recent_faves %>% 
+  mutate(command = glue('tweet_embed("{url}")')) %>% 
+  pull(command) %>% 
+  purrr::walk(cat, sep="\n")
+```
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+```{r html-script, eval =FALSE, echo = FALSE}
+# **TK**: Need to reintroduce the widgets after the comment tag -- by default they get included too early.
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+  htmltools::attachDependencies(htmltools::div("Code here"), 
+                                tweetrmd:::html_dependency_twitter())
+
+```
+
+Week in review, `r start_date` - `r end_date`.
+
+***
+
+### Read
+
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FGSQYND&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_YZBNNTJHVXP529SAT52Y" ></iframe>
+
+\
+
+1.  **"Somebody's Daughter"**, Ashley C. Ford  
+    The tenuous position of continually possible violence and abuse looms large throughout here, even before meeting the incarcerated father. The detail of each specific memory is amazingly compelling.
+    
+
+### Watched
+<--★★★½-->
+
+[ezra-klein]: https://www.nytimes.com/2021/06/04/opinion/ezra-klein-podcast-brian-christian.html?searchResultPosition=1&showTranscript=1
+[alignment-problem]: https://www.amazon.com/Alignment-Problem-Machine-Learning-Values/dp/0393635821
+[bumblebee-soundtrack]: https://open.spotify.com/playlist/5d3YO1rE9AYoSePZJxkCf2
+
+1.  **White Tiger** ★★★★★  
+    I couldn't quite get into the book by Aravind Adiga when I had tried before. But the movie makes some perfect moves -- softening our protagonist perhaps somewhat, and diminishing the reflective flashback structure of the book. Great stuff. 
+2.  **Coded Bias** ★★★★  
+    For the most part, I've seen the canonical examples they presented here. But there's still something interesting about how each of these players comes at the challenge - policy, art, maths, ethics. 
+3.  **Bumblebee** ★★★½  
+    Way more entertaining than it had a right to be. My son was favorably impressed with John Cena's acting chops. I was more taken with the [soundtrack][bumblebee-soundtrack] though.
+
+
+### Listened
+
+1.  **Ezra Klein Show (Brian Christian)**  
+    "Coded Bias" pairs nicely with the recent [Ezra Klein show][ezra-klein] in support of Brian Christian's new book [The Alignment Problem][alignment-problem]. I was intrigued by the use of the word "irredeemable" for some of the AI initiatives, and how those can be highlighted from the jump. (Lemonade's video-based claims seem like one, for certain.)
+2.  **Loud Numbers** ★★★.  
+  As a lead-in for the eponymous podcast, Duncan Geere and Miriam Quick hosted a set of sessions on [data sonification](https://twitter.com/1215604990645014528/status/1401270434633560067). It's an interesting exercise, maybe obviously set for radio, but curious about finding other applications.
+
+***
+
+### Quotes
+
+> But if we’re to tell the stories that matter with integrity, we have to do the work, and that means reaching out to those most impacted. As South African disability rights activists said, “Nothing about us, without us, is for us.” -- [Annie Tan](https://annietan.com/2021/06/02/my-statement-on-the-hold-still-vincent-podcast/) 
+
+```{r quote-methods, echo = FALSE}
+tweet_embed("https://twitter.com/94068362/status/1400097629908836362")
+tweet_embed("https://twitter.com/191945961/status/1400093856939528193")
+tweet_embed("https://twitter.com/957645568578334721/status/1400452902515138569")
+```
+
+
+***
+
+
+### To read
+
+1.  **"The Cruelty is the Point"** - Adam Serwer    
+    Via this bump from [Kiese Laymon](tweet_embed("https://twitter.com/16326882/status/1400876953398358022")
+2.  **"Year of Swollen Appendices"** - Brian Eno  
+    Via this bump from [Michael Sippey](https://twitter.com/4711/status/1400939949889789955)  
+
+
+***
+
+### For study
+
+Looks like I should wait until end of summer for the next edition of [Introduction to Statistical Learning](https://twitter.com/139627907/status/1401398468871016451)
+
+
+```{r tweet-methods, echo = FALSE}
+tweet_embed("https://twitter.com/765548/status/1400910135581712387")
+tweet_embed("https://twitter.com/331827860/status/1401045456235339776")
+tweet_embed("https://twitter.com/784078/status/1400816738275581957", hide_media = T)
+tweet_embed("https://twitter.com/1076526138736951298/status/1400802351682920452", hide_media=T)
+tweet_embed("https://twitter.com/1601593543/status/1400567197680943106")
+tweet_embed("https://twitter.com/951169512925097984/status/1400512668511920132")
+tweet_embed("https://twitter.com/821105693948264448/status/1400485671089971201")
+tweet_embed("https://twitter.com/16948477/status/1400188530547122181")
+```
+
+```{r more, echo = FALSE}
+```
+
+***
+
+### For Thought
+
+
+```{r tweet-metrics, echo = FALSE}
+# Metrics
+tweet_embed("https://twitter.com/17611446/status/1399935663684734977")
+tweet_embed("https://twitter.com/533409964/status/1399510290710941696")
+tweet_embed("https://twitter.com/23462787/status/1400481264306733057")
+
+```
+
+
+
+<!--Appendix-->
+
+
+
