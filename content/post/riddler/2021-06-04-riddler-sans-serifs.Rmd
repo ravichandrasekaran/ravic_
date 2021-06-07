@@ -84,12 +84,12 @@ candidates
 
 ### Approach
 
-The word *sans-serif* is a hint, telling us that we should look carefully at the letterforms. An initial cut would be to map letters based on the **number of distinct strokes** -- where one has to pick up the pen to write the letter as shown without traversing a section twice. (The letters  `J`, `A`, and `H` have one, two, and three strokes, respectively.)  Then, we can load [Peter Norvig's word list][norvig-word-list], map the letters to strokes, and find the candidate answers.
+*Sans-serif* is a hint. Let's look at the letterforms. First, let's find the  **number of distinct strokes**. If we have to pick up the pen to avoid traversing a section twice, that's a stroke. (`J` has one, `A` has two, and `H` has three.)  Then, we load [Peter Norvig's word list][norvig-word-list], map  letters to strokes, and find the answer.
 
-It turns out, though, that won't be enough to get a unique answer. With this mapping, we get three possible candidates: `EUREKA`, `TWEAKY`, and `APATHY`. The next cut would add a feature for the **number of enclosed regions** formed by the letter. (`J`, `A`, and `B` have zero, one, and two enclosed regions, respectively.) That gets us to a unique answer, **`EUREKA`**. 
-
+Not so fast. Turns out, we get three possible candidates: `EUREKA`, `TWEAKY`, and `APATHY`. What next? Let's add a feature for the **number of enclosed regions** formed by the letter. (`J` has none, `A` has one, and `B` has two.) That gets us to a unique answer, **`EUREKA`**. 
 
 Is this enough to decode Laurent Lessard's clue here? Let's run it this through our decoder and find out.
+
 
 ```{r clue, echo = FALSE, message = FALSE, warning = FALSE}
 require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
@@ -136,7 +136,7 @@ decoded_sentence
 
 ### Extension
 
-Are all words unique under this scheme? Which words tend to get projected to the same encodings? The most ambiguous encoding captures the words below, including "minimum", "missing", "winning". Maybe unsurprisingly, they're composed of single-stroke, non-enclosing letterforms. 
+Do all words have a unique encoding? If not, which words are the most ambiguous? The most ambiguous encoding captures the words below, including "minimum", "missing", "winning". Maybe unsurprisingly, they're composed of single-stroke, non-enclosing letterforms. 
 
 ```{python ambiguous-words, echo = FALSE}
 pd.set_option('max_rows', None) 
@@ -173,7 +173,7 @@ ambiguous_words = (
 ambiguous_words
 ```
 
-A side benefit of this scheme is that it deals well with certain kinds of British vs. American English spelling, where the `S` and `Z` are equivalent.
+One nice perk? This mapping doesn't care about British vs. American English -- the `S` and `Z` are equivalent.
 
 ***
 
