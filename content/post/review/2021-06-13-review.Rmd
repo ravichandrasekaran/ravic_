@@ -45,6 +45,7 @@ recent_faves %>%
 # 2. Remove media URL's, substitute link URL's
 # 3. Link to screen names, highlight text-internal screen names, maybe real names
 # 4. De-emoji, ftfy
+# 5. Shorten to single sentence?
 
 formatted_faves <- faves %>%
   filter(between(as.Date(created_at), start_date, end_date)) %>%
@@ -58,6 +59,13 @@ formatted_faves <- faves %>%
 formatted_faves %>% 
   pull(formatted)
 ```
+<!--
+Harvest:
+1.  Chrome history
+2.  NYT
+3.  Netflix, Amazon Prime
+4.  Kindle highlights
+-->
 
 
 Week in review, `r start_date` - `r end_date`.
@@ -118,11 +126,19 @@ knitr::include_graphics("https://m.media-amazon.com/images/I/51hsd1r6wLL._SY346_
 [small-menus]: https://www.grubstreet.com/2021/06/in-praise-of-small-menus.html
 
 1.  **"Furious Cool"**, David and Joe Henry    
-2.  [Kevin Durant and (Possibly) the Greatest Basketball Team of All Time][kevin-durant], Sam Anderson
-3.  [Martina Navratilova has Plenty to Say][martina], Matthew Futterman
+2.  Thoughtful sports leaders given their due. [Kevin Durant and (Possibly) the Greatest Basketball Team of All Time][kevin-durant], Sam Anderson; and [Martina Navratilova has Plenty to Say][martina], Matthew Futterman. Sam Anderson has a gift. 
 4.  A Pride-based reminder that all the good opinion columns in the New York Times are from the Black columnists:  [Charles Blow's Journey to Pride][blow-pride] and [Roxane Gay on Cops Place at Pride][roxane-gay-pride]
-5.  [Sri Lanka in Lasting Environmental Disaster][sri-lanka]
-6.  [In Praise of Small Menus][small-menus] via Roxane Gay
+6.  [In Praise of Small Menus][small-menus], Rachel Sugar via Roxane Gay
+
+
+> The best way to experience a restaurant, I have always felt, is by eating exactly what it wants to feed you. I do not want choices. I want the best thing. A restaurant might have five or ten best things, but it cannot have 45. There are many infuriating things about the world, but one of the more fixable is the sensation of acute regret from having ordered wrong. 
+> ...
+> 
+> A short menu, though, exudes confidence. It is a statement. It commands respect. Without the padding of half-hearted roasted cauliflower and ambivalent crostini, a short-menued restaurant has decided exactly what it is. 
+> ...
+> 
+> A small menu is a gift. You, the host, will do the labor of finding a small menu that is reasonably appropriate, thus allowing your companions to bask in the minor pleasure of thinking less.
+
 
 ### Watched
 
@@ -137,8 +153,6 @@ knitr::include_graphics("https://m.media-amazon.com/images/I/51hsd1r6wLL._SY346_
 ### Listened
 ### Quotes
 -->
-
-
 
 
 ```{r quote-methods, echo = FALSE}
@@ -202,14 +216,13 @@ knitr::include_graphics("https://m.media-amazon.com/images/I/51hsd1r6wLL._SY346_
 
 ### For study
 
-1.  [**"Invisible Work"**](https://blog.harterrt.com/static/invisible_work_preso/#p1)
-6. "Conducting power analysis before data collection avoids wasting resources and assesses the information value of your design in case of null results.I have made a list of easy-to-use tools for power analysis. Maybe it is useful to some of you. https://t.co/7gQMKG5jzf. https://t.co/29fW18Efhv," --kunkakom [Jun 11](https://twitter.com/172942846/status/1403285476023414787)
-3. "Really excited to share this ecology paper as a glorious example of how to properly interpret (and not over interpret) the inference from a regression model, https://t.co/zSgRHtb8p0.  I helped with the model but that careful interpretation was all @fsdias8.," --betanalpha [2021-06-11](https://twitter.com/78196808/status/1403149659502227456)
-7. "So you think you know distillation; it's easy, right?We thought so too with @XiaohuaZhai @__kolesnikov__ @_arohan_ and the amazing @royaleerieme and Larisa Markeeva.Until we didn't. But now we do again. Hop on for a ride (+the best ever ResNet50?)🧵👇https://t.co/3SlkXVZcG3 https://t.co/Qp5qiZzV14," --giffmana [2021-06-10](https://twitter.com/2236047510/status/1402836863954599936)
-25. "Introducing MERLOT: a new model that learns about language, vision, &amp; the world from 6M YouTube videos.Out-of-the-box, MERLOT has intrinsic notions of multimodal temporal commonsense. When finetuned, we get SOTA performance on 12 video tasks + VCR. https://t.co/2H6ng2Yfxt https://t.co/oMPPtOjLBm," --rown [2021-06-07](https://twitter.com/17108894/status/1401980209876783109)
-30. "Gramformer a framework for detecting, highlighting and correcting grammatical errors on natural language text. It's like Grammarly but it's free! Don't forget to spend some star love for the repository!https://t.co/PI0J6zP7Vw https://t.co/7HxuQDDSDA," --philipvollet [2021-06-07](https://twitter.com/421795636/status/1401809727294611466)
+1. "Conducting power analysis before data collection avoids wasting resources and assesses the information value of your design in case of null results. https://t.co/7gQMKG5jzf," --kunkakom [Jun 11](https://twitter.com/172942846/status/1403285476023414787)
+3. "Really excited to share this ecology paper as a glorious example of how to properly interpret (and not over interpret) the inference from a regression model, https://t.co/zSgRHtb8p0." --betanalpha [2021-06-11](https://twitter.com/78196808/status/1403149659502227456)
+7. "So you think you know distillation; it's easy, right? https://t.co/3SlkXVZcG3" --giffmana [2021-06-10](https://twitter.com/2236047510/status/1402836863954599936)
+25. "Introducing MERLOT: a new model that learns about language, vision, &amp; the world from 6M YouTube videos.  https://t.co/2H6ng2Yfxt" --rown [2021-06-07](https://twitter.com/17108894/status/1401980209876783109)
+30. "Gramformer a framework for detecting, highlighting and correcting grammatical errors on natural language text. https://t.co/PI0J6zP7Vw" --philipvollet [2021-06-07](https://twitter.com/421795636/status/1401809727294611466)
 19. "Adolescent trial showcases pre-registration and the Law of Small Numbers https://t.co/rNcaOFlb9l," --junkcharts [2021-06-08](https://twitter.com/111407412/status/1402253838547968004)
-13. "Why? Because the second hint never makes you *want* to change your decision. (Think about the four possible hint combinations.)This is a key idea behind a beautiful paper by Meg Meyer, here: 2/ https://t.co/z1C8cDxloe," --ben_golub [2021-06-10](https://twitter.com/314734325/status/1402781286067023875)
+13. "Why? Because the second hint never makes you *want* to change your decision. https://t.co/z1C8cDxloe," --ben_golub [2021-06-10](https://twitter.com/314734325/status/1402781286067023875)
 
 
 
@@ -247,7 +260,8 @@ tweet_embed("https://twitter.com/486038409/status/1404032560582201351")
 
 ### For Thought
 
-1. "The problem with workload (and thus work-life balance) in academia is: You can always do more.(A thread based on a recent personal epiphany.)," --cfiesler [2021-06-09 14:33:19](https://twitter.com/194203770/status/1402634919516512259)
+1.  [**"Invisible Work"**](https://blog.harterrt.com/static/invisible_work_preso/#p1)
+2. "The problem with workload (and thus work-life balance) in academia is: You can always do more.(A thread based on a recent personal epiphany.)," --cfiesler [2021-06-09 14:33:19](https://twitter.com/194203770/status/1402634919516512259)
 8. "Absolutely nuts paper by researchers from U Chicago analyzing the productivity of 10,000 workers before and after the pandemic. Conclusions: WFH led to 2 more hrs of work per day, more meetings, less focus time, and *less productivity* https://t.co/DL2DfAvknm https://t.co/czPTKdrOSw," --altimor [2021-06-10 23:31:34](https://twitter.com/21125274/status/1403132762610089984)
 12. "PRD template for those who haven't seen it before. Caveats: - I have a few updates planned later this year- does not apply to every type of product- should evolve with the project- etc...https://t.co/aLcVXwwLa1," --kevinyien [2021-06-10 00:26:02](https://twitter.com/486352931/status/1402784082073956356)
 1. "@wandzilak_drew Consumers will buy a cheap crap speaker, or headphones, with or indeed without a voice assistant, but will only buy a good expensive speaker from a hifi brand, if that. But I want to see market sales data.," --benedictevans [2021-06-13 17:46:04](https://twitter.com/1236101/status/1404132980277145602)
