@@ -134,7 +134,8 @@ decoded_sentence
 
 
 
-### Extension
+
+### Ambiguous words
 
 Do all words have a unique encoding? If not, which words are the most ambiguous? The most ambiguous encoding captures the words below, including "minimum", "missing", "winning". Maybe unsurprisingly, they're composed of single-stroke, non-enclosing letterforms. 
 
@@ -176,9 +177,18 @@ ambiguous_words
 One nice perk? This mapping doesn't care about British vs. American English -- the `S` and `Z` are equivalent.
 
 ***
+### Update
+
+
+```{r related, echo = FALSE, message = FALSE, warning = FALSE}
+library("tweetrmd")
+tweet_embed("https://twitter.com/1366811/status/1402364306725949441")
+```
 
 
 
+
+***
 
 ### Code 
 
@@ -224,3 +234,34 @@ translation_table = str.maketrans({
 ```
 
 <!--img src="/riddler/2021-06-04-riddler-sans-serifs_files/eureka-6884380.png" alt="Light bulb with Eureka text"-->
+
+
+
+```{r letter-mapping, echo = FALSE, eval = FALSE}
+options(tidyverse.quiet = TRUE)
+require("tidyverse", quietly = TRUE, warn.conflicts = FALSE)
+
+tbl <- tibble(letter = LETTERS,
+              stroke = c(2, 1, 1, 1, 2, 
+                          2, 1, 3, 1, 1, 
+                          3, 1, 1, 1, 1, 
+                          1, 1, 2, 1, 2, 
+                          1, 1, 1, 3, 2, 
+                          1),
+              enclosure = c(1, 2, 0, 1, 0, 
+                             0, 0, 0, 0, 0,
+                             0, 0, 0, 0, 1,
+                             1, 1, 1, 0, 0, 
+                             0, 0, 0, 0, 0,
+                             0))
+              
+tbl %>% 
+  nest(data = c(letter)) %>% 
+  mutate(letters = purrr::map(data, "letter") %>% 
+           purrr::map_chr(str_c, collapse = ",")) %>%
+  select(stroke, enclosure, letters) %>%
+  arrange(stroke, enclosure)
+```
+
+
+

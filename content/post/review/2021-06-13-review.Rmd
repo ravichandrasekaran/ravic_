@@ -1,0 +1,294 @@
+---
+title: 'Week ending 2021-06-13'
+author: ravic
+date: '2021-06-13'
+slug: week-ending-2021-06-13
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-06-13"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 6
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+```{r list-tweets, include = FALSE, eval=FALSE}
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweet_url(user_id, status_id))
+recent_faves %>% 
+  mutate(command = glue('tweet_embed("{url}")')) %>% 
+  pull(command) %>% 
+  purrr::walk(cat, sep="\n")
+```
+```{r link-faves, include = FALSE, eval = FALSE}
+# More todos on handling the text: 
+# 1. Deal with internal quotes, smart quotes
+# 2. Remove media URL's, substitute link URL's
+# 3. Link to screen names, highlight text-internal screen names, maybe real names
+# 4. De-emoji, ftfy
+# 5. Shorten to single sentence?
+
+formatted_faves <- faves %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(tweet_url = tweetrmd::tweet_url(user_id, status_id),
+         create_date = as.character(created_at, "%b %d"),
+         text = str_replace_all(text, "[\r\n]" , ""),
+         screen_name = str_to_lower(screen_name),
+         idx = row_number(),
+         text = str_replace_all(text, ".http", ". http")) %>%
+  mutate(formatted = glue::glue('{idx}. "{text}," --{screen_name} [{create_date}]({tweet_url})')) 
+formatted_faves %>% 
+  pull(formatted)
+```
+<!--
+Harvest:
+1.  Chrome history
+2.  NYT
+3.  Netflix, Amazon Prime
+4.  Kindle highlights
+-->
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+```{r html-script, eval =FALSE, echo = FALSE}
+# **TK**: Need to reintroduce the widgets after the comment tag -- by default they get included too early.
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+  htmltools::attachDependencies(htmltools::div("Code here"), 
+                                tweetrmd:::html_dependency_twitter())
+
+```
+
+Week in review, `r start_date` - `r end_date`.
+
+***
+<!--
+### Meal plan
+
+1.  [Meen Fish Curry](https://cooking.nytimes.com/recipes/1020914-meen-gassi-fish-curry)
+2.  [Crispy Tofu with Cashews and Blistered Snap Peas](https://cooking.nytimes.com/recipes/1021200-crispy-tofu-with-cashews-and-blistered-snap-peas)
+
+
+***
+
+### Seen
+-->
+
+```{r sri-lanka-climate, eval = FALSE, echo=FALSE, fig.cap="Sri Lanka microplastics"}
+knitr::include_graphics("https://media.npr.org/assets/img/2021/06/04/gettyimages-1233244335_wide-75f843880ec94549885b1c8f8adb4bee65f988fe-s800-c85.webp")
+```
+
+
+
+
+### Read
+
+<!--
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B00CL08LNK&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_0W1DYDGK6TQMT2VSMQZ0" ></iframe>
+-->
+
+```{r furious-cool-image, echo = FALSE}
+knitr::include_graphics("https://m.media-amazon.com/images/I/51hsd1r6wLL._SY346_.jpg")
+```
+
+
+\
+
+[kevin-durant]: https://www.nytimes.com/2021/06/02/magazine/kevin-durant-brooklyn-nets.html
+[martina]: https://www.nytimes.com/2021/06/06/sports/martina-navratilova-french-open.html
+[blow-pride]: https://www.nytimes.com/2021/06/06/opinion/lgbtq-pride-month.html
+[roxane-gay-pride]: https://www.nytimes.com/2021/05/29/opinion/lgbtq-police-pride-parade.html
+[sri-lanka]: https://www.npr.org/2021/06/05/1003445739/the-ship-sinking-off-sri-lanka-looks-like-a-lasting-environmental-disaster
+[small-menus]: https://www.grubstreet.com/2021/06/in-praise-of-small-menus.html
+
+1.  **"Furious Cool"**, David and Joe Henry    
+2.  Thoughtful sports leaders given their due. [Kevin Durant and (Possibly) the Greatest Basketball Team of All Time][kevin-durant], Sam Anderson; and [Martina Navratilova has Plenty to Say][martina], Matthew Futterman. Sam Anderson has a gift. 
+4.  A Pride-based reminder that all the good opinion columns in the New York Times are from the Black columnists:  [Charles Blow's Journey to Pride][blow-pride] and [Roxane Gay on Cops Place at Pride][roxane-gay-pride]
+6.  [In Praise of Small Menus][small-menus], Rachel Sugar via Roxane Gay
+
+
+> The best way to experience a restaurant, I have always felt, is by eating exactly what it wants to feed you. I do not want choices. I want the best thing. A restaurant might have five or ten best things, but it cannot have 45. There are many infuriating things about the world, but one of the more fixable is the sensation of acute regret from having ordered wrong. 
+> ...
+> 
+> A short menu, though, exudes confidence. It is a statement. It commands respect. Without the padding of half-hearted roasted cauliflower and ambivalent crostini, a short-menued restaurant has decided exactly what it is. 
+> ...
+> 
+> A small menu is a gift. You, the host, will do the labor of finding a small menu that is reasonably appropriate, thus allowing your companions to bask in the minor pleasure of thinking less.
+
+
+### Watched
+
+[high-hog-reader]: https://www.blackculinaryhistory.com/high-on-the-hog-reader-1    
+
+1.  **Westminster Dog Show Agility Challenge** ★★★★★  
+    
+2.  **High on the Hog** ★★★★  
+    With a [reader from Roxane Gay][high-hog-reader]
+
+<!--
+### Listened
+### Quotes
+-->
+
+
+```{r quote-methods, echo = FALSE}
+```
+
+
+***
+
+
+### To read
+[vgr-thread]: https://twitter.com/vgr/status/1404100023772598283
+[climate-reading]: https://rachelbinx.com/climate-reading
+[ethanz-book-rec]: https://twitter.com/6267962/status/1402123700229402625
+[world-of-daas]: https://twitter.com/752644853419220992/status/1403102192349990913
+[saeed-jones-rec]: https://twitter.com/15649438/status/1402028265057968132
+[climate-lyricism]: https://twitter.com/2191771714/status/1402585317899706370
+
+
+1.  **"Let the Record Show"**, Sarah Schulman, via [Saeed Jones][saeed-jones-rec]
+5.  **"Digital Cosmopolitans"**, Ethan Zuckerman, via [Dan Gillmor][ethanz-book-rec]
+7.  [**"Climate Lyricism"**][climate-lyricism], Min Hyoung Song
+2.  "**Farsighted**: How We Make the Decisions That Matter the Most", Steven Johnson, via [vgr non-fiction thread][vgr-thread]    
+3.  "**Boomtown**: The Fantastical Saga of Oklahoma City, Its Chaotic Founding... Its Purloined Basketball Team, and the Dream of Becoming a World-class Metropolis", Sam Anderson  
+7.  [Rachel Binx Climate Reading][climate-reading], via Duncan Greene
+
+
+```{r book-recs, echo = FALSE}
+```
+
+
+### To listen
+
+1. [**"World of DaaS"**][world-of-daas], Auren Hoffman
+2. Stanford NLP, Spacy on [Youtube](https://twitter.com/575050905/status/1402136118305431557)
+
+
+
+### To watch
+[danton-movie]: https://twitter.com/245442984/status/1402070273747152902
+[breathless-movie]: https://twitter.com/1543986138/status/1402068698031083520
+[matewan]: https://twitter.com/626788014/status/1402078703958568962
+
+
+1.  [**"Danton"**][danton-movie], feat. Gerard Depardieu    
+    "Fencing is a science. Loving is a passion. Duelling is an obsession."
+2.  [**"Breathless"**][breathless-movie]
+3.  [**"Matewan"**][matewan]
+
+
+
+### Upcoming
+
+[user-conf]: https://twitter.com/1280779280579022848/status/1402745848631603205
+[scicomm]: https://twitter.com/1282525711991894019/status/1401802926050496512
+[art-machines]: https://twitter.com/225542451/status/1402186769337098246
+
+1.  [UseR conference][user-conf], closes June 25
+2.  **"Science Communication through Graphic Stories"**, [Daisy Chung][scicomm]
+3.  [**"Art Machines"**][art-machines]
+
+
+### For study
+
+1. "Conducting power analysis before data collection avoids wasting resources and assesses the information value of your design in case of null results. https://t.co/7gQMKG5jzf," --kunkakom [Jun 11](https://twitter.com/172942846/status/1403285476023414787)
+3. "Really excited to share this ecology paper as a glorious example of how to properly interpret (and not over interpret) the inference from a regression model, https://t.co/zSgRHtb8p0." --betanalpha [2021-06-11](https://twitter.com/78196808/status/1403149659502227456)
+7. "So you think you know distillation; it's easy, right? https://t.co/3SlkXVZcG3" --giffmana [2021-06-10](https://twitter.com/2236047510/status/1402836863954599936)
+25. "Introducing MERLOT: a new model that learns about language, vision, &amp; the world from 6M YouTube videos.  https://t.co/2H6ng2Yfxt" --rown [2021-06-07](https://twitter.com/17108894/status/1401980209876783109)
+30. "Gramformer a framework for detecting, highlighting and correcting grammatical errors on natural language text. https://t.co/PI0J6zP7Vw" --philipvollet [2021-06-07](https://twitter.com/421795636/status/1401809727294611466)
+19. "Adolescent trial showcases pre-registration and the Law of Small Numbers https://t.co/rNcaOFlb9l," --junkcharts [2021-06-08](https://twitter.com/111407412/status/1402253838547968004)
+13. "Why? Because the second hint never makes you *want* to change your decision. https://t.co/z1C8cDxloe," --ben_golub [2021-06-10](https://twitter.com/314734325/status/1402781286067023875)
+
+
+
+```{r more-stuff, echo = FALSE}
+tweet_embed("https://twitter.com/3004269184/status/1402381289093742598", plain = F)
+```
+
+
+### Visual study
+
+[trump-ban-png]: https://static01.nyt.com/newsgraphics/2021/04/19/trump-words/d31a6b0d884b8b8758bdd36e5f0fd97fb8aa61a6/overall-update-900.png
+
+1.  [**"What Happened When Trump Was Banned on Social Media"**](https://www.nytimes.com/interactive/2021/06/07/technology/trump-social-media-ban.html)
+20. "NEW POST: A collection of some of the best data visualisation content I discovered during January 2021 https://t.co/0GMu2Mpj5L Featuring work by @hannahdormido @catmule @ksituan @corycone https://t.co/Pd3ZExk0HD," --visualisingdata [2021-06-08 11:51:25](https://twitter.com/137712607/status/1402231788362256388)
+17. "The @ECONdailycharts "Off the charts" newsletter this week contains an interesting overview of the tools they use to make datavisualisations https://t.co/rdDCResiaU," --maartenzam [2021-06-08 20:52:35](https://twitter.com/17242884/status/1402367979564765184)
+20. ""Picking suitable colors—not only in terms of accessibility but also based on their emotional values—is an important skill for every designer to practice." Thank you @CedScherer for penning this great guest post! https://t.co/C6WF7KcXmX," --storywithdata [2021-06-09 13:33:01](https://twitter.com/404895983/status/1402619747481571328)
+21. "Randomly remembered Shortcut by @wattenberg earlier, as I do every couple of years, and watching it is again a total delight of simplicity and closure https://t.co/n2ZdyOvGOh," --genmon [2021-06-09 11:27:25](https://twitter.com/13124/status/1402588138200047618)
+15. "It's been an incredible journey making this #DoNoHarmGuide. #dataviz that embraces diversity, equity, and inclusion ultimately benefits everyone. I hope this can be the start of a larger conversation in our field! Check out the full report here: https://t.co/RMD2h8k8QE https://t.co/izP2WfR0Dt," --fleecealeece [2021-06-09 21:20:10](https://twitter.com/28409051/status/1402737306172366852)
+
+```{r tweet-methods, echo = FALSE}
+tweet_embed("https://twitter.com/830599432223629313/status/1401976252563525632")
+tweet_embed("https://twitter.com/154261653/status/1401942560386555913")
+tweet_embed("https://twitter.com/486038409/status/1404032560582201351")
+```
+
+
+
+
+
+
+```{r more, echo = FALSE}
+```
+
+***
+
+### For Thought
+
+1.  [**"Invisible Work"**](https://blog.harterrt.com/static/invisible_work_preso/#p1)
+2. "The problem with workload (and thus work-life balance) in academia is: You can always do more.(A thread based on a recent personal epiphany.)," --cfiesler [2021-06-09 14:33:19](https://twitter.com/194203770/status/1402634919516512259)
+8. "Absolutely nuts paper by researchers from U Chicago analyzing the productivity of 10,000 workers before and after the pandemic. Conclusions: WFH led to 2 more hrs of work per day, more meetings, less focus time, and *less productivity* https://t.co/DL2DfAvknm https://t.co/czPTKdrOSw," --altimor [2021-06-10 23:31:34](https://twitter.com/21125274/status/1403132762610089984)
+12. "PRD template for those who haven't seen it before. Caveats: - I have a few updates planned later this year- does not apply to every type of product- should evolve with the project- etc...https://t.co/aLcVXwwLa1," --kevinyien [2021-06-10 00:26:02](https://twitter.com/486352931/status/1402784082073956356)
+1. "@wandzilak_drew Consumers will buy a cheap crap speaker, or headphones, with or indeed without a voice assistant, but will only buy a good expensive speaker from a hifi brand, if that. But I want to see market sales data.," --benedictevans [2021-06-13 17:46:04](https://twitter.com/1236101/status/1404132980277145602)
+
+```{r tweet-metrics, echo = FALSE}
+tweet_embed("https://twitter.com/1115235802601140224/status/1402942119547920390")
+tweet_embed("https://twitter.com/1363429904910610434/status/1401841786528620545")
+```
+
+### Pretties
+```{r tweet-pretties, echo = FALSE}
+tweet_embed("https://twitter.com/267512876/status/1402277292437553153")
+tweet_embed("https://twitter.com/1063685129661382656/status/1401981254208155650")
+tweet_embed("https://twitter.com/97708927/status/1403902021007286274")
+tweet_embed("https://twitter.com/1719282710/status/1401916942789795845")
+tweet_embed("https://twitter.com/20228975/status/1401906832227045376")
+tweet_embed("https://twitter.com/526326547/status/1401864154974244865")
+tweet_embed("https://twitter.com/1308506567508070400/status/1402027731278254081")
+tweet_embed("https://twitter.com/18070567/status/1401740591201804291")
+
+```
+
+
+
+
+
+<!--Appendix-->
+
+
+

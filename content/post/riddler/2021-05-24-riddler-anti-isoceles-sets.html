@@ -9,10 +9,12 @@ tags:
 ---
 
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
 
 
 <p>A Riddler challenge involving anti-isoceles sets.</p>
 <!--more-->
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
 <div id="problem" class="section level3">
 <h3>Problem</h3>
 <p>This feels like a NP-complete problem, where we are faced with too many possibilities to recursively exhaust for an exact answer for anything more than a small grid width <span class="math inline">\(N\)</span>. Not quite sure yet which of the <a href="https://en.wikipedia.org/wiki/Karp%27s_21_NP-complete_problems">Karp problems</a> most resembles this one, though. My approach here was simply to use the brute-force recursive approach, which allowed me to find solutions up to <span class="math inline">\(N = 7\)</span>.</p>
@@ -48,6 +50,9 @@ tags:
 <h3>Distribution of anti-isoceles set sizes</h3>
 <p>Looking beyond just the largest anti-isoceles set, it seems like that perhaps we can model the distribution at play here, using a Conway-Maxwell-Poisson (CMP) distribution. Does that suggest the a range of likely maximum values for each grid size?</p>
 <p><img src="/post/riddler/2021-05-24-riddler-anti-isoceles-sets_files/figure-html/distributions-1.png" width="576" /></p>
+<hr />
+<blockquote class="twitter-tweet" data-width="550" data-lang="en" data-dnt="true" data-theme="light"><p lang="en" dir="ltr">It&#39;s a nice problem and also apparently a very hard one; here&#39;s a nice short Numberphile video walking through n=1, 2, and 3, and talking about known results for n=4 (173) and n=5 (16951). Nobody&#39;s managed n=6 yet. No easy process for this!<a href="https://t.co/xBmSq1yiRg">https://t.co/xBmSq1yiRg</a></p>&mdash; an elaborate plot (@joshmillard) <a href="https://twitter.com/joshmillard/status/1402665337418436614?ref_src=twsrc%5Etfw">June 9, 2021</a></blockquote>
+
 <hr />
 </div>
 <div id="code" class="section level3">
