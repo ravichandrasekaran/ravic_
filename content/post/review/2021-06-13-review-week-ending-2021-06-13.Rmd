@@ -59,28 +59,17 @@ Week in review, `r start_date` - `r end_date`.
 Week in review, `r start_date` - `r end_date`.
 
 ***
-
+<!--
 ### Meal plan
 
 1.  [Meen Fish Curry](https://cooking.nytimes.com/recipes/1020914-meen-gassi-fish-curry)
 2.  [Crispy Tofu with Cashews and Blistered Snap Peas](https://cooking.nytimes.com/recipes/1021200-crispy-tofu-with-cashews-and-blistered-snap-peas)
 
 
-### Travel plan
-
-1.  Turn off mail delivery
-2.  Buy books
-3.  Pack clothes, electronics
-4.  Pack dog food, etc.
-
-**Sun**: Prep books, moneys, computer to go back to PDS.
-**Mon**: Submit Riddler, Groceries, Spice Shop
-
-
 ***
 
 ### Seen
-
+-->
 
 ```{r sri-lanka-climate, eval = FALSE, echo=FALSE, fig.cap="Sri Lanka microplastics"}
 knitr::include_graphics("https://media.npr.org/assets/img/2021/06/04/gettyimages-1233244335_wide-75f843880ec94549885b1c8f8adb4bee65f988fe-s800-c85.webp")
@@ -91,70 +80,42 @@ knitr::include_graphics("https://media.npr.org/assets/img/2021/06/04/gettyimages
 
 ### Read
 
-<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B08FGSQYND&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_YZBNNTJHVXP529SAT52Y" ></iframe>
+<iframe type="text/html" width="200" height="324" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?asin=B00CL08LNK&preview=inline&linkCode=kpe&ref_=cm_sw_r_kb_dp_0W1DYDGK6TQMT2VSMQZ0" ></iframe>
 
 \
 
-1.  **"Somebody's Daughter"**, Ashley C. Ford  
-    The tenuous position of continually possible violence and abuse looms large throughout here, even before meeting the incarcerated father. The detail of each specific memory is amazingly compelling.
+[kevin-durant]: https://www.nytimes.com/2021/06/02/magazine/kevin-durant-brooklyn-nets.html
+[martina]: https://www.nytimes.com/2021/06/06/sports/martina-navratilova-french-open.html
+[blow-pride]: https://www.nytimes.com/2021/06/06/opinion/lgbtq-pride-month.html
+[roxane-gay-pride]: https://www.nytimes.com/2021/05/29/opinion/lgbtq-police-pride-parade.html
+[sri-lanka]: https://www.npr.org/2021/06/05/1003445739/the-ship-sinking-off-sri-lanka-looks-like-a-lasting-environmental-disaster
+[small-menus]: https://www.grubstreet.com/2021/06/in-praise-of-small-menus.html
 
-https://static01.nyt.com/newsgraphics/2021/04/19/trump-words/d31a6b0d884b8b8758bdd36e5f0fd97fb8aa61a6/overall-update-900.png
-
-
-https://www.nytimes.com/2021/06/02/magazine/kevin-durant-brooklyn-nets.html?action=click&module=Well&pgtype=Homepage&section=The%20New%20York%20Times%20Magazine
-https://www.nytimes.com/2021/06/06/sports/martina-navratilova-french-open.html?action=click&module=Top%20Stories&pgtype=Homepage
-
-A reminder that all the good opinion columns in the New York Times are from the Black columnists.
-https://www.nytimes.com/2021/06/06/opinion/lgbtq-pride-month.html?action=click&module=Opinion&pgtype=Homepage
-https://www.nytimes.com/2021/05/29/opinion/lgbtq-police-pride-parade.html
-
-https://www.npr.org/2021/06/05/1003445739/the-ship-sinking-off-sri-lanka-looks-like-a-lasting-environmental-disaster
-
-Via Roxane Gay
-https://www.grubstreet.com/2021/06/in-praise-of-small-menus.html
-https://texashighways.com/culture/people/essay-a-houston-native-returns-home-from-harlem-to-heal-alongside-his-family/
-https://www.blackculinaryhistory.com/high-on-the-hog-reader-1
+1.  **"Furious Cool"**, David and Joe Henry    
+2.  [Kevin Durant and (Possibly) the Greatest Basketball Team of All Time][kevin-durant], Sam Anderson
+3.  [Martina Navratilova has Plenty to Say][martina], Matthew Futterman
+4.  A Pride-based reminder that all the good opinion columns in the New York Times are from the Black columnists:  [Charles Blow's Journey to Pride][blow-pride] and [Roxane Gay on Cops Place at Pride][roxane-gay-pride]
+5.  [Sri Lanka in Lasting Environmental Disaster][sri-lanka]
+6.  [In Praise of Small Menus][small-menus] via Roxane Gay
 
 ### Watched
 
+[high-hog-reader]: https://www.blackculinaryhistory.com/high-on-the-hog-reader-1    
 
-
-1.  **White Tiger** ★★★★★  
-    I couldn't quite get into the book by Aravind Adiga when I had tried before. But the movie makes some perfect moves -- softening our protagonist perhaps somewhat, and diminishing the reflective flashback structure of the book. Great stuff. 
-2.  **Coded Bias** ★★★★  
-    For the most part, I've seen the canonical examples they presented here. But there's still something interesting about how each of these players comes at the challenge - policy, art, maths, ethics. 
+1.  **Westminster Dog Show Agility Challenge** ★★★★★  
     
-https://www.blackculinaryhistory.com/high-on-the-hog-reader-1    
+2.  **High on the Hog** ★★★★  
+    With a [reader from Roxane Gay][high-hog-reader]
 
-
+<!--
 ### Listened
-
-[invisible-work]: https://blog.harterrt.com/static/invisible_work_preso/#p1
-[ezra-klein]: https://www.nytimes.com/2021/06/04/opinion/ezra-klein-podcast-brian-christian.html?searchResultPosition=1&showTranscript=1
-[alignment-problem]: https://www.amazon.com/Alignment-Problem-Machine-Learning-Values/dp/0393635821
-
-
-1.  **Ezra Klein Show (Brian Christian)**  
-    "Coded Bias" pairs nicely with the recent [Ezra Klein show][ezra-klein] in support of Brian Christian's new book [The Alignment Problem][alignment-problem]. I was intrigued by the use of the word "irredeemable" for some of the AI initiatives, and how those can be highlighted from the jump. (Lemonade's video-based claims seem like one, for certain.)
-2.  **Loud Numbers** ★★★.  
-  As a lead-in for the eponymous podcast, Duncan Geere and Miriam Quick hosted a set of sessions on [data sonification](https://twitter.com/1215604990645014528/status/1401270434633560067). It's an interesting exercise, maybe obviously set for radio, but curious about finding other applications.
-
-
-
-***
-
 ### Quotes
+-->
 
-> But if we’re to tell the stories that matter with integrity, we have to do the work, and that means reaching out to those most impacted. As South African disability rights activists said, “Nothing about us, without us, is for us.” -- [Annie Tan](https://annietan.com/2021/06/02/my-statement-on-the-hold-still-vincent-podcast/) 
 
-
-Small menus have the power to clarify even muddled visions: Here are the dishes we believe in, says a small menu. We don’t fuck around. 
 
 
 ```{r quote-methods, echo = FALSE}
-tweet_embed("https://twitter.com/94068362/status/1400097629908836362")
-tweet_embed("https://twitter.com/191945961/status/1400093856939528193")
-tweet_embed("https://twitter.com/957645568578334721/status/1400452902515138569")
 ```
 
 
@@ -162,34 +123,90 @@ tweet_embed("https://twitter.com/957645568578334721/status/1400452902515138569")
 
 
 ### To read
+[vgr-thread]: https://twitter.com/vgr/status/1404100023772598283
+[climate-reading]: https://rachelbinx.com/climate-reading
+[ethanz-book-rec]: https://twitter.com/6267962/status/1402123700229402625
+[world-of-daas]: https://twitter.com/752644853419220992/status/1403102192349990913
+[saeed-jones-rec]: https://twitter.com/15649438/status/1402028265057968132
+[climate-lyricism]: https://twitter.com/2191771714/status/1402585317899706370
 
-1.  **"The Cruelty is the Point"** - Adam Serwer    
-    Via this bump from [Kiese Laymon](tweet_embed("https://twitter.com/16326882/status/1400876953398358022")
-2.  **"Year of Swollen Appendices"** - Brian Eno  
-    Via this bump from [Michael Sippey](https://twitter.com/4711/status/1400939949889789955)  
-3.  https://rachelbinx.com/climate-reading?utm_source=duncangeere&utm_medium=email
+
+1.  **"Let the Record Show"**, Sarah Schulman, via [Saeed Jones][saeed-jones-rec]
+2.  **"Farsighted"** - Adam Serwer, via [vgr non-fiction thread][vgr-thread]    
+3.  **"Boomtown"** - Brian Eno  
+4.  **"Peopleware"** 
+5.  **"Digital Cosmopolitans"**, Ethan Zuckerman, via [Dan Gillmor][ethanz-book-rec]
+6.  [**"World of DaaS"**][world-of-daas], Auren Hoffman
+7.  [**"Climate Lyricism"**][climate-lyricism], Min Hyoung Song
+7.  [Rachel Binx Climate Reading][climate-reading], via Duncan Greene
 
 
-https://www.nytimes.com/interactive/2021/books/summer-reading.html?action=click&module=Editors%20Picks&pgtype=Homepage
+```{r book-recs, echo = FALSE}
+```
 
-***
+
+### To watch
+[danton-movie]: https://twitter.com/245442984/status/1402070273747152902
+[breathless-movie]: https://twitter.com/1543986138/status/1402068698031083520
+[matewan]: https://twitter.com/626788014/status/1402078703958568962
+
+
+1.  [**"Danton"**][danton-movie], feat. Gerard Depardieu    
+    "Fencing is a science. Loving is a passion. Duelling is an obsession."
+2.  [**"Breathless"**][breathless-movie]
+3.  [**"Matewan"**][matewan]
+
+
+
+### Upcoming
+
+[user-conf]: https://twitter.com/1280779280579022848/status/1402745848631603205
+[scicomm]: https://twitter.com/1282525711991894019/status/1401802926050496512
+[art-machines]: https://twitter.com/225542451/status/1402186769337098246
+
+1.  [UseR conference][user-conf]
+2.  **"Science Communication through Graphic Stories"**, [Daisy Chung][scicomm]
+3.  [**"Art Machines"**][art-machines]
+
 
 ### For study
 
 
+```{r more-stuff, echo = FALSE}
+tweet_embed("https://twitter.com/172942846/status/1403285476023414787", plain = T)
+tweet_embed("https://twitter.com/78196808/status/1403149659502227456", plain = T)
+tweet_embed("https://twitter.com/2236047510/status/1402836863954599936", plain = T)
+tweet_embed("https://twitter.com/314734325/status/1402781286067023875", plain = F)
+tweet_embed("https://twitter.com/3004269184/status/1402381289093742598", plain = T)
+tweet_embed("https://twitter.com/111407412/status/1402253838547968004", plain = T)
+tweet_embed("https://twitter.com/17108894/status/1401980209876783109", plain = T)
+tweet_embed("https://twitter.com/421795636/status/1401809727294611466", plain = T)
+```
 
-https://blog.harterrt.com/static/invisible_work_preso/#p1
+
+### Visual study
+
+[trump-ban-png]: https://static01.nyt.com/newsgraphics/2021/04/19/trump-words/d31a6b0d884b8b8758bdd36e5f0fd97fb8aa61a6/overall-update-900.png
+
+1.  [**"Invisible Work"**](https://blog.harterrt.com/static/invisible_work_preso/#p1)
+2.  [**"What Happened When Trump Was Banned on Social Media"**](https://www.nytimes.com/interactive/2021/06/07/technology/trump-social-media-ban.html)
+3.  Stanford NLP, Spacy on [Youtube](https://twitter.com/575050905/status/1402136118305431557)
 
 ```{r tweet-methods, echo = FALSE}
-tweet_embed("https://twitter.com/765548/status/1400910135581712387")
-tweet_embed("https://twitter.com/331827860/status/1401045456235339776")
-tweet_embed("https://twitter.com/784078/status/1400816738275581957", hide_media = T)
-tweet_embed("https://twitter.com/1076526138736951298/status/1400802351682920452", hide_media=T)
-tweet_embed("https://twitter.com/1601593543/status/1400567197680943106")
-tweet_embed("https://twitter.com/951169512925097984/status/1400512668511920132")
-tweet_embed("https://twitter.com/821105693948264448/status/1400485671089971201")
-tweet_embed("https://twitter.com/16948477/status/1400188530547122181")
+tweet_embed("https://twitter.com/137712607/status/1402231788362256388")
+tweet_embed("https://twitter.com/830599432223629313/status/1401976252563525632")
+tweet_embed("https://twitter.com/154261653/status/1401942560386555913")
+tweet_embed("https://twitter.com/404895983/status/1402619747481571328")
+tweet_embed("https://twitter.com/13124/status/1402588138200047618")
+tweet_embed("https://twitter.com/28409051/status/1402737306172366852")
+tweet_embed("https://twitter.com/486038409/status/1404032560582201351")
+tweet_embed("https://twitter.com/17242884/status/1402367979564765184")
 ```
+
+
+
+
+
 
 ```{r more, echo = FALSE}
 ```
@@ -200,12 +217,29 @@ tweet_embed("https://twitter.com/16948477/status/1400188530547122181")
 
 
 ```{r tweet-metrics, echo = FALSE}
-# Metrics
-tweet_embed("https://twitter.com/17611446/status/1399935663684734977")
-tweet_embed("https://twitter.com/533409964/status/1399510290710941696")
-tweet_embed("https://twitter.com/23462787/status/1400481264306733057")
+# Reminder that you cannot build products to a missing space on spreadsheet
+tweet_embed("https://twitter.com/1236101/status/1404132980277145602")
+tweet_embed("https://twitter.com/1115235802601140224/status/1402942119547920390")
+tweet_embed("https://twitter.com/486352931/status/1402784082073956356")
+tweet_embed("https://twitter.com/21125274/status/1403132762610089984")
+tweet_embed("https://twitter.com/194203770/status/1402634919516512259")
+tweet_embed("https://twitter.com/1363429904910610434/status/1401841786528620545")
+```
+
+### Pretties
+```{r tweet-pretties, echo = FALSE}
+tweet_embed("https://twitter.com/97708927/status/1403902021007286274")
+tweet_embed("https://twitter.com/267512876/status/1402277292437553153")
+tweet_embed("https://twitter.com/1308506567508070400/status/1402027731278254081")
+tweet_embed("https://twitter.com/1063685129661382656/status/1401981254208155650")
+tweet_embed("https://twitter.com/1719282710/status/1401916942789795845")
+tweet_embed("https://twitter.com/20228975/status/1401906832227045376")
+tweet_embed("https://twitter.com/526326547/status/1401864154974244865")
+tweet_embed("https://twitter.com/18070567/status/1401740591201804291")
 
 ```
+
+
 
 
 

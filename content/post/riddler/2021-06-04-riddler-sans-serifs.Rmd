@@ -178,7 +178,19 @@ One nice perk? This mapping doesn't care about British vs. American English -- t
 
 
 
+***
+### Update
 
+
+```{r related, echo = FALSE, message = FALSE, warning = FALSE}
+library("tweetrmd")
+tweet_embed("https://twitter.com/1366811/status/1402364306725949441")
+```
+
+
+
+
+***
 
 ### Code 
 

@@ -12,6 +12,7 @@ tags:
 A Riddler challenge involving anti-isoceles sets.
 
 <!--more-->
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
 
 ```{r load-packages, include=FALSE}
 library("tidyverse")
@@ -106,6 +107,13 @@ iso_lengths %>%
   labs(subtitle = "Distribution of anti-isoceles set sizes",
        x = NULL, y = NULL) +
   scale_x_continuous(breaks=1:10, minor_breaks=NULL)
+```
+
+***
+
+```{r related-circles, echo = FALSE, message = FALSE, warning = FALSE}
+library("tweetrmd")
+tweet_embed("https://twitter.com/9378282/status/1402665337418436614")
 ```
 
 
