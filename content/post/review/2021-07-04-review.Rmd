@@ -88,6 +88,9 @@ Week in review, `r start_date` - `r end_date`.
 
 1.  Sweetcorn curry. ★★★  
     A save of the busted tomaticán recipe from the Chilean Kitchen.
+2.  Nik Sharma's meatloaf.  ★★★★★  
+    Always a hit. Although maybe I will learn to do the prep at 4p like I should.
+    
 
 ### Seen
 
@@ -96,6 +99,7 @@ Week in review, `r start_date` - `r end_date`.
 
 ### Listened
 
+Conversation with Tim O'Reilly and Shoshana Z.
 
 ### Read
 
@@ -105,37 +109,62 @@ Week in review, `r start_date` - `r end_date`.
 
 ### Upcoming
 
-1.  https://bethduckles.podia.com/qualitative-research-for-quantitative-researchers
+1.  Qual for Quant training, [Beth Duckles](https://bethduckles.podia.com/qualitative-research-for-quantitative-researchers)
+20. @NadiehBremer's &amp; @sxywu's "Data Sketches" written book club [Tue Aug 3](https://t.co/RVptAbaga6)
+3. Sir David Speigelhalter: Mathematical Concepts in the Age of Covid [Tue 13 July 8:30](https://www.kingsmathsschool.com/mathemagora-2021)
+
 
 ### To read
 <!--starts at 30-->
 
-8. "Thread! And for a vivid description of a wet bulb crisis in fiction, see Kim Stanley Robinson's Ministry For The Future.. https://t.co/9xHXUxZXNE," --timoreilly [Jun 29](https://twitter.com/2384071/status/1409689228234018816)
+8. **"Ministry For The Future"**, Kim Stanley Robinson, via [Tim O'Reilly](https://twitter.com/2384071/status/1409689228234018816)
+37. **"Bad Data Handbook"**, Paul Murrell, via [Jenny Bryan](https://twitter.com/2167059661/status/1411717015492960261)
+38. **"Master of Fine Arts in Software"**, Richard P. Gabriel, via [Hadley Wickham](https://twitter.com/hadleywickham/status/1411740569789861892)
+27. **"The Atlas of Disappearing Places"**  
+    “Climate change is not just about melting ice caps and starving polar bears, and The Atlas of Disappearing Places brings that reality home.” --[forewordreviews](https://twitter.com/18914404/status/1410976573864431616)
+26. **"The Cruelty is the Point"**, Adam Serwer, via [Alberto Cairo](https://twitter.com/34255829/status/1410925141513707520)  
+    "Once malice is embraced as virtue, it is impossible to contain." 
+
+
 
 ### To listen
 
 1.  Ologies
-6. "I just binged every available episode of Now &amp; Then by @HC_Richardson &amp; @jbf1755while doing touch-up trim painting. Fabulous history presented in these podcasts that ties the past to what's happening today. https://t.co/iFYRvBroPF," --maximum_mew [Jun 28](https://twitter.com/16494635/status/1409635858303447041)
+6. **"Now and Then"**, [\@HC_Richardson and \@jbf1755while](https://twitter.com/16494635/status/1409635858303447041)
+25. "UUID 0412a969-5b27-4c28-9662-85ef2c201e0c. Is this identifier unique? Can we be sure?. https://t.co/BF9zWLyPSv," --aperiodical [Jul 02](https://twitter.com/480493093/status/1410869445564768257)
+tweet_embed("https://twitter.com/480493093/status/1410869445564768257")
+11. "Great podcast on loneliness, and it's 2nd order effects on society." --matthewedanwoo [Jun 29](https://twitter.com/331651962/status/1409847007275929602)
 
 
 
 ### For study
-3. "1) Wrote about shade inequality w/ @aliyaute and how poorer communities of color in cities like #Houston face hotter temperatures because of a lack of #trees 🌳. https://t.co/QvnS2uKrm0," --salamdogmillion [Jun 28](https://twitter.com/51544489/status/1409523115357523974)
-7. "Communities that couldn't get mortgage loans in the 1940s are the same areas without fast home internet service today. There's no easy fix.. https://t.co/foa3ZcOIl4," --journojoshua [Jun 28](https://twitter.com/757955095086542848/status/1409647401376174080)
-4. "thank you all for the thoughtful replies. some of the more interesting topics require a bit of background, so i have decided to start with something introductory, which we will build upon. https://t.co/bU8YZaaaA5"Variance Reduction in Monte Carlo Methods: Bilinear Strategies". https://t.co/278q97Vhed," --sam_power_825 [Jun 28](https://twitter.com/949284328315367425/status/1409561523832475650)
+3. Long-lasting racist impacts baked into the land: [Shade inequality](https://twitter.com/51544489/status/1409523115357523974) and [Broadband access](https://twitter.com/757955095086542848/status/1409647401376174080)
+33. "Need to give your ML model 🤖 reliable uncertainty quantification? Check out our new Gentle Intro to Conformal Prediction tutorial + video. You get valid confidence sets with any model for any (unknown) distribution, no retraining. https://t.co/ZspxjfvaZuwith @ml_angelopoulos," --stats_stephen [Jul 02](https://twitter.com/990717732613013505/status/1411035644252418048)
+12. "You Don’t Understand Neural Networks til You Understand the Universal Approximation Theorem", [Andre Ye](https://t.co/F7PTtpD8Rk) via [sapinker](https://twitter.com/107225267/status/1409869656610033681)
+32. "Rescues of cats vs other animals by @LondonFire for this week's #TidyTuesday. Used stat_difference() of {ggh4x} for the first time and {geofacet} for the borough gridcode:. https://t.co/0MClOTLYYh#RStats #dataviz. https://t.co/jDmIQ1O7Oo," --geokaramanis [Jul 02](https://twitter.com/1002212251/status/1411026482168832002)
+16. "My favorite dplyr combo is group_split() and furrr::future_imap_dfr(), for easy parallelization of your commands (and easy maxxing out your multi-core processor 🔥🔥)," --skyetetra [Jun 30](https://twitter.com/14225080/status/1410085063203573762)
+4. "Variance Reduction in Monte Carlo Methods: Bilinear Strategies", [Sam Power](https://t.co/bU8YZaaaA5)
 
 
 ### For thought
-10. "I think hedgefunds are the most suited to remote work because there's a lot of "daily action", which provides alternative fuel for bonding, normally powered by Duchenne smiles. And the pre-PMF startups are the worst hit, because the coworker Duchenne is all they have.," --danielgross [Jun 29](https://twitter.com/38190583/status/1409861159910621186)
-5. "It is important to consider company stage when thinking about how to intervene to up your product game. What "works" in a big company will not work in a startup.At @Amplitude_HQ we tailor our coaching/feedback to meet companies where they are.(a quick morning activity ⬇️). https://t.co/UGMFiHRqEO," --johncutlefish [Jun 28](https://twitter.com/533409964/status/1409580615368773634)
+10. Daily action, smiles as team bonding glue  
+  "I think hedgefunds are the most suited to remote work because there's a lot of 'daily action', which provides alternative fuel for bonding, normally powered by Duchenne smiles. And the pre-PMF startups are the worst hit, because the coworker Duchenne is all they have.," --danielgross [Jun 29](https://twitter.com/38190583/status/1409861159910621186)
 1. "We can't keep regulating AI as if it..works. Most policy interventions start with the assumption that the technology lives up to its claims of performance but policymakers &amp; critical scholars need to stop falling for the corporate hype and should scrutinize these claims more.," --rajiinio [Jun 28](https://twitter.com/985158406125375488/status/1409333845795622912)
+34. Inverting the problem.  
+  Examples from [Charlie Munger](https://twitter.com/11336782/status/1411398340592295938) and the [CIA](https://twitter.com/2988396162/status/1410580982810431494).  "An important lesson from Charlie Munger from this article is that even if you can’t figure out the right solution to a problem, you can get very far by cataloging and avoiding all the wrong things."
+22. "How One Company Got Employees to Speak Up and Ask for Help", Joe Brown, via ttorres [Jul 01](https://twitter.com/2728761/status/1410706538990391303)
+5. "It is important to consider company stage when thinking about how to intervene to up your product game. What "works" in a big company will not work in a startup.At @Amplitude_HQ we tailor our coaching/feedback to meet companies where they are.(a quick morning activity ⬇️). https://t.co/UGMFiHRqEO," --johncutlefish [Jun 28](https://twitter.com/533409964/status/1409580615368773634)
+30. "Fundamental attribution error is our tendency to blame (or credit) the PERSON instead of the SITUATION. Everyone has high &amp; low periods in their lives that are beyond their control.  And even the most adaptable people struggle in some environments &amp; easily succeed in others.," --cindyalvarez [Jul 02](https://twitter.com/14164956/status/1411002488359067652)
+31. "@SahilBloom The work required to have an opinion. https://t.co/ISZ7VY23aW," --farnamstreet [Jul 02](https://twitter.com/112290748/status/1411009826759512068)
 
 
 
 
 
 
-<!--### Project seeds, courses-->
+<!--### Project seeds, courses -->
+
+
 
 <!--### To watch-->
 
@@ -144,14 +173,41 @@ Week in review, `r start_date` - `r end_date`.
 
 ### Pretties
 
-9. "NEW POST: A collection of some of the best data visualisation work, articles, and other references discovered during April 2021. https://t.co/UxeRuqKSpZFeaturing work by @CraigTaylorViz @dr_xeo @framoriniii &amp; @_kathchan_. https://t.co/Kna2UCllJu," --visualisingdata [Jun 29](https://twitter.com/137712607/status/1409822362141343745)
-
-
 ```{r pretties, echo = FALSE}
+# 9. "NEW POST: A collection of some of the best data visualisation work, articles, and other references discovered during April 2021. https://t.co/UxeRuqKSpZFeaturing work by @CraigTaylorViz @dr_xeo @framoriniii &amp; @_kathchan_. https://t.co/Kna2UCllJu," --visualisingdata [Jun 29](https://twitter.com/137712607/status/1409822362141343745)
+tweet_embed("https://twitter.com/137712607/status/1409822362141343745")
+
+# 35. "Geometric Shapes / 210703#processing#creativecoding #everyday. https://t.co/RX1RQlvn0z," --sasj_nl [Jul 03](https://twitter.com/18282165/status/1411410661331116049)
+tweet_embed("https://twitter.com/18282165/status/1411410661331116049")
+
+# 29. "Walter Diethelm in collaboration with Dr. Marion Diethelm, Signet Signal Symbol: Handbook of International Signs, ABC Edition Zurich, 1970.. https://t.co/TOT9kSOeSP," --lett_arc [Jul 02](https://twitter.com/1654135140/status/1410991716979576833)
+tweet_embed("https://twitter.com/1654135140/status/1410991716979576833")
+
+
+# 39. "Illustrations from Japanese fireworks catalogues (ca. 1880s) —. https://t.co/LcUe1zpoYU #Fireworks appeared in Japan sometime around 1600 and were called hanabi — a combination of the kanji “fire” and “flower”.. https://t.co/NtExpQEEc9," --publicdomainrev [Jul 04](https://twitter.com/203307838/status/1411789676608954372)
+tweet_embed("https://twitter.com/203307838/status/1411789676608954372")
+
+# 36. "https://t.co/uAtc3Bcnf9," --incre_ment [Jul 04](https://twitter.com/1325484425371508736/status/1411704119291572229)
+tweet_embed("https://twitter.com/1325484425371508736/status/1411704119291572229")
+# 23. "Beethoven 5th Symphony. https://t.co/hI12d1VtTG," --panthera156 [Jul 02](https://twitter.com/2378823619/status/1410838301284651008)
+tweet_embed("https://twitter.com/2378823619/status/1410838301284651008")
+
+# 21. "Space Alphabet (1964) by Irene Zacks.We scanned the book in here. https://t.co/5dwF56fJLF. https://t.co/YM5xyGq4Ht," --presentcorrect [Jul 01](https://twitter.com/20228975/status/1410676066541264906)
+tweet_embed("https://twitter.com/20228975/status/1410676066541264906")
+# 15. "came across a wonderful dataset showing songbird interactions and created a new #DataArt piece 🕊. https://t.co/vW6KLgXCGR," --allitorban [Jun 30](https://twitter.com/856223700638674945/status/1410038802442240000)
+tweet_embed("https://twitter.com/856223700638674945/status/1410038802442240000")
+
+# 13. "As Portland experiences record-breaking heat, its worth remembering that the city has some of the greatest heat disparities between its formerly redlined and greenlined neighborhoods.. https://t.co/2VuWuRMZpQ," --repbonnie [Jun 29](https://twitter.com/2968451607/status/1409890531660996613)
+tweet_embed("https://twitter.com/2968451607/status/1409890531660996613")
+```
+
+
+### Absurdities
+
+```{r absurd, echo = FALSE}
 # 2. "the department of safety and security at my girlfriend’s school just sent all an email telling students not to make eye contact with crows. https://t.co/GD4GbYV0LG," --gabrielledrolet [Jun 28](https://twitter.com/829155743215546372/status/1409508425738883073)
 tweet_embed("https://twitter.com/829155743215546372/status/1409508425738883073")
 ```
-
 
 <!--### Poem-->
 
