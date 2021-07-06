@@ -1,0 +1,191 @@
+---
+title: 'Week ending 2021-07-11'
+author: ravic
+date: '2021-07-11'
+slug: week-ending-2021-07-11
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-07-11"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 6
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+```{r list-tweets, include = FALSE, eval=FALSE}
+# More todos on handling the text: 
+# 1. Deal with internal quotes, smart quotes
+# 2. Remove media URL's, substitute link URL's
+# 3. Link to screen names, highlight text-internal screen names, maybe real names
+# 4. De-emoji, ftfy
+# 5. Shorten to single sentence?
+
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweetrmd::tweet_url(user_id, status_id),
+         create_date = as.character(created_at, "%b %d"),
+         text = str_replace_all(text, "[\r\n]" , ""),
+         screen_name = str_to_lower(screen_name),
+         text = str_replace_all(text, ".http", ". http")) 
+recent_faves %>% 
+  arrange(created_at) %>%  
+  mutate(idx = row_number(),
+         # command = glue('tweet_embed("{url}")'),
+         formatted = glue::glue('# {idx}. "{text}," --{screen_name} [{create_date}]({url})\ntweet_embed("{url}")\n\n')) %>%
+  pull(formatted) %>% 
+  purrr::walk(cat, sep="\n")
+```
+```{r kindle-highlights, eval=FALSE, include = FALSE}
+kh <- readr::read_csv("~/projects/kindle-highlights/output.csv",
+                      col_types = cols()) %>%
+  mutate(formatted = paste0("\n\n> ", content, "  \n", "-- ", author, ", ", title)) %>%
+  filter(between(as.Date(create_dt), end_date - 7, end_date)) 
+kh %>%
+  pull(formatted) %>%
+  purrr::walk(cat, sep = "\n")
+```
+
+<!--
+Harvest:
+1.  Chrome history
+2.  NYT
+3.  Netflix, Amazon Prime
+4.  Kindle highlights
+-->
+
+
+
+
+
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+
+```{r tweet-preview, echo = TRUE}
+
+```
+
+
+### Cooked
+
+1.  Chili Fish Curry, "S is for Sri Lanka". ★★★  
+    This could be a really good meal - the coconut + tomato + fish was really 
+    flavorful, and the timing on the steps was good. But replacing onion with
+    பெருங்காயம் was not a great move.
+2.  Lemon bars, "101 Cookies", Sarah Kieffer. ★★★★     
+    Nice, but the lemon could definitely be more pronounced.
+3.  Honey, Soy, and Ginger Braised Tofu, "East", Meera Sodha. ★★★★  
+    With some broccoli and rice.
+
+    
+### Seen
+
+1.  Haikyu!!. ★★★  
+    Need to find another good competition manga after this is done.
+2.  Edge of Tomorrow. ★★★★  
+    Emily Blunt + Tom Cruise somehow works. Re-watch, and still holds up. End 
+    is still weirdly resolved.
+
+
+### Listened
+
+2.  **"Why Do We Work So Damn Much?"**, Ezra Klein Show with [James Suzman](https://www.nytimes.com/2021/06/29/opinion/ezra-klein-podcast-james-suzman.html)
+
+
+### Read
+
+
+
+### Quotes
+
+```{r quotes, echo = FALSE}
+# 8. "A calendar speaks more truth than a to-do list.," --shreyas [Jul 05](https://twitter.com/2048741/status/1412094069921046528)
+tweet_embed("https://twitter.com/2048741/status/1412094069921046528")
+```
+
+### Upcoming
+
+
+
+### To read
+<!--starts at 30-->
+
+1. "With The Culture Map Meyer masterfully condensed the broad cross cultural communication research, as well as adding some of her own—demonstrating her ability to ably curate, synthesise, and communicate to a mass audience.," --janchip [Jul 05](https://twitter.com/14491008/status/1411885246295928844)
+2. "The main case that inspired me to write my 2015 book How Propaganda Works was the panic about violent crime in the 90s, which was inflamed by media and politicians throughout that decade even though crime was rapidly dropping throughout the decade.," --jasonintrator [Jul 05](https://twitter.com/1726682706/status/1411918801432727554)
+3. "I just received my gorgeous physical copy of "Mapping Affinities", a marvelous book that goes from the history of data visualization to new legible modes of mapping organizational structures.Congratulations, @dariorodighiero!. https://t.co/AUsVVu5n0X," --scott_bot [Jul 05](https://twitter.com/15762276/status/1412011667479744513)
+tweet_embed("https://twitter.com/15762276/status/1412011667479744513")
+4. "Also, New Dawn by Michael Dawson.. https://t.co/74K5HxGk3Z," --jaejaeykim2 [Jul 05](https://twitter.com/968294068559097856/status/1412036741096120327)
+
+
+
+
+### To listen
+
+
+
+### For study
+7. "Draft of "Spatial Data Science" book by @edzerpebesma and R. Bivand is here:. https://t.co/tKjt4yXimh @_useRconf #useR2021," --sheilasaia [Jul 05](https://twitter.com/2907277769/status/1412083601026519042)
+11. "Unfortunately it is hard to test whether the MCMC has converged to a stationary distribution. However, it is possible to prove that a map is an outlier (i.e. has been gerrymandered) from a MCMC **without mixing**. https://t.co/lF9CWXBx14," --womeninstat [Jul 05](https://twitter.com/1217315090/status/1412137661352103939)
+12. "The rise and fall of the OLAP cub. https://t.co/jYtEeWFkXe," --datascifact [Jul 05](https://twitter.com/220139885/status/1412150866128293893)
+
+
+### For thought
+
+
+
+
+
+
+<!--### Project seeds, courses -->
+
+
+
+<!--### To watch-->
+
+
+
+
+### Pretties
+
+```{r pretties, echo = FALSE}
+# 5. "Caroline Walker, Atrium,  Oil on linen, 200 x 260cm  2018. https://t.co/gsOuKIm7Dz," --rabihalameddine [Jul 05](https://twitter.com/267512876/status/1412068708755800067)
+tweet_embed("https://twitter.com/267512876/status/1412068708755800067")
+
+# 9. "Why people describe warm colors more efficiently than cool ones—across 110 languages! Nice research on color terms, with elegant visualizations and a new use for a classic ML data set.Paper:. https://t.co/nA91mVS8aiSummary:. https://t.co/qzLf0G9B2Y  (h/t @timhwang &amp; @emollick). https://t.co/GlPsjP0Gmx," --wattenberg [Jul 05](https://twitter.com/15463062/status/1412097860833849348)
+tweet_embed("https://twitter.com/15463062/status/1412097860833849348")
+
+# 10. ""With every new birder comes a new observer, one whose eyes and ears are aimed toward that which is small and fragile and alive."I wrote about birding's post-pandemic boom, and how cities might benefit from this new generation of noticers. https://t.co/klsaniwBqT," --blprnt [Jul 05](https://twitter.com/17013577/status/1412121880853630981)
+tweet_embed("https://twitter.com/17013577/status/1412121880853630981")
+```
+
+
+### Absurdities
+
+```{r absurd, echo = FALSE}
+```
+
+<!--### Poem-->
+
+
