@@ -1,0 +1,220 @@
+---
+title: 'Week ending 2021-07-04'
+author: ravic
+date: '2021-07-04'
+slug: week-ending-2021-07-04
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-07-04"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 6
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+```{r list-tweets, include = FALSE, eval=FALSE}
+# More todos on handling the text: 
+# 1. Deal with internal quotes, smart quotes
+# 2. Remove media URL's, substitute link URL's
+# 3. Link to screen names, highlight text-internal screen names, maybe real names
+# 4. De-emoji, ftfy
+# 5. Shorten to single sentence?
+
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweetrmd::tweet_url(user_id, status_id),
+         create_date = as.character(created_at, "%b %d"),
+         text = str_replace_all(text, "[\r\n]" , ""),
+         screen_name = str_to_lower(screen_name),
+         text = str_replace_all(text, ".http", ". http")) 
+recent_faves %>% 
+  arrange(created_at) %>%  
+  mutate(idx = row_number(),
+         # command = glue('tweet_embed("{url}")'),
+         formatted = glue::glue('# {idx}. "{text}," --{screen_name} [{create_date}]({url})\ntweet_embed("{url}")\n\n')) %>%
+  pull(formatted) %>% 
+  purrr::walk(cat, sep="\n")
+```
+```{r kindle-highlights, eval=FALSE, include = FALSE}
+kh <- readr::read_csv("~/projects/kindle-highlights/output.csv",
+                      col_types = cols()) %>%
+  mutate(formatted = paste0("\n\n> ", content, "  \n", "-- ", author, ", ", title)) %>%
+  filter(between(as.Date(create_dt), end_date - 7, end_date)) 
+kh %>%
+  pull(formatted) %>%
+  purrr::walk(cat, sep = "\n")
+```
+
+<!--
+Harvest:
+1.  Chrome history
+2.  NYT
+3.  Netflix, Amazon Prime
+4.  Kindle highlights
+-->
+
+
+
+
+
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+
+
+### Cooked
+
+1.  Sweetcorn curry. ★★★  
+    A save of the busted tomaticán recipe from the Chilean Kitchen.
+2.  Nik Sharma's meatloaf.  ★★★★★  
+    Always a hit. Although maybe I will learn to do the prep at 4p like I should.
+3.  Egg curry. ★★★★     
+    Maybe a lighter hand with the tamarind.
+    
+    
+### Seen
+
+1.  Haikyu!!. ★★★  
+    Need to find another good competition manga after this is done.
+2.  
+
+
+### Listened
+
+1.  Conversation with Tim O'Reilly and Shoshana Z. Notes below
+2.  **"Why Do We Work So Damn Much?"**, Ezra Klein Show with [James Suzman](https://www.nytimes.com/2021/06/29/opinion/ezra-klein-podcast-james-suzman.html)
+
+
+### Read
+
+1.  https://www.nytimes.com/interactive/2021/06/28/magazine/levar-burton-interview.html?action=click&module=Editors%20Picks&pgtype=Homepage
+2.  https://www.nytimes.com/interactive/2021/06/27/us/louisiana-graves-enslaved-people.html?action=click&module=Top%20Stories&pgtype=Homepage 
+3.  https://www.theinsight.org/p/rare-events-need-different-methods
+
+### Upcoming
+
+1.  Qual for Quant training, [Beth Duckles](https://bethduckles.podia.com/qualitative-research-for-quantitative-researchers)
+20. @NadiehBremer's &amp; @sxywu's "Data Sketches" written book club [Tue Aug 3](https://t.co/RVptAbaga6)
+3. Sir David Speigelhalter: Mathematical Concepts in the Age of Covid [Tue 13 July 8:30](https://www.kingsmathsschool.com/mathemagora-2021)
+
+
+### To read
+<!--starts at 30-->
+
+8. **"Ministry For The Future"**, Kim Stanley Robinson, via [Tim O'Reilly](https://twitter.com/2384071/status/1409689228234018816)
+37. **"Bad Data Handbook"**, Paul Murrell, via [Jenny Bryan](https://twitter.com/2167059661/status/1411717015492960261)
+38. **"Master of Fine Arts in Software"**, Richard P. Gabriel, via [Hadley Wickham](https://twitter.com/hadleywickham/status/1411740569789861892)
+27. **"The Atlas of Disappearing Places"**  
+    “Climate change is not just about melting ice caps and starving polar bears, and The Atlas of Disappearing Places brings that reality home.” --[forewordreviews](https://twitter.com/18914404/status/1410976573864431616)
+26. **"The Cruelty is the Point"**, Adam Serwer, via [Alberto Cairo](https://twitter.com/34255829/status/1410925141513707520)  
+    "Once malice is embraced as virtue, it is impossible to contain." 
+
+
+
+### To listen
+
+1.  Ologies
+6. **"Now and Then"**, [\@HC_Richardson and \@jbf1755while](https://twitter.com/16494635/status/1409635858303447041)
+25. "UUID 0412a969-5b27-4c28-9662-85ef2c201e0c. Is this identifier unique? Can we be sure?. https://t.co/BF9zWLyPSv," --aperiodical [Jul 02](https://twitter.com/480493093/status/1410869445564768257)
+tweet_embed("https://twitter.com/480493093/status/1410869445564768257")
+11. "Great podcast on loneliness, and it's 2nd order effects on society." --matthewedanwoo [Jun 29](https://twitter.com/331651962/status/1409847007275929602)
+
+
+
+### For study
+3. Long-lasting racist impacts baked into the land: [Shade inequality](https://twitter.com/51544489/status/1409523115357523974) and [Broadband access](https://twitter.com/757955095086542848/status/1409647401376174080)
+33. "Need to give your ML model 🤖 reliable uncertainty quantification? Check out our new Gentle Intro to Conformal Prediction tutorial + video. You get valid confidence sets with any model for any (unknown) distribution, no retraining. https://t.co/ZspxjfvaZuwith @ml_angelopoulos," --stats_stephen [Jul 02](https://twitter.com/990717732613013505/status/1411035644252418048)
+12. "You Don’t Understand Neural Networks til You Understand the Universal Approximation Theorem", [Andre Ye](https://t.co/F7PTtpD8Rk) via [sapinker](https://twitter.com/107225267/status/1409869656610033681)
+32. "Rescues of cats vs other animals by @LondonFire for this week's #TidyTuesday. Used stat_difference() of {ggh4x} for the first time and {geofacet} for the borough gridcode:. https://t.co/0MClOTLYYh#RStats #dataviz. https://t.co/jDmIQ1O7Oo," --geokaramanis [Jul 02](https://twitter.com/1002212251/status/1411026482168832002)
+16. "My favorite dplyr combo is group_split() and furrr::future_imap_dfr(), for easy parallelization of your commands (and easy maxxing out your multi-core processor 🔥🔥)," --skyetetra [Jun 30](https://twitter.com/14225080/status/1410085063203573762)
+4. "Variance Reduction in Monte Carlo Methods: Bilinear Strategies", [Sam Power](https://t.co/bU8YZaaaA5)
+
+
+### For thought
+10. Daily action, smiles as team bonding glue  
+  "I think hedgefunds are the most suited to remote work because there's a lot of 'daily action', which provides alternative fuel for bonding, normally powered by Duchenne smiles. And the pre-PMF startups are the worst hit, because the coworker Duchenne is all they have.," --danielgross [Jun 29](https://twitter.com/38190583/status/1409861159910621186)
+1. "We can't keep regulating AI as if it..works. Most policy interventions start with the assumption that the technology lives up to its claims of performance but policymakers &amp; critical scholars need to stop falling for the corporate hype and should scrutinize these claims more.," --rajiinio [Jun 28](https://twitter.com/985158406125375488/status/1409333845795622912)
+34. Inverting the problem.  
+  Examples from [Charlie Munger](https://twitter.com/11336782/status/1411398340592295938) and the [CIA](https://twitter.com/2988396162/status/1410580982810431494).  "An important lesson from Charlie Munger from this article is that even if you can’t figure out the right solution to a problem, you can get very far by cataloging and avoiding all the wrong things."
+22. "How One Company Got Employees to Speak Up and Ask for Help", Joe Brown, via ttorres [Jul 01](https://twitter.com/2728761/status/1410706538990391303)
+5. "It is important to consider company stage when thinking about how to intervene to up your product game. What "works" in a big company will not work in a startup.At @Amplitude_HQ we tailor our coaching/feedback to meet companies where they are.(a quick morning activity ⬇️). https://t.co/UGMFiHRqEO," --johncutlefish [Jun 28](https://twitter.com/533409964/status/1409580615368773634)
+30. "Fundamental attribution error is our tendency to blame (or credit) the PERSON instead of the SITUATION. Everyone has high &amp; low periods in their lives that are beyond their control.  And even the most adaptable people struggle in some environments &amp; easily succeed in others.," --cindyalvarez [Jul 02](https://twitter.com/14164956/status/1411002488359067652)
+31. "@SahilBloom The work required to have an opinion. https://t.co/ISZ7VY23aW," --farnamstreet [Jul 02](https://twitter.com/112290748/status/1411009826759512068)
+
+
+
+
+
+
+<!--### Project seeds, courses -->
+
+
+
+<!--### To watch-->
+
+
+
+
+### Pretties
+
+```{r pretties, echo = FALSE}
+# 9. "NEW POST: A collection of some of the best data visualisation work, articles, and other references discovered during April 2021. https://t.co/UxeRuqKSpZFeaturing work by @CraigTaylorViz @dr_xeo @framoriniii &amp; @_kathchan_. https://t.co/Kna2UCllJu," --visualisingdata [Jun 29](https://twitter.com/137712607/status/1409822362141343745)
+tweet_embed("https://twitter.com/137712607/status/1409822362141343745")
+
+# 35. "Geometric Shapes / 210703#processing#creativecoding #everyday. https://t.co/RX1RQlvn0z," --sasj_nl [Jul 03](https://twitter.com/18282165/status/1411410661331116049)
+tweet_embed("https://twitter.com/18282165/status/1411410661331116049")
+
+# 29. "Walter Diethelm in collaboration with Dr. Marion Diethelm, Signet Signal Symbol: Handbook of International Signs, ABC Edition Zurich, 1970.. https://t.co/TOT9kSOeSP," --lett_arc [Jul 02](https://twitter.com/1654135140/status/1410991716979576833)
+tweet_embed("https://twitter.com/1654135140/status/1410991716979576833")
+
+
+# 39. "Illustrations from Japanese fireworks catalogues (ca. 1880s) —. https://t.co/LcUe1zpoYU #Fireworks appeared in Japan sometime around 1600 and were called hanabi — a combination of the kanji “fire” and “flower”.. https://t.co/NtExpQEEc9," --publicdomainrev [Jul 04](https://twitter.com/203307838/status/1411789676608954372)
+tweet_embed("https://twitter.com/203307838/status/1411789676608954372")
+
+# 36. "https://t.co/uAtc3Bcnf9," --incre_ment [Jul 04](https://twitter.com/1325484425371508736/status/1411704119291572229)
+tweet_embed("https://twitter.com/1325484425371508736/status/1411704119291572229")
+# 23. "Beethoven 5th Symphony. https://t.co/hI12d1VtTG," --panthera156 [Jul 02](https://twitter.com/2378823619/status/1410838301284651008)
+tweet_embed("https://twitter.com/2378823619/status/1410838301284651008")
+
+# 21. "Space Alphabet (1964) by Irene Zacks.We scanned the book in here. https://t.co/5dwF56fJLF. https://t.co/YM5xyGq4Ht," --presentcorrect [Jul 01](https://twitter.com/20228975/status/1410676066541264906)
+tweet_embed("https://twitter.com/20228975/status/1410676066541264906")
+# 15. "came across a wonderful dataset showing songbird interactions and created a new #DataArt piece 🕊. https://t.co/vW6KLgXCGR," --allitorban [Jun 30](https://twitter.com/856223700638674945/status/1410038802442240000)
+tweet_embed("https://twitter.com/856223700638674945/status/1410038802442240000")
+
+# 13. "As Portland experiences record-breaking heat, its worth remembering that the city has some of the greatest heat disparities between its formerly redlined and greenlined neighborhoods.. https://t.co/2VuWuRMZpQ," --repbonnie [Jun 29](https://twitter.com/2968451607/status/1409890531660996613)
+tweet_embed("https://twitter.com/2968451607/status/1409890531660996613")
+```
+
+
+### Absurdities
+
+```{r absurd, echo = FALSE}
+# 2. "the department of safety and security at my girlfriend’s school just sent all an email telling students not to make eye contact with crows. https://t.co/GD4GbYV0LG," --gabrielledrolet [Jun 28](https://twitter.com/829155743215546372/status/1409508425738883073)
+tweet_embed("https://twitter.com/829155743215546372/status/1409508425738883073")
+```
+
+<!--### Poem-->
+
+
