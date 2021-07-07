@@ -123,6 +123,10 @@ Week in review, `r start_date` - `r end_date`.
 ```{r quotes, echo = FALSE}
 # 8. "A calendar speaks more truth than a to-do list.," --shreyas [Jul 05](https://twitter.com/2048741/status/1412094069921046528)
 tweet_embed("https://twitter.com/2048741/status/1412094069921046528")
+
+# 15. "@TheRaDR “Once is happenstance. Twice is coincidence. The third time it’s enemy action.”     - Auric Goldfinger," --egalitare [Jul 06](https://twitter.com/3277614776/status/1412538086492409857)
+tweet_embed("https://twitter.com/3277614776/status/1412538086492409857")
+
 ```
 
 ### Upcoming
@@ -149,9 +153,14 @@ tweet_embed("https://twitter.com/15762276/status/1412011667479744513")
 7. "Draft of "Spatial Data Science" book by @edzerpebesma and R. Bivand is here:. https://t.co/tKjt4yXimh @_useRconf #useR2021," --sheilasaia [Jul 05](https://twitter.com/2907277769/status/1412083601026519042)
 11. "Unfortunately it is hard to test whether the MCMC has converged to a stationary distribution. However, it is possible to prove that a map is an outlier (i.e. has been gerrymandered) from a MCMC **without mixing**. https://t.co/lF9CWXBx14," --womeninstat [Jul 05](https://twitter.com/1217315090/status/1412137661352103939)
 12. "The rise and fall of the OLAP cub. https://t.co/jYtEeWFkXe," --datascifact [Jul 05](https://twitter.com/220139885/status/1412150866128293893)
+# 14. "Because this keeps coming up here's a short thread on why tools that claim to seamlessly fit discrete parameters are not the boons that you might think they are.," --betanalpha [Jul 06](https://twitter.com/78196808/status/1412488546351562762)
+tweet_embed("https://twitter.com/78196808/status/1412488546351562762")
 
 
 ### For thought
+
+13. "A report found that by June 2021, 86% of Iceland's working population were working shorter weeks or had “new mechanisms made available to them through which they can negotiate shorter hours." #FourDayWeek. https://t.co/TVarMFZ24Z," --vmckeevercnbc [Jul 06](https://twitter.com/302836632/status/1412365993897234434)
+tweet_embed("https://twitter.com/302836632/status/1412365993897234434")
 
 
 
