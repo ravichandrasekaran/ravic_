@@ -97,8 +97,15 @@ Week in review, `r start_date` - `r end_date`.
 2.  Lemon bars, "101 Cookies", Sarah Kieffer. ★★★★     
     Nice, but the lemon could definitely be more pronounced.
 3.  Honey, Soy, and Ginger Braised Tofu, "East", Meera Sodha. ★★★★  
-    With some broccoli and rice.
-
+    With some broccoli and rice. Lower the heat of the oil, double the sauce.
+4.  Rajasthani-Cucumber Sushi. 
+5.  Mango-Avocado Salad. ★★★
+    Good mango, but didn't need the balsamic. 
+6.  Vegetables in Spiced Coconut Milk. ★★★★  
+    Simple, yummy. Kind of like a Keralite avial
+7.  Lime dhal. ★★★  
+    Water and simmer/cook time is still off. Trying the tadka without the onion
+    is a poor choice.
     
 ### Seen
 
@@ -112,7 +119,14 @@ Week in review, `r start_date` - `r end_date`.
 ### Listened
 
 2.  **"Why Do We Work So Damn Much?"**, Ezra Klein Show with [James Suzman](https://www.nytimes.com/2021/06/29/opinion/ezra-klein-podcast-james-suzman.html)
-
+3.  useR conference session. From Sevvandi Kandanaarachchi (Hyndman lab at Monash) 
+    had `{dobit}` and `{lookout}` for 
+    anomaly detection, both of which looked really interesting -- especially the
+    idea of dimensionality reduction preserving the outliers, rather than minimizing
+    the variance. The `{maars}` package (Riccardo Fogliato, Shamindra Shrotriya, 
+    out of the Kuchibhotla lab in CMU) also looked good for linear regression 
+    with violations of assumptions, replacing things like `{sandwich}` with an
+    integrated design.
 
 ### Read
 
@@ -126,6 +140,9 @@ tweet_embed("https://twitter.com/2048741/status/1412094069921046528")
 
 # 15. "@TheRaDR “Once is happenstance. Twice is coincidence. The third time it’s enemy action.”     - Auric Goldfinger," --egalitare [Jul 06](https://twitter.com/3277614776/status/1412538086492409857)
 tweet_embed("https://twitter.com/3277614776/status/1412538086492409857")
+
+# 17. "@janecoaston Wilhoit’s Law holds. https://t.co/xymjoAwvkR. https://t.co/sKHnqWNQ88," --patrickgillam [Jul 07](https://twitter.com/24682880/status/1412867998797418500)
+tweet_embed("https://twitter.com/24682880/status/1412867998797418500")
 
 ```
 
@@ -141,8 +158,10 @@ tweet_embed("https://twitter.com/3277614776/status/1412538086492409857")
 3. "I just received my gorgeous physical copy of "Mapping Affinities", a marvelous book that goes from the history of data visualization to new legible modes of mapping organizational structures.Congratulations, @dariorodighiero!. https://t.co/AUsVVu5n0X," --scott_bot [Jul 05](https://twitter.com/15762276/status/1412011667479744513)
 tweet_embed("https://twitter.com/15762276/status/1412011667479744513")
 4. "Also, New Dawn by Michael Dawson.. https://t.co/74K5HxGk3Z," --jaejaeykim2 [Jul 05](https://twitter.com/968294068559097856/status/1412036741096120327)
-
-
+27. "New publication! Our experimental Theatre in Pandemic syllabus, co-created with my fab @cmudrama colleague Nica Ross.What kinds of structures of participation are most generative for making live art and storytelling together online. https://t.co/fhyzn96d5V #design #improv #larp," --futuryst [Jul 09](https://twitter.com/12331792/status/1413515291498139649)
+tweet_embed("https://twitter.com/12331792/status/1413515291498139649")
+25. "We're very excited to see forthcoming books from Claire Vaye Watkins, @colsonwhitehead, and @rabihalameddine among so many great looking titles on @lithub's most anticipated list for the second half of 2021.💗. https://t.co/GE9HJ4PwWx," --aragiauthors [Jul 08](https://twitter.com/256073990/status/1413215700408311810)
+tweet_embed("https://twitter.com/256073990/status/1413215700408311810")
 
 
 ### To listen
@@ -153,14 +172,21 @@ tweet_embed("https://twitter.com/15762276/status/1412011667479744513")
 7. "Draft of "Spatial Data Science" book by @edzerpebesma and R. Bivand is here:. https://t.co/tKjt4yXimh @_useRconf #useR2021," --sheilasaia [Jul 05](https://twitter.com/2907277769/status/1412083601026519042)
 11. "Unfortunately it is hard to test whether the MCMC has converged to a stationary distribution. However, it is possible to prove that a map is an outlier (i.e. has been gerrymandered) from a MCMC **without mixing**. https://t.co/lF9CWXBx14," --womeninstat [Jul 05](https://twitter.com/1217315090/status/1412137661352103939)
 12. "The rise and fall of the OLAP cub. https://t.co/jYtEeWFkXe," --datascifact [Jul 05](https://twitter.com/220139885/status/1412150866128293893)
-# 14. "Because this keeps coming up here's a short thread on why tools that claim to seamlessly fit discrete parameters are not the boons that you might think they are.," --betanalpha [Jul 06](https://twitter.com/78196808/status/1412488546351562762)
-tweet_embed("https://twitter.com/78196808/status/1412488546351562762")
+14. "Because this keeps coming up here's a short thread on why tools that claim to seamlessly fit discrete parameters are not the boons that you might think they are.," --betanalpha [Jul 06](https://twitter.com/78196808/status/1412488546351562762)
+19. ""To deal with hyper-planes in a 14-dimensional space, visualize a 3-D space and say 'fourteen' to yourself very loudly. Everyone does it."-- Geoff Hinton," --generativist [Jul 07](https://twitter.com/1416500532/status/1412898826914988038)
 
+```{r for-study}
+# 18. "p &lt; 0.001  extremely significantp &lt; 0.01    highly significantp &lt; 0.05   significantp &lt; 0.10    trending to significancep &lt; 0.20   horizon of significancep &lt; 0.50   coin flip of significancep &lt; 1         so you’re saying there’s a chance," --kdpsinghlab [Jul 07](https://twitter.com/75958753/status/1412879199501787140)
+tweet_embed("https://twitter.com/75958753/status/1412879199501787140")
+```
 
 ### For thought
 
 13. "A report found that by June 2021, 86% of Iceland's working population were working shorter weeks or had “new mechanisms made available to them through which they can negotiate shorter hours." #FourDayWeek. https://t.co/TVarMFZ24Z," --vmckeevercnbc [Jul 06](https://twitter.com/302836632/status/1412365993897234434)
 tweet_embed("https://twitter.com/302836632/status/1412365993897234434")
+16. ""Product teams work on a faster cadence. We don’t have time for perfect research. And that’s okay. We are trying to mitigate risk, not seek truth." - @ttorres. https://t.co/I8TqjjXuXw #prodmgmt #ux. https://t.co/loRXhJuCR2," --ttorres [Jul 07](https://twitter.com/2728761/status/1412854188380413956)
+23. "north america is in the midst of a worsening mega drought, increasing the probability that any of a number of events could lead to a black swan-like economic/social crisis... (1/n)," --friedberg [Jul 08](https://twitter.com/16359535/status/1413044148735672322)
+24. ""Testing a four-day workweek is about finding creative ways our team can use our time and energy as potently as possible [toward our mission] while also being more engaged and fulfilled by the work.”– Aziz Hasan, Kickstarter CEO. https://t.co/xRQ97uZ3CM," --kickstarter [Jul 08](https://twitter.com/16186995/status/1413137513581998092)
 
 
 
@@ -177,6 +203,11 @@ tweet_embed("https://twitter.com/302836632/status/1412365993897234434")
 
 
 ### Pretties
+
+
+21. "Good post! 👏 my Twitter timeline has filled up with a lot of these renders recently, expect we'll see a lot more art from neural nets.. https://t.co/rBqHiSEc2Z," --karpathy [Jul 08](https://twitter.com/33836629/status/1412976791451357196)
+22. "\@MortaraSara \@_useRconf \@ijeamaka_a \@thomasp85 \@W_R_Chase \@aschinchon for those who missed it, i wrote a short blog post about my contribution to the even. https://t.co/0NHJN1VMEn," --djnavarro [Jul 08](https://twitter.com/108899342/status/1413021272674508803)
+26. "See also: A comprehensive, interactive reference guide to data viz genres. https://t.co/h8Lp9VlzrB. https://t.co/vJX3zwCEwX," --presentcorrect [Jul 09](https://twitter.com/20228975/status/1413510719107174405)
 
 ```{r pretties, echo = FALSE}
 # 5. "Caroline Walker, Atrium,  Oil on linen, 200 x 260cm  2018. https://t.co/gsOuKIm7Dz," --rabihalameddine [Jul 05](https://twitter.com/267512876/status/1412068708755800067)
