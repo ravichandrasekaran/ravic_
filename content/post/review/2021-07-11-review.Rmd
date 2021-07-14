@@ -1,0 +1,253 @@
+---
+title: 'Week ending 2021-07-11'
+author: ravic
+date: '2021-07-11'
+slug: week-ending-2021-07-11
+categories: []
+tags:
+  - week-in-review
+params:
+  end_date: "2021-07-11"
+---
+
+```{r load-packages, include = FALSE}
+options(tidyverse.quiet = TRUE)
+library("tidyverse")
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+```
+```{r date-range, include= FALSE}
+library("lubridate")
+end_date = as.Date(params$end_date)
+start_date = end_date - 6
+```
+```{r get-twitter-favorites, include = FALSE, cache = TRUE}
+require("rtweet", quietly = TRUE, warn.conflicts = FALSE)
+
+rtweet::get_token()
+faves <- rtweet::get_favorites(user = "ravic_")
+```
+```{r list-tweets, include = FALSE, eval=FALSE}
+# More todos on handling the text: 
+# 1. Deal with internal quotes, smart quotes
+# 2. Remove media URL's, substitute link URL's
+# 3. Link to screen names, highlight text-internal screen names, maybe real names
+# 4. De-emoji, ftfy
+# 5. Shorten to single sentence?
+
+require("tweetrmd", quietly = TRUE, warn.conflicts = FALSE)
+require("glue", quietly = TRUE, warn.conflicts = FALSE)
+
+recent_faves <- faves %>%
+  select(user_id, status_id, created_at, screen_name, text) %>%
+  filter(between(as.Date(created_at), start_date, end_date)) %>%
+  mutate(url = tweetrmd::tweet_url(user_id, status_id),
+         create_date = as.character(created_at, "%b %d"),
+         text = str_replace_all(text, "[\r\n]" , ""),
+         screen_name = str_to_lower(screen_name),
+         text = str_replace_all(text, ".http", ". http")) 
+recent_faves %>% 
+  arrange(created_at) %>%  
+  mutate(idx = row_number(),
+         # command = glue('tweet_embed("{url}")'),
+         formatted = glue::glue('# {idx}. "{text}," --{screen_name} [{create_date}]({url})\ntweet_embed("{url}")\n\n')) %>%
+  pull(formatted) %>% 
+  purrr::walk(cat, sep="\n")
+```
+```{r kindle-highlights, eval=FALSE, include = FALSE}
+kh <- readr::read_csv("~/projects/kindle-highlights/output.csv",
+                      col_types = cols()) %>%
+  mutate(formatted = paste0("\n\n> ", content, "  \n", "-- ", author, ", ", title)) %>%
+  filter(between(as.Date(create_dt), end_date - 7, end_date)) 
+kh %>%
+  pull(formatted) %>%
+  purrr::walk(cat, sep = "\n")
+```
+
+<!--
+Harvest:
+1.  Chrome history
+2.  NYT
+3.  Netflix, Amazon Prime
+4.  Kindle highlights
+-->
+
+
+
+
+
+
+
+Week in review, `r start_date` - `r end_date`.
+
+<!--more--> 
+<script src="/rmarkdown-libs/twitter-widget/widgets.js"></script>
+
+
+```{r tweet-preview, echo = TRUE}
+
+```
+
+
+### Cooked
+
+1.  Chili Fish Curry, "S is for Sri Lanka". ★★★  
+    This could be a really good meal - the coconut + tomato + fish was really 
+    flavorful, and the timing on the steps was good. But replacing onion with
+    பெருங்காயம் was not a great move.
+2.  Lemon bars, "101 Cookies", Sarah Kieffer. ★★★★     
+    Nice, but the lemon could definitely be more pronounced.
+3.  Honey, Soy, and Ginger Braised Tofu, "East", Meera Sodha. ★★★★  
+    With some broccoli and rice. Lower the heat of the oil, double the sauce.
+4.  Rajasthani-Cucumber Sushi. 
+5.  Mango-Avocado Salad. ★★★
+    Good mango, but didn't need the balsamic. 
+6.  Vegetables in Spiced Coconut Milk. ★★★★  
+    Simple, yummy. Kind of like a Keralite avial
+7.  Lime dhal. ★★★  
+    Water and simmer/cook time is still off. Trying the tadka without the onion
+    is a poor choice.
+8.  Curry leaf popcorn chicken, Nik Sharma. ★★★★★
+9.  Doriyaki pancakes with blueberry crema, Meena Sodha, East. ★★★  
+    The cream filling was good, but the doriyaki recipe was way off. Need flour
+    measurements in weights at least.
+10. Ricotta-lemon pasta.
+
+    
+### Seen
+
+1.  Haikyu!!. ★★★  
+    Need to find another good competition manga after this is done.
+2.  Edge of Tomorrow. ★★★★  
+    Emily Blunt + Tom Cruise somehow works. Re-watch, and still holds up. End 
+    is still weirdly resolved.
+
+
+### Listened
+
+2.  **"Why Do We Work So Damn Much?"**, Ezra Klein Show with [James Suzman](https://www.nytimes.com/2021/06/29/opinion/ezra-klein-podcast-james-suzman.html)
+3.  useR conference session. From Sevvandi Kandanaarachchi (Hyndman lab at Monash) 
+    had `{dobit}` and `{lookout}` for 
+    anomaly detection, both of which looked really interesting -- especially the
+    idea of dimensionality reduction preserving the outliers, rather than minimizing
+    the variance. The `{maars}` package (Riccardo Fogliato, Shamindra Shrotriya, 
+    out of the Kuchibhotla lab in CMU) also looked good for linear regression 
+    with violations of assumptions, replacing things like `{sandwich}` with an
+    integrated design.
+
+### Read
+[grant-revisit]: https://www.nytimes.com/2021/07/10/opinion/sunday/covid-group-emotions-happiness.html
+[grant-languish]: https://www.nytimes.com/2021/04/19/well/mind/covid-mental-health-languishing.html
+[blum-flourish]: https://www.nytimes.com/2021/05/04/well/mind/flourishing-languishing.html
+1.  Adam Grant, [revisiting][grant-revisit] [languishing][grant-languish].  
+    Curious about this "collective effervescence" idea from Émile Durkheim. The 
+    antidote supplied by [Dani Blum][blum-flourish] is almost too simple.
+
+
+
+
+### Quotes
+<!--# 15. "@TheRaDR “Once is happenstance. Twice is coincidence. The third time it’s enemy action.”     - Auric Goldfinger," --egalitare [Jul 06](https://twitter.com/3277614776/status/1412538086492409857) -->
+
+> "Once is happenstance. Twice is coincidence. The third time it’s enemy action"  
+  --Auric Goldfinger, via @egalitare [Jul 06](https://twitter.com/3277614776/status/1412538086492409857)
+
+> Conservatism consists of exactly one proposition, to wit: There must be in-groups whom the law protects but does not bind, alongside out-groups whom the law binds but does not protect.  
+  -- [Frank Wilhoit][https://crookedtimber.org/2018/03/21/liberals-against-progressives/]
+
+```{r quotes, echo = FALSE}
+# 8. "A calendar speaks more truth than a to-do list.," --shreyas [Jul 05](https://twitter.com/2048741/status/1412094069921046528)
+tweet_embed("https://twitter.com/2048741/status/1412094069921046528")
+```
+
+### Upcoming
+29. "Re-upping this Books &amp; Map Kickstarter of trekking in Iceland's Westfjords because, selfishly, I want to see this brought to life:. https://t.co/RIbRAC38EpEncapsulates a decade of experience working with the local community, and a love of the mountains. cc @Al_Humphreys," --janchip [Jul 10](https://twitter.com/14491008/status/1413662929572950016)
+
+
+
+### To read
+
+1. "With The Culture Map Meyer masterfully condensed the broad cross cultural communication research, as well as adding some of her own—demonstrating her ability to ably curate, synthesise, and communicate to a mass audience.," --janchip [Jul 05](https://twitter.com/14491008/status/1411885246295928844)
+2. "The main case that inspired me to write my 2015 book How Propaganda Works was the panic about violent crime in the 90s, which was inflamed by media and politicians throughout that decade even though crime was rapidly dropping throughout the decade.," --jasonintrator [Jul 05](https://twitter.com/1726682706/status/1411918801432727554)
+3. "I just received my gorgeous physical copy of "Mapping Affinities", a marvelous book that goes from the history of data visualization to new legible modes of mapping organizational structures.Congratulations, @dariorodighiero!. https://t.co/AUsVVu5n0X," --scott_bot [Jul 05](https://twitter.com/15762276/status/1412011667479744513)
+tweet_embed("https://twitter.com/15762276/status/1412011667479744513")
+4. "Also, New Dawn by Michael Dawson.. https://t.co/74K5HxGk3Z," --jaejaeykim2 [Jul 05](https://twitter.com/968294068559097856/status/1412036741096120327)
+27. "New publication! Our experimental Theatre in Pandemic syllabus, co-created with my fab @cmudrama colleague Nica Ross.What kinds of structures of participation are most generative for making live art and storytelling together online. https://t.co/fhyzn96d5V #design #improv #larp," --futuryst [Jul 09](https://twitter.com/12331792/status/1413515291498139649)
+tweet_embed("https://twitter.com/12331792/status/1413515291498139649")
+25. "We're very excited to see forthcoming books from Claire Vaye Watkins, @colsonwhitehead, and @rabihalameddine among so many great looking titles on @lithub's most anticipated list for the second half of 2021.💗. https://t.co/GE9HJ4PwWx," --aragiauthors [Jul 08](https://twitter.com/256073990/status/1413215700408311810)
+
+
+<!-- ### To listen -->
+
+
+
+### For study
+7. "Draft of "Spatial Data Science" book by @edzerpebesma and R. Bivand is here:. https://t.co/tKjt4yXimh @_useRconf #useR2021," --sheilasaia [Jul 05](https://twitter.com/2907277769/status/1412083601026519042)
+11. "Unfortunately it is hard to test whether the MCMC has converged to a stationary distribution. However, it is possible to prove that a map is an outlier (i.e. has been gerrymandered) from a MCMC **without mixing**. https://t.co/lF9CWXBx14," --womeninstat [Jul 05](https://twitter.com/1217315090/status/1412137661352103939)
+12. "The rise and fall of the OLAP cub. https://t.co/jYtEeWFkXe," --datascifact [Jul 05](https://twitter.com/220139885/status/1412150866128293893)
+14. "Because this keeps coming up here's a short thread on why tools that claim to seamlessly fit discrete parameters are not the boons that you might think they are.," --betanalpha [Jul 06](https://twitter.com/78196808/status/1412488546351562762)
+32. "Speaking as a black statistician, I don't think we can completely eliminate using race in medical decisions if we want to make the best decisions for each patient given our current state of technology. Gene testing for specific ancestry would be better but we aren't there yet.," --kareem_carr [Jul 10](https://twitter.com/1558283664/status/1413891054571507723)
+33. "See slides for that winning #user2021 lightning talk here. https://t.co/ovhTYyJVAF  and the useful collection of #rstats #gis tutorials and resources here. https://t.co/3JaC5bgolj. https://t.co/AKzAIHeyQO," --sharon000 [Jul 11](https://twitter.com/10915042/status/1414221860024340486)
+
+```{r for-study, echo = FALSE}
+# 18. "p &lt; 0.001  extremely significantp &lt; 0.01    highly significantp &lt; 0.05   significantp &lt; 0.10    trending to significancep &lt; 0.20   horizon of significancep &lt; 0.50   coin flip of significancep &lt; 1         so you’re saying there’s a chance," --kdpsinghlab [Jul 07](https://twitter.com/75958753/status/1412879199501787140)
+tweet_embed("https://twitter.com/75958753/status/1412879199501787140")
+
+# 19. ""To deal with hyper-planes in a 14-dimensional space, visualize a 3-D space and say 'fourteen' to yourself very loudly. Everyone does it."-- Geoff Hinton," --generativist [Jul 07](https://twitter.com/1416500532/status/1412898826914988038)
+tweet_embed("https://twitter.com/1416500532/status/1412898826914988038")
+
+```
+
+### For thought
+
+16. ""Product teams work on a faster cadence. We don’t have time for perfect research. And that’s okay. We are trying to mitigate risk, not seek truth." - @ttorres. https://t.co/I8TqjjXuXw #prodmgmt #ux. https://t.co/loRXhJuCR2," --ttorres [Jul 07](https://twitter.com/2728761/status/1412854188380413956)
+23. "north america is in the midst of a worsening mega drought, increasing the probability that any of a number of events could lead to a black swan-like economic/social crisis... (1/n)," --friedberg [Jul 08](https://twitter.com/16359535/status/1413044148735672322)
+13. "A report found that by June 2021, 86% of Iceland's working population were working shorter weeks or had “new mechanisms made available to them through which they can negotiate shorter hours." #FourDayWeek. https://t.co/TVarMFZ24Z," --vmckeevercnbc [Jul 06](https://twitter.com/302836632/status/1412365993897234434)
+24. ""Testing a four-day workweek is about finding creative ways our team can use our time and energy as potently as possible [toward our mission] while also being more engaged and fulfilled by the work.”– Aziz Hasan, Kickstarter CEO. https://t.co/xRQ97uZ3CM," --kickstarter [Jul 08](https://twitter.com/16186995/status/1413137513581998092)
+28. "New publication! Our experimental Theatre in Pandemic syllabus, co-created with my fab @cmudrama colleague Nica Ross.What kinds of structures of participation are most generative for making live art and storytelling together online. https://t.co/fhyzn96d5V #design #improv #larp," --futuryst [Jul 09](https://twitter.com/12331792/status/1413515291498139649)
+
+
+
+
+
+
+
+<!--### Project seeds, courses -->
+
+
+
+<!--### To watch-->
+
+
+
+
+### Pretties
+
+
+21. "Good post! 👏 my Twitter timeline has filled up with a lot of these renders recently, expect we'll see a lot more art from neural nets.. https://t.co/rBqHiSEc2Z," --karpathy [Jul 08](https://twitter.com/33836629/status/1412976791451357196)
+22. "\@MortaraSara \@_useRconf \@ijeamaka_a \@thomasp85 \@W_R_Chase \@aschinchon for those who missed it, i wrote a short blog post about my contribution to the even. https://t.co/0NHJN1VMEn," --djnavarro [Jul 08](https://twitter.com/108899342/status/1413021272674508803)
+26. "See also: A comprehensive, interactive reference guide to data viz genres. https://t.co/h8Lp9VlzrB. https://t.co/vJX3zwCEwX," --presentcorrect [Jul 09](https://twitter.com/20228975/status/1413510719107174405)
+27. https://everest-pipkin.com/#games/ground.html
+
+```{r pretties, echo = FALSE}
+# 5. "Caroline Walker, Atrium,  Oil on linen, 200 x 260cm  2018. https://t.co/gsOuKIm7Dz," --rabihalameddine [Jul 05](https://twitter.com/267512876/status/1412068708755800067)
+tweet_embed("https://twitter.com/267512876/status/1412068708755800067")
+
+# 9. "Why people describe warm colors more efficiently than cool ones—across 110 languages! Nice research on color terms, with elegant visualizations and a new use for a classic ML data set.Paper:. https://t.co/nA91mVS8aiSummary:. https://t.co/qzLf0G9B2Y  (h/t @timhwang &amp; @emollick). https://t.co/GlPsjP0Gmx," --wattenberg [Jul 05](https://twitter.com/15463062/status/1412097860833849348)
+tweet_embed("https://twitter.com/15463062/status/1412097860833849348")
+
+# 10. ""With every new birder comes a new observer, one whose eyes and ears are aimed toward that which is small and fragile and alive."I wrote about birding's post-pandemic boom, and how cities might benefit from this new generation of noticers. https://t.co/klsaniwBqT," --blprnt [Jul 05](https://twitter.com/17013577/status/1412121880853630981)
+tweet_embed("https://twitter.com/17013577/status/1412121880853630981")
+
+# 31. "#Hyperbolic #tiling shown in the inverted Poincaré disk projection. Snub {8,3}.. https://t.co/f9gtKv6ETF. https://t.co/fDE9dnmn2E," --tilingbot [Jul 10](https://twitter.com/982493449286029312/status/1413679402127396867)
+tweet_embed("https://twitter.com/982493449286029312/status/1413679402127396867")
+```
+
+
+<!-- ### Absurdities -->
+
+```{r absurd, echo = FALSE}
+```
+
+<!--### Poem-->
+
+
